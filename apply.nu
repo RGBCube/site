@@ -27,7 +27,7 @@ def main [] {
 
   cd _site
 
-  for host in [cube, disk] {
+  for host in [best, disk] {
     ssh -qtt $host "sudo nu -c '
       mkdir /var/www
       chown nginx:users -R /var/www
