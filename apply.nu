@@ -2,7 +2,6 @@
 
 def --wrapped sync [...arguments] {
   (rsync
-    --rsh "ssh -q"
     --compress
     --delete --recursive --force
     --delete-excluded
@@ -27,21 +26,18 @@ def main [] {
 
   cd _site
 
-  {
-    let host = "best";
+  let host = "root@best";
 
-    ssh -qtt $host "sudo nu -c '
-      mkdir /var/www
-      chown nginx:users -R /var/www
-      chmod 775 -R /var/www
-    '"
-    sync --chown nginx:users ./ ($host + ":/var/www/site")
+  ssh -qtt $host "
+    rm --force --recursive /var/www/site
+    mkdir /var/www/site
+  "
+  sync --chown nginx:users ./ ($host + ":/var/www/site")
 
-    ssh -qtt $host "sudo nu -c '
-      chown nginx:users -R /var/www
-      chmod 775 -R /var/www
-    '"
-  }
+  ssh -qtt $host "
+    chown nginx:users -R /var/www
+    chmod 775 -R /var/www
+  "
 
   cd -
 
