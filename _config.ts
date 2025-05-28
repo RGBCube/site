@@ -9,12 +9,15 @@ import sitemap from "lume/plugins/sitemap.ts";
 
 const site = lume({
   src: "./site",
+
+  server: {
+    debugBar: false,
+  },
 });
 
-site.use(codeHighlight());
-site.use(esbuild());
+site.add(".");
+
 site.use(jsx());
-site.use(minifyHTML());
 
 site.process([".html"], (pages) => {
   pages.forEach((page) => {
@@ -30,7 +33,7 @@ site.process([".html"], (pages) => {
       div.appendChild(table);
     });
 
-    document.querySelectorAll(".hljs").forEach((code) => {
+    document.querySelectorAll("pre code").forEach((code) => {
       const pre = code.parentElement!;
       const div = document.createElement("div");
 
@@ -66,10 +69,14 @@ site.use(feed({
 }));
 
 site.use(sitemap({
-  // @ts-ignore: We don't want lastmods.
-  lastmod: null,
+  items: {
+    // @ts-ignore: We don't want lastmods.
+    lastmod: null,
+  },
 }));
 
-site.copyRemainingFiles();
+site.use(esbuild());
+site.use(codeHighlight());
+site.use(minifyHTML());
 
 export default site;

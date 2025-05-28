@@ -156,7 +156,7 @@ const handleMove = (event: MouseEvent) => {
 
   const newMouse = new Vec3(event.clientX, event.clientY, 0);
 
-  const timeDelta = (window.performance.now() - mouse.lastMove) / 1000;
+  const timeDelta = (globalThis.performance.now() - mouse.lastMove) / 1000;
 
   if (timeDelta > 0.1) {
     // This is a fresh scroll.
@@ -166,7 +166,7 @@ const handleMove = (event: MouseEvent) => {
   const delta = Vec3.sub(newMouse, mouse.previous);
 
   mouse.previous = newMouse;
-  mouse.lastMove = window.performance.now();
+  mouse.lastMove = globalThis.performance.now();
 
   const axis = new Vec3(-delta.y, delta.x, 0)
     .normalize()
@@ -221,7 +221,7 @@ const updateFrame = (timestamp: number) => {
       velocity.z = 0;
     }
 
-    if (window.performance.now() - mouse.lastMove > 10000) {
+    if (globalThis.performance.now() - mouse.lastMove > 10000) {
       const impulse = new Vec3(0.7, 0.7, -0.7);
       velocity = Vec3.sum(impulse.scale(effectiveDelta * 3), velocity);
     }

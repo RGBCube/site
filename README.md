@@ -15,9 +15,11 @@ and the site contents will be under the `_site/` directory.
 ## License
 
 All the human writing (non-HTML and not templating related) under the `site/`
-directory is licensed under [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/).
+directory is licensed under
+[CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/).
 
-The other HTML and templating code is licensed under the GPU General Public License (`LICENSE_GPL.md`):
+The other HTML and templating code is licensed under the GPU General Public
+License (`LICENSE_GPL.md`):
 
 ```
 Copyright (C) 2023-present  RGBCube
