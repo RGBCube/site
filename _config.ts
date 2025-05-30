@@ -77,6 +77,11 @@ site.use(sitemap({
 
 site.use(esbuild());
 site.use(codeHighlight());
-site.use(minifyHTML());
+site.use(minifyHTML({
+  options: {
+    minify_css: true,
+    minify_js: true,
+  },
+}));
 
 export default site;
