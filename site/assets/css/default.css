@@ -193,12 +193,10 @@
     @apply border-black dark:border-white;
   }
 
-  pre:has(> code) {
-    @apply px-3 py-2;
-  }
-
   div:has(> pre code) {
-    @apply border-2 border-black dark:border-white;
+    @apply outline-1 outline-dotted outline-offset-1 outline-[#444] border-1
+      border-black p-2 bg-[#eee] dark:outline-[#bbb] dark:border-white
+      dark:bg-[#111];
   }
 
   li {
@@ -222,8 +220,8 @@
   }
 
   blockquote {
-    @apply border-l-2 pl-4 py-2 border-black bg-[#eee] dark:border-white
-      dark:bg-[#222];
+    @apply border-1 p-2 bg-[#eee] shadow-[4px_4px_#444] dark:border-white
+      dark:bg-[#111] dark:shadow-[4px_4px_#bbb];
   }
 
   .hljs-attr {
