@@ -14,7 +14,7 @@ def main [] {
   if (pwd | str starts-with "/data/data/com.termux") {
     sync ./ nine:site
 
-    ssh -qtt nine "
+    ssh -tt nine "
       cd site
       LUME_DRAFTS=false nix run default#deno -- task build --location https://rgbcu.be/
     "
@@ -28,13 +28,13 @@ def main [] {
 
   let host = "root@best";
 
-  ssh -qtt $host "
+  ssh -tt $host "
     rm --force --recursive /var/www/site
     mkdir /var/www/site
   "
   sync --chown nginx:users ./ ($host + ":/var/www/site")
 
-  ssh -qtt $host "
+  ssh -tt $host "
     chown nginx:users -R /var/www
     chmod 775 -R /var/www
   "

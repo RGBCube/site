@@ -1,0 +1,259 @@
+<style>
+  :root {
+    --cube-width: 5rem;
+  }
+
+  html {
+    font-size: min(9vw, 9vh, 4.5rem);
+  }
+
+  /* Guess what? Yeah, you guessed right. Safari can't render shit. */
+  .cube-face-front  { transform: rotateY(0deg)                  translateZ(calc(var(--cube-width) / 2 - 1px)); }
+  .cube-face-top    { transform: rotateX( 89.99999999999999deg) translateZ(calc(var(--cube-width) / 2 - 1px)); }
+  .cube-face-back   { transform: rotateY(180deg)                translateZ(calc(var(--cube-width) / 2 - 1px)); }
+  .cube-face-bottom { transform: rotateX(-89.99999999999999deg) translateZ(calc(var(--cube-width) / 2 - 1px)); }
+  .cube-face-right  { transform: rotateY( 89.99999999999999deg) translateZ(calc(var(--cube-width) / 2 - 1px)); }
+  .cube-face-left   { transform: rotateY(-89.99999999999999deg) translateZ(calc(var(--cube-width) / 2 - 1px)); }
+</style>
+
+<cube-scene class="
+  h-dvh w-dvw
+  overscroll-none
+  flex items-center justify-center
+  perspective-[calc(var(--cube-width)*3)]
+">
+  <cube-itself class="
+    size-(--cube-width)
+    transform-3d transform-[translateZ(-calc(var(--cube-width)/2-1px))]
+  ">
+    {{> const style = `
+      size-(--cube-width) absolute
+      flex items-center justify-center
+    ` }}
+    <cube-face draggable="false" class="{{ style }} cube-face-front">  {{ cube_face_front }}  </cube-face>
+    <cube-face draggable="false" class="{{ style }} cube-face-back">   {{ cube_face_back }}   </cube-face>
+    <cube-face draggable="false" class="{{ style }} cube-face-left">   {{ cube_face_left }}   </cube-face>
+    <cube-face draggable="false" class="{{ style }} cube-face-right">  {{ cube_face_right }}  </cube-face>
+    <cube-face draggable="false" class="{{ style }} cube-face-top">    {{ cube_face_top }}    </cube-face>
+    <cube-face draggable="false" class="{{ style }} cube-face-bottom"> {{ cube_face_bottom }} </cube-face>
+  </cube-itself>
+</cube-scene>
+
+<script>
+  "use strict";
+
+  const Vec = (x, y, z) => ({
+    x,
+    y,
+    z,
+
+    length() {
+      return Math.sqrt(this.x ** 2 + this.y ** 2 + this.z ** 2);
+    },
+
+    scale(factor) {
+      return Vec(
+        this.x * factor,
+        this.y * factor,
+        this.z * factor,
+      );
+    },
+
+    normalize() {
+      let length = this.length();
+      length = length == 0 ? 1 : length;
+
+      return Vec(
+        this.x / length,
+        this.y / length,
+        this.z / length,
+      );
+    },
+  });
+
+  Vec.ZERO = Vec(0, 0, 0);
+
+  Vec.sum = (a, b) => Vec(
+    a.x + b.x,
+    a.y + b.y,
+    a.z + b.z,
+  );
+
+  Vec.sub = (a, b) => Vec(
+    a.x - b.x,
+    a.y - b.y,
+    a.z - b.z,
+  );
+
+  const Quat = (x, y, z, w) => ({
+    x,
+    y,
+    z,
+    w,
+  });
+
+  Quat.fromAxis = (axis) => {
+    const angle = axis.length();
+
+    axis = axis.normalize();
+
+    const half = angle / 2;
+
+    const sinHalf = Math.sin(half);
+    const cosHalf = Math.cos(half);
+
+    const x = axis.x * sinHalf;
+    const y = axis.y * sinHalf;
+    const z = axis.z * sinHalf;
+    const w = cosHalf;
+
+    return Quat(x, y, z, w);
+  };
+
+  Quat.mul = (a, b) => Quat(
+    a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y,
+    a.w * b.y - a.x * b.z + a.y * b.w + a.z * b.x,
+    a.w * b.z + a.x * b.y - a.y * b.x + a.z * b.w,
+    a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z,
+  );
+
+  const friction = 3;
+  const sensitivity = 0.01;
+
+  // One minute.
+  const screensaverTimeoutMs = 1 * 60 * 1000;
+
+  const mouse = {
+    down: false,
+    lastMove: -screensaverTimeoutMs,
+    previous: Vec.ZERO,
+  };
+
+  const orient = {
+    element: document.querySelector("cube-itself"),
+    quat: Quat(0, 0, 0, 1),
+
+    set(q) {
+      this.quat = q;
+
+      this.element.style.transform =
+        `rotate3d(${q.x}, ${q.y}, ${q.z}, ${Math.acos(q.w) * 2}rad)`;
+    },
+
+    get() {
+      return this.quat;
+    },
+  };
+
+  let velocity = Vec.ZERO;
+  let impulseThisFrame = Vec.ZERO;
+
+  const handleUp = () => {
+    mouse.down = false;
+  };
+
+  document.addEventListener("mouseup", handleUp);
+  document.addEventListener("touchend", handleUp);
+
+  const handleDown = (event) => {
+    mouse.down = true;
+
+    velocity = Vec.ZERO;
+  };
+
+  document.addEventListener("mousedown", handleDown);
+  document.addEventListener("touchstart", handleDown);
+
+  const handleMove = (event) => {
+    // Disables scrolling.
+    event.preventDefault();
+
+    if (!mouse.down) return;
+
+    const newMouse = Vec(event.clientX, event.clientY, 0);
+
+    const timeDelta = (globalThis.performance.now() - mouse.lastMove) / 1000;
+
+    if (timeDelta > 0.1) {
+      // This is a fresh scroll.
+      mouse.previous = newMouse;
+    }
+
+    const delta = Vec.sub(newMouse, mouse.previous);
+
+    mouse.previous = newMouse;
+    mouse.lastMove = globalThis.performance.now();
+
+    const axis = Vec(-delta.y, delta.x, 0)
+      .normalize()
+      .scale(delta.length() * sensitivity);
+
+    impulseThisFrame = Vec.sum(impulseThisFrame, axis);
+
+    const rotation = Quat.fromAxis(axis);
+
+    orient.set(Quat.mul(rotation, orient.get()));
+  };
+
+  document.addEventListener("mousemove", handleMove);
+  document.addEventListener("touchmove", (event) => {
+    const delta = event.changedTouches[0];
+
+    event.clientX = delta.clientX;
+    event.clientY = delta.clientY;
+
+    handleMove(event);
+  });
+
+  let lastUpdate = 0;
+
+  const updateFrame = (timestamp) => {
+    if (lastUpdate == 0) lastUpdate = timestamp;
+
+    const delta = (timestamp - lastUpdate) / 1000;
+    lastUpdate = timestamp;
+
+    if (mouse.down) {
+      velocity = impulseThisFrame.scale(1 / delta);
+      impulseThisFrame = Vec.ZERO;
+
+      requestAnimationFrame(updateFrame);
+      return;
+    }
+
+    const decay = Math.exp(-delta * friction);
+
+    const effectiveDelta = friction > 0 ? (1 - decay) / friction : delta;
+
+    let theta = effectiveDelta * velocity.length();
+
+    velocity.x *= decay;
+    velocity.y *= decay;
+    velocity.z *= decay;
+
+    if (friction > 0 && velocity.length() < 0.00001) {
+      theta += velocity.length() / friction;
+
+      velocity.x = 0;
+      velocity.y = 0;
+      velocity.z = 0;
+    }
+
+    if (globalThis.performance.now() - mouse.lastMove > screensaverTimeoutMs) {
+      const impulse = Vec(0.7, 0.7, -0.7);
+      velocity = Vec.sum(impulse.scale(effectiveDelta * 3), velocity);
+    }
+
+    const axis = Vec(velocity.x, velocity.y, velocity.z)
+      .normalize()
+      .scale(theta);
+
+    const rotation = Quat.fromAxis(axis);
+
+    orient.set(Quat.mul(rotation, orient.get()));
+
+    requestAnimationFrame(updateFrame);
+  };
+
+  updateFrame(0);
+</script>

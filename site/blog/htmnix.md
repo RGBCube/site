@@ -4,7 +4,7 @@ description: How the absolutely cursed HTMNIX project works.
 
 date: 2024-03-04
 
-tags:
+keywords:
 - html
 - nix
 ---
@@ -26,9 +26,6 @@ snippet that uses it:
 <.html>
 ```
 
-> (hightlight.js shits the bed while highlighting this abomination - just ignore
-> it)
-
 You are probably thinking furiously right now, maybe you've noticed something:
 
 > Aha! In Nix, `<foo>` is used to find stuff from the Nix path like so:
@@ -45,8 +42,8 @@ You are somewhat correct. But not quite.
 Nix `<foo>` expressions actually boil down to a call of the builtin
 `__findFile`, like so:
 
-```shell
-❯ nix-instantiate --parse --expr "<foo>"
+```nix
+# nix-instantiate --parse --expr "<foo>"
 
 (__findFile __nixPath "foo")
 ```

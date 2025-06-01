@@ -1,0 +1,63 @@
+---
+layout: null
+---
+
+<head>
+  <!-- CHARSET -->
+  <meta charset="UTF-8">
+
+  <!-- VIEWPORT -->
+  <meta name="viewport" content="width=device-width,initial-scale=1.0{{ if prevent_zoom }},maximum-scale=1.0,user-scalable=0{{ /if }}">
+
+  <!-- NUKE DARKREADER -->
+  <meta name="darkreader-lock">
+
+  <!-- META -->
+  {{ if title }}       <title>{{ title }}</title>                                   {{ /if }}
+  {{ if description }} <meta name="description" content="{{ description }}">        {{ /if }}
+  {{ if author }}      <meta name="author"      content="{{ author }}">             {{ /if }}
+  {{ if keywords }}    <meta name="keywords"    content="{{ keywords.join(",") }}"> {{ /if }}
+
+  <!-- FANCY -->
+  <link rel="icon" href="/assets/icons/icon.gif">
+  <meta name="theme-color" content="{{ color }}">
+ 
+  <!-- ALTERNATIVE FORMATS -->
+  <link rel="alternate" type="application/rss+xml"   href="/blog.rss">
+  <link rel="alternate" type="application/feed+json" href="/blog.json">
+
+  <!-- CANONICAL URL -->
+  <link rel="canonical" href="{{ url |> url(true) }}">
+
+  <!-- OPENGRAPH CONTAINMENT ZONE -->
+  {{ if title }}      <meta property="og:title" name="title" content="{{ title }}">       {{ /if }}
+  {{ if description}} <meta property="og:description"        content="{{ description }}"> {{ /if }}
+  <meta property="og:type"      content="{{ type ?? "website" }}">
+  <meta property="og:locale"    content="en_US">
+  <meta property="og:site_name" content="{{ site_name }}">
+  <meta property="og:url"       content="{{ url |> url(true) }}">
+  {{ if thumbnail }}
+    <meta property="og:image" name="image" content="{{ thumbnail |> url(true) }}">
+  {{ else }}
+    <meta property="og:image" name="image" content="{{ "/assets/icons/icon.webp" |> url(true) }}">
+  {{ /if }}
+
+  <!-- TWITTER CONTAINMENT ZONE -->
+  {{ if title }} <meta name="twitter:title" content="{{ title }}"> {{ /if }}
+  <meta name="twitter:creator" content="HSVSphere">
+  {{ if thumbnail }}
+    <meta name="twitter:card"  content="summary_large_image">
+    <meta name="twitter:image" content="{{ thumbnail |> url(true) }}">
+  {{ else }}
+    <meta name="twitter:card"  content="summary">
+    <meta name="twitter:image" content="{{ "/assets/icons/icon.webp" |> url(true) }}">
+  {{ /if }}
+
+  <!-- STYLES -->
+  <link href="/assets/css/fonts.css" rel="stylesheet" inline>
+  <link href="/assets/css/default.css" rel="stylesheet" inline>
+</head>
+
+<body class="bg-white text-black dark:bg-black dark:text-white">
+  {{ content }}
+</body>

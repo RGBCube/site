@@ -5,13 +5,13 @@ description: And revealing how cursed Nix is.
 date: 2024-04-15
 draft: true
 
-tags:
+keywords:
 - nix
 ---
 
 I was surfing the web a few weeks ago, and I came across this iceberg chart:
 
-![The Nix Iceberg](/assets/nix-iceberg.webp)
+![The Nix Iceberg](/assets/images/nix-iceberg.webp)
 
 [Here's the original source for this image,
 created by @leftpaddotpy, @puckipedia,
@@ -262,7 +262,7 @@ allows flakes to be configured in "flake compile time". Let's say you have a
 flake that provides a binary. Let's also assume you can run it with the
 following Nix CLI invokation:
 
-```shell
+```sh
 nix run github:me/hello-world
 ```
 
@@ -292,7 +292,7 @@ is an ugly hack. You can do this in your flake:
 
 And override the `debug-mode` input like so, to run a debug binary instead:
 
-```shell
+```sh
 nix run github:me/hello-world --override debug-mode github:boolean-option/true
 ```
 
@@ -502,7 +502,7 @@ This syntax is a way to check for the existence of a key in an attribute set.
 
 <h2>
 
-```shell
+```sh
 #!/usr/bin/env nix-shell
 #!nix-shell -i python3 -p python3
 ```
@@ -515,7 +515,7 @@ You can use nix-shell as a script interpreter to allow scripts written in
 arbitrary languages to obtain their own dependencies via Nix. This is done by
 starting the script with the following lines:
 
-```shell
+```sh
 #!/usr/bin/env nix-shell
 #!nix-shell -i real-interpreter --packages packages
 ```

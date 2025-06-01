@@ -1,20 +1,20 @@
 # RGBCube's Homepage
 
-The official website and link portal of RGBCube and his work.
+The home directory and journal of RGBCube and his work.
 
 ## Building
 
 To build the site, you will need deno, simply run this command:
 
-```
+```sh
 deno task build
 ```
 
-and the site contents will be under the `_site/` directory.
+and the site contents will be under the `_site` directory.
 
 ## License
 
-All the human writing (non-HTML and not templating related) under the `site/`
+All the human writing (non-HTML and not templating related) under the `site`
 directory is licensed under
 [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/).
 
@@ -22,7 +22,7 @@ The other HTML and templating code is licensed under the GPU General Public
 License (`LICENSE_GPL.md`):
 
 ```
-Copyright (C) 2023-present  RGBCube
+Copyright (C) 2023-present RGBCube
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

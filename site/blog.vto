@@ -1,21 +1,20 @@
 ---
 layout: text.vto
-
-title: Blog
+title: about:blog
 ---
 
-<h1>Blog Articles</h1>
+<h1>Blog Articles
+<a class="-translate-y-4 text-sm font-[ecrou] pt-1 -ml-2" href="/blog.rss">rss</a>
+<a class="-translate-y-4 text-sm font-[ecrou] pt-1 -ml-3" href="/blog.json">json</a>
+</h1>
 
-Are you old? Then you might want to check out my super cool
-<a href="/blog.rss">RSS Feed</a> too!
+<p>Here is where I dump all my schizophenic and sometimes coherent ramblings. Take a look!</p>
 
 <ul>
   {{ for article of search.pages("type=article", "order=asc date=desc")}}
   <li>
-    <p>
-      <a href="{{ article.url }}">{{ article.date.toISOString().slice(0, 10) }}</a>:
-      {{ article.title }}
-    </p>
+    <code><a href="{{ article.url }}">{{ article.date.toISOString().slice(0, 10) }}</a></code>
+    <div class="inline-block">{{ article.title |> md }}</div>
   </li>
   {{ /for }}
 </ul>

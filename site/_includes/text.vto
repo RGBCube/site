@@ -1,196 +1,47 @@
 ---
-layout: base.vto
+layout: default.vto
 ---
 
-<style>
-  /* Centering */
-  html,
-  body {
-    display: flex;
-    justify-content: center;
-  }
+<div class="flex justify-center">
+<div class="block text-xl w-[min(100vw,50rem)]">
 
-  .centered {
-    font-size: large;
+<nav class="
+  transform-[rotateX(180deg)]
+  text-black text-2xl font-bold
+  absolute w-[inherit] z-999
+  overflow-x-auto
+">
+  <div class="transform-[rotateX(180deg)] flex items-start justify-evenly">
+    {{> const style = `
+      flex-auto text-center px-3 pt-3 pb-2
+      bg-white font-[ecrou] border-2 border-black
+      origin-bottom
+      md:hover:text-[300%] ease-[cubic-bezier(1,-0.07,0.57,1.56)] md:duration-200
 
-    display: initial;
-    width: min(100vw - 2rem, 50rem);
-  }
+      md:hover:not-active:after:content-['?']
+      md:active:after:content-['!!'] active:after:italic
 
-  /* Make wrapping pretty */
-  h1,
-  h2,
-  h3,
-  h4 {
-    text-wrap: balance;
-  }
+      nuclear
+    ` }}
+    <style>.right-delete:has(+ *:hover) { border-right-width: 0; }</style>
+    <a class="nav-link {{ style }} right-delete" href="/">home</a>
+    <a class="nav-link {{ style }} right-delete not-hover:border-l-0" href="/about/">about</a>
+    <a class="nav-link {{ style }} right-delete not-hover:border-l-0" href="/blog/">blog</a>
+    <a class="nav-link {{ style }}              not-hover:border-l-0" href="/contact/">contact</a>
+  </div>
+</nav>
 
-  p {
-    text-wrap: pretty;
-  }
-
-  /* Rotate nav, tables and codeblocks so the scrollbar is at the top */
-  .rotated {
-    transform: rotateX(180deg);
-  }
-
-  /* Make tables and other elements scroll horizontally */
-  .overflow {
-    overflow-x: auto;
-  }
-
-  /* Style nav */
-  nav {
-    font-size: larger;
-    word-break: normal;
-
-    overflow-wrap: normal;
-    overflow-x: auto;
-
-    background-color: white;
-    padding: 0.3rem 0.6rem;
-
-    /* Rotated 180deg so it's top instead of bottom. */
-    border-top-left-radius: 1rem;
-    border-top-right-radius: 1rem;
-  }
-
-  @media (prefers-color-scheme: light) {
-    nav {
-      border: 0.15rem solid black;
-      border-bottom-width: 0;
-    }
-  }
-
-  nav a {
-    color: black;
-    font-weight: bold;
-    margin-right: 0.6rem;
-  }
-
-  /* Make images fit */
-  p:has(img) {
-    display: flex;
-    justify-content: center;
-  }
-
-  img {
-    max-width: 100%;
-    height: auto;
-  }
-
-  /* Style content */
-  .content {
-    overflow-wrap: break-word;
-  }
-
-  a {
-    color: var(--link);
-  }
-
-  a:hover {
-    font-style: italic;
-  }
-
-  blockquote {
-    border-left: 0.15rem solid var(--foreground);
-
-    padding: 0.05rem 1rem;
-    margin: 1.3rem 1rem;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    blockquote {
-      background-color: #222;
-    }
-  }
-
-  @media (prefers-color-scheme: light) {
-    blockquote {
-      background-color: #EEE;
-    }
-  }
-
-  /* Style tables */
-  table {
-    border-collapse: collapse;
-    white-space: nowrap;
-  }
-
-  /* Doesn't seem to work with the scrolling? */
-  /* thead {
-    position: sticky;
-    top: 0;
-  } */
-
-  th, td {
-    border: 0.15rem solid var(--foreground);
-    padding: 0.3rem;
-  }
-
-  th {
-    background-color: var(--foreground);
-    color: var(--background);
-  }
-
-  /* Codeblocks */
-  .rotated:has(pre) {
-    padding: 0.6rem;
-    border: 0.15rem solid var(--foreground);
-  }
-
-  pre {
-    margin: 0;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    .hljs-attr { color: lightblue; }
-    .hljs-built_in { color: firebrick; }
-    .hljs-keyword { color: firebrick; }
-    .hljs-number { color: mediumslateblue; }
-    .hljs-string { color: limegreen; }
-    .hljs-title { color: lightcoral; }
-    .hljs-type { color: aquamarine; }
-  }
-
-  @media (prefers-color-scheme: light) {
-    .hljs-attr { color: darkblue; }
-    .hljs-built_in { color: darkred; }
-    .hljs-keyword { color: darkred; }
-    .hljs-number { color: darkslateblue; }
-    .hljs-string { color: darkgreen; }
-    .hljs-title { color: darkgoldenrod; }
-    .hljs-type { color: darkcyan; }
-  }
-
-  /* The end */
-  hr {
-    border: 0.15rem solid var(--foreground);
-  }
-
-  footer {
-    display: flex;
-    justify-content: center;
-
-    font-size: small;
-
-    margin-bottom: 1rem;
-    padding-top: 0.5rem;
-  }
-</style>
-
-<div class="centered">
-  <nav class="rotated">
-    <div class="rotated">
-      <a href="/">HOME</a>
-      <a href="/about">ABOUT</a>
-      <a href="/blog">BLOG</a>
-      <a href="/contact">CONTACT</a>
-    </div>
-  </nav>
-
+{{> const padding = 4 }} <!-- Keep in sync with -mx-N in default.css. -->
+<div class="text-content p-{{ padding }} pt-{{ padding + 12 }}">
   {{ content }}
+</div>
 
-  <hr>
-  <footer>Copyright {{ new Date().getFullYear() }} © RGBCube</footer>
+<hr class="border-2 border-black dark:border-white">
+
+<footer class="flex justify-center text-sm pt-1 pb-2 wrap-anywhere">
+  Copyright {{ Temporal.Now.plainDateISO().year }} ©
+  <a href="/"><img class="pl-0.5 pt-0.25 size-5" src="/assets/icons/icon.gif" alt="RGBCube"></a>
+</footer>
+
+</div>
 </div>

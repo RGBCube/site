@@ -1,0 +1,256 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Exo 2";
+  --font-serif: "Exo 2";
+  --font-mono: "Ubuntu Mono";
+
+  @keyframes blink {
+    0%, 100% {
+      opacity: 100%;
+    }
+    50% {
+      opacity: 0%;
+    }
+  }
+
+  --animate-blink: blink 0.2s steps(1) infinite;
+
+  @keyframes blink-red-white {
+    0%, 100% {
+      background-color: red;
+    }
+    50% {
+      background-color: white;
+    }
+  }
+
+  --animate-blink-red-white: blink-red-white 0.2s steps(1) infinite;
+
+  @keyframes to-the-future {
+    0% {
+      transform: skewX(0deg);
+    }
+    100% {
+      transform: skewX(-89.9deg);
+    }
+  }
+
+  --animate-to-the-future: to-the-future 50ms cubic-bezier(
+    0.16,
+    0.56,
+    0.44,
+    0.93
+  ) 1;
+
+  @keyframes shake-x {
+    0%, 100% {}
+
+    50% {
+      transform: translateX(4px);
+    }
+  }
+
+  --animate-shake-x: shake-x 0.07s linear infinite;
+
+  @keyframes shake-y {
+    0%, 100% {}
+
+    50% {
+      transform: translateY(4px);
+    }
+  }
+
+  --animate-shake-y: shake-y 0.08s linear infinite;
+
+  @keyframes slide-down-shake {
+    0% {
+      transform: translateY(-100%);
+    }
+    70% {
+      transform: translateY(0);
+    }
+    75% {
+      transform: translateY(0) translateX(2px);
+    }
+    80% {
+      transform: translateY(0) translateX(-2px);
+    }
+    85% {
+      transform: translateY(0) translateX(1px);
+    }
+    90% {
+      transform: translateY(0) translateX(-1px);
+    }
+    95% {
+      transform: translateY(0) translateX(0.5px);
+    }
+    100% {
+      transform: translateY(0) translateX(0);
+    }
+  }
+
+  --animate-slide-down-shake: slide-down-shake 0.8s linear forwards;
+}
+
+.shake {
+  @apply animate-shake-x;
+
+  & > * {
+    @apply animate-shake-y;
+  }
+}
+
+.nuclear {
+  &:active {
+    @apply animate-blink-red-white text-white;
+
+    -webkit-text-stroke: 0.05rem black;
+  }
+
+  &:hover {
+    @apply text-white;
+
+    -webkit-text-stroke: 0.05rem black;
+
+    &:not(:active) {
+      background: repeating-linear-gradient(
+        45deg,
+        yellow 0rem,
+        yellow 0.625rem,
+        black 0.625rem,
+        black 1.25rem
+      );
+    }
+  }
+}
+
+.text-content {
+  @apply space-y-3;
+
+  * {
+    @apply wrap-break-word text-pretty;
+
+    &:not(ol, ul) {
+      @apply space-y-3;
+    }
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-balance before:pr-2 font-bold;
+  }
+
+  h1 {
+    @apply text-4xl before:content-["#"];
+  }
+  h2 {
+    @apply text-3xl before:content-["##"];
+  }
+  h3 {
+    @apply text-2xl before:content-["###"];
+  }
+  h4 {
+    @apply text-xl before:content-["####"];
+  }
+
+  p {
+    &:has(img) {
+      @apply flex justify-center;
+    }
+  }
+
+  a {
+    @apply inline-block wrap-anywhere text-[red] dark:text-[yellow] px-1 pb-0.75
+      border-2 border-[transparent] border-dashed;
+
+    * {
+      @apply wrap-anywhere;
+    }
+
+    &:hover {
+      @apply border-[red] dark:border-[yellow];
+    }
+
+    &:active {
+      @apply border-[fuchsia] dark:border-[springgreen] animate-to-the-future;
+    }
+  }
+
+  table {
+    @apply border-collapse whitespace-nowrap;
+  }
+
+  th, td {
+    @apply p-1 border-2;
+  }
+
+  th {
+    @apply bg-black text-white border-black dark:bg-white dark:text-black
+      dark:border-white;
+  }
+
+  td {
+    @apply border-black dark:border-white;
+  }
+
+  pre:has(> code) {
+    @apply px-3 py-2;
+  }
+
+  div:has(> pre code) {
+    @apply border-2 border-black dark:border-white;
+  }
+
+  li {
+    @apply relative pl-4;
+
+    &::before {
+      @apply content-[""] absolute left-0 size-2 top-1/2 -translate-y-1/3
+        rotate-45 border-t-2 border-r-2 border-black dark:border-white;
+    }
+
+    &:hover {
+      &::before {
+        @apply size-4 -translate-x-2/3 border-[red] dark:border-[yellow];
+      }
+    }
+  }
+
+  hr {
+    @apply border-1 border-black dark:border-white
+      -mx-4; /* Keep in sync with p-N in text.vto. */
+  }
+
+  blockquote {
+    @apply border-l-2 pl-4 py-2 border-black bg-[#eee] dark:border-white
+      dark:bg-[#222];
+  }
+
+  .hljs-attr {
+    @apply text-[darkblue] dark:text-[lightblue];
+  }
+  .hljs-built_in {
+    @apply text-[darkred] dark:text-[firebrick];
+  }
+  .hljs-comment {
+    @apply italic text-[dimgray] dark:text-[darkgray];
+  }
+  .hljs-keyword {
+    @apply text-[darkred] dark:text-[firebrick];
+  }
+  .hljs-number {
+    @apply text-[darkslateblue] dark:text-[mediumslateblue];
+  }
+  .hljs-string {
+    @apply text-[darkgreen] dark:text-[limegreen];
+  }
+  .hljs-symbol {
+    @apply text-[darkgoldenrod] dark:text-[gold];
+  }
+  .hljs-title {
+    @apply text-[indianred] dark:text-[lightcoral];
+  }
+  .hljs-type {
+    @apply text-[darkcyan] dark:text-[aquamarine];
+  }
+}

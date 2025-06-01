@@ -1,13 +1,13 @@
 ---
-title: .gitignore is inherently Sisyphean
+title: "`.gitignore` is inherently Sisyphean"
 description: And how to roll the rock over the edge.
 
 color: "#A5804C"
-thumbnail: /assets/sisyphus-ds-store.webp
+thumbnail: /assets/images/sisyphus-ds-store.webp
 
 date: 2024-09-30
 
-tags:
+keywords:
 - vcs
 ---
 
@@ -17,7 +17,7 @@ You just started a new project. You ran `cargo init`, `poetry init` and
 Those commands created the necessary files to work, it also added the following
 lines to your .gitignore:
 
-```text
+```ignore
 target
 __pycache__
 bin
@@ -36,12 +36,12 @@ You start reviewing the code and notice a file quite out of place: `.DS_Store`.
 You ask the person what it is, he says he has no clue.
 
 ![Hundreds of thousands of merge requests on GitHub trying
-to gitignore .DS_Store](/assets/github-ds-store-mr-list.webp)
+to gitignore .DS_Store](/assets/images/github-ds-store-mr-list.webp)
 
 Whatever. You just delete the file from the branch and add the file's name to
 the repositories gitignore:
 
-```text
+```ignore
 target
 __pycache__
 bin
@@ -56,7 +56,7 @@ request. You look at it, and see that there is a whole directory that is
 irrelevant. You tell that person to delete the directory from the branch and add
 it to the gitignore. The gitignore lives on:
 
-```text
+```ignore
 target
 __pycache__
 bin
@@ -67,7 +67,7 @@ bin
 Then, someone that uses IntelliJ IDEA commits five hundred XML files and the
 `.idea` directory. You repeat this process:
 
-```text
+```ignore
 target
 __pycache__
 bin
@@ -84,7 +84,7 @@ Hell. You feel like a mythic god undergoing punishment for cheating death and
 deceiving the underworld.
 
 ![Sisyphus pushing up a boulder that has .DS_Store written
-on it](/assets/sisyphus-ds-store.webp)
+on it](/assets/images/sisyphus-ds-store.webp)
 
 How do you escape this endless loop of ignoring files that sneak in? Maybe by
 educating every single merge request author? Nope, that definitely won't work,
@@ -95,7 +95,7 @@ Luckily, you realize that you can turn the blacklist of files (the gitignore) to
 a whitelist, by just ignoring everything and manually un-ignoring desired files.
 You change your gitignore to this:
 
-```text
+```ignore
 *
 
 !.gitignore

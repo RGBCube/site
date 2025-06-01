@@ -1,10 +1,10 @@
 ---
-title: Swap the ı and i key on your keyboard for faster modal editing
+title: Swap the `ı` and `i` key on your keyboard for faster modal editing
 description: How to swap the ı and i key on your Turkish keyboard on Linux.
 
 date: 2024-05-20
 
-tags:
+keywords:
 - localisation
 - modal-editors
 ---
@@ -12,7 +12,7 @@ tags:
 If you have ever used a Turkish-Q keyboard in combination with a modal editor
 before, you might have noticed that the `i` key is pretty far off to the side:
 
-![The placement of the `i` key on the Turkish-Q layout](/assets/turkish-q-i.webp)
+![The placement of the `i` key on the Turkish-Q layout](/assets/images/turkish-q-i.webp)
 
 This blog post will guide you on how to swap the `ı` key with the `i` key (but
 not the `I` and `İ` keys). This will be a great change if you write primarily in
@@ -119,7 +119,7 @@ This is how it is done on NixOS:
 
 And this is how it is done on Arch:
 
-```shell
+```sh
 cat << :end
 include "/usr/share/kbd/keymaps/i386/qwerty/trq.map"
 

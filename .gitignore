@@ -1,9 +1,14 @@
 *
 
+!.gitignore
+
 !site/
-!site/_includes/
-!site/assets/
-!site/blog/
+!site/**/ 
+
+!*.nu
+
+!*.ts
+!*.css
 
 !*.md
 !*.vto
@@ -12,11 +17,4 @@
 !*.webp
 !*.woff2
 
-!.gitignore
-
-!*.json
-!*.lock
-!*.ts
-!*.tsx
-
-!*.nu
+!deno.*
