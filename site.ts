@@ -108,7 +108,7 @@ site.use(feed({
   },
 
   items: {
-    content: "$ .article-content",
+    content: "$ .text-content",
   },
 }));
 

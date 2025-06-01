@@ -1,4 +1,4 @@
 export default {
-  layout: "article.vto",
+  layout: "text.vto",
   type: "article",
 };
