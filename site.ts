@@ -3,6 +3,7 @@ import extract_date from "lume/plugins/extract_date.ts";
 import code_highlight from "lume/plugins/code_highlight.ts";
 import redirects from "lume/plugins/redirects.ts";
 import tailwindcss from "lume/plugins/tailwindcss.ts";
+import lightningcss from "lume/plugins/lightningcss.ts";
 import resolve_urls from "lume/plugins/resolve_urls.ts";
 import slugify_urls from "lume/plugins/slugify_urls.ts";
 import check_urls from "lume/plugins/check_urls.ts";
@@ -118,6 +119,7 @@ site.use(sitemap({
   },
 }));
 
+site.use(lightningcss()); // TODO: LightningCSS doesn't handle inline styles.
 site.use(inline());
 
 site.use(minify_html({
