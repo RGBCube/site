@@ -176,6 +176,7 @@
     }
   }
 
+  /* TODO: Make it better. */
   table {
     @apply border-collapse whitespace-nowrap;
   }
