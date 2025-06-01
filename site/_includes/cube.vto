@@ -118,7 +118,8 @@
   );
 
   const friction = 3;
-  const sensitivity = 0.01;
+  const sensitivityMouse = 0.01;
+  const sensitivityWheel = 0.005;
 
   // One minute.
   const screensaverTimeoutMs = 1 * 60 * 1000;
@@ -172,9 +173,7 @@
 
     const newMouse = Vec(event.clientX, event.clientY, 0);
 
-    const timeDelta = (globalThis.performance.now() - mouse.lastMove) / 1000;
-
-    if (timeDelta > 0.1) {
+    if (globalThis.performance.now() - mouse.lastMove > 100) {
       // This is a fresh scroll.
       mouse.previous = newMouse;
     }
@@ -186,7 +185,8 @@
 
     const axis = Vec(-delta.y, delta.x, 0)
       .normalize()
-      .scale(delta.length() * sensitivity);
+      .scale(delta.length())
+      .scale(sensitivityMouse);
 
     impulseThisFrame = Vec.sum(impulseThisFrame, axis);
 
@@ -204,6 +204,20 @@
 
     handleMove(event);
   });
+
+  const handleWheel = (event) => {
+    mouse.lastMove = globalThis.performance.now();
+
+    const axis = Vec(event.deltaY, -event.deltaX, 0)
+      .scale(sensitivityWheel);
+
+    impulseThisFrame = Vec.sum(impulseThisFrame, axis);
+
+    const rotation = Quat.fromAxis(axis);
+    orient.set(Quat.mul(rotation, orient.get()));
+  };
+
+  document.addEventListener("wheel", handleWheel, { passive: false });
 
   let lastUpdate = 0;
 
