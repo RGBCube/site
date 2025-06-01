@@ -12,9 +12,15 @@ title: about:blog
 
 <ul>
   {{ for article of search.pages("type=article", "order=asc date=desc")}}
-  <li>
-    <code><a href="{{ article.url }}">{{ article.date.toISOString().slice(0, 10) }}</a></code>
-    <div class="inline-block">{{ article.title |> md }}</div>
+  <li class="flex">
+    <!-- Nope, m-0 doesn't work! -->
+    <code style="margin:0" class="pr-1.25">
+    <a class="text-right" href="{{ article.url }}">
+      {{ article.date.toISOString().slice(2, 10).replaceAll("-", " ") }}
+    </a>
+    </code>
+
+    {{ article.title |> md }}
   </li>
   {{ /for }}
 </ul>
