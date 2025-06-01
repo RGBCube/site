@@ -118,12 +118,12 @@ site.use(sitemap({
   },
 }));
 
-// TODO: Fix this. Tailwind doesn't process some classes when I inline links.
-// site.use(inline());
+site.use(inline());
 
 site.use(minify_html({
   options: {
-    minify_css: true,
+    // TODO: This breaks tailwind.
+    // minify_css: true,
     minify_js: true,
   },
 }));
