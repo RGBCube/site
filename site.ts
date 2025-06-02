@@ -70,6 +70,8 @@ site.process([".html"], (pages) => {
       wrapper.appendChild(element);
     });
 
+    const encountered: Record<string, boolean> = {};
+
     document
       .querySelectorAll(".text-content :where(h1, h2, h3, h4, h5, h6)")
       .forEach((header) => {
@@ -85,10 +87,20 @@ site.process([".html"], (pages) => {
           .replace(/-+/g, "-")
           .trim();
 
-        header.id = textNormalized;
+        let textUnique = textNormalized;
+        let counter = 1;
+
+        while (encountered[textUnique]) {
+          counter++;
+          textUnique = `${textNormalized}-${counter}`;
+        }
+
+        encountered[textUnique] = true;
+
+        header.id = textUnique;
 
         const link = document.createElement("a");
-        link.setAttribute("href", "#" + textNormalized);
+        link.setAttribute("href", "#" + textUnique);
 
         header.parentNode!.insertBefore(link, header);
         link.appendChild(header);
