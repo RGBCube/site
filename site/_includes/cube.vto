@@ -5,6 +5,7 @@
 
   html {
     font-size: min(9svw, 9svh, 4.5rem);
+    overscroll-behavior: none;
   }
 
   /* Guess what? Yeah, you guessed right. Safari can't render shit. */
@@ -18,7 +19,6 @@
 
 <cube-scene class="
   h-dvh w-dvw
-  overscroll-none
   flex items-center justify-center
   perspective-[calc(var(--cube-width)*3)]
 ">
