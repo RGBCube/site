@@ -160,10 +160,35 @@
   }
 
   a {
-    @apply px-1 pb-0.75;
+    @apply m-0;
 
     * {
       @apply wrap-anywhere;
+    }
+
+    &:not(:has(> code:only-child)) {
+      @apply px-1;
+
+      &:not(.font-mono) {
+        @apply pb-0.75;
+      }
+    }
+
+    &:not(:has(h1, h2, h3, h4, h5, h6)) {
+      @apply inline-block wrap-anywhere text-[red] dark:text-[yellow] border-2
+        border-[transparent] border-dashed;
+
+      &:has(> code:only-child) {
+        @apply border-dotted;
+      }
+
+      &:hover {
+        @apply border-[red] dark:border-[yellow];
+      }
+
+      &:active {
+        @apply border-[fuchsia] dark:border-[springgreen] animate-to-the-future;
+      }
     }
 
     & :where(h1, h2, h3, h4, h5, h6) {
@@ -175,19 +200,6 @@
 
       &:hover::before {
         @apply italic text-[red] dark:text-[yellow];
-      }
-    }
-
-    &:not(:has(h1, h2, h3, h4, h5, h6)) {
-      @apply inline-block wrap-anywhere text-[red] dark:text-[yellow] border-2
-        border-[transparent] border-dashed;
-
-      &:hover {
-        @apply border-[red] dark:border-[yellow];
-      }
-
-      &:active {
-        @apply border-[fuchsia] dark:border-[springgreen] animate-to-the-future;
       }
     }
   }
@@ -210,12 +222,20 @@
     @apply border-black dark:border-white;
   }
 
+  code:not(pre > code) {
+    @apply border-1 border-dotted px-2 py-0.5 border-black dark:border-white;
+
+    a:hover & {
+      @apply border-transparent;
+    }
+  }
+
   pre code, pre code * {
     @apply whitespace-pre;
   }
 
   div:has(> pre code) {
-    @apply outline-1 outline-dotted outline-offset-1 outline-[#444] border-1
+    @apply outline outline-dotted outline-offset-1 outline-[#444] border-1
       border-black p-2 bg-[#eee] dark:outline-[#bbb] dark:border-white
       dark:bg-[#111];
   }

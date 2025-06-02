@@ -20,12 +20,9 @@ Blog Articles
 <ul>
   {{ for article of search.pages("type=article", "order=asc date=desc")}}
   <li class="flex">
-    <!-- Nope, m-0 doesn't work! -->
-    <code style="margin:0" class="pr-1.25">
-    <a class="text-right" href="{{ article.url }}">
+    <a class="text-right font-mono" style="margin-right:calc(var(--spacing)*2)" href="{{ article.url }}">
       {{ article.date.toISOString().slice(2, 10).replaceAll("-", " ") }}
     </a>
-    </code>
 
     {{ article.title |> md }}
   </li>
