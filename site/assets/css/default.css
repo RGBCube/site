@@ -194,7 +194,7 @@
     @apply border-black dark:border-white;
   }
 
-  pre code {
+  pre code, pre code * {
     @apply whitespace-pre;
   }
 
