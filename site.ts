@@ -70,8 +70,6 @@ site.process([".html"], (pages) => {
       wrapper.appendChild(element);
     });
 
-    const encountered: Record<string, boolean> = {};
-
     document
       .querySelectorAll(".text-content :where(h1, h2, h3, h4, h5, h6)")
       .forEach((header) => {
@@ -90,12 +88,10 @@ site.process([".html"], (pages) => {
         let textUnique = textNormalized;
         let counter = 1;
 
-        while (encountered[textUnique]) {
+        while (document.getElementById(textUnique)) {
           counter++;
           textUnique = `${textNormalized}-${counter}`;
         }
-
-        encountered[textUnique] = true;
 
         header.id = textUnique;
 
