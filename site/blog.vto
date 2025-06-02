@@ -9,8 +9,8 @@ title: about:blog
 Blog Articles
 
 <span class="whitespace-nowrap overflow-hidden text-sm font-[ecrou]">
-  <a href="/blog.rss">rss</a>
-  <a href="/blog.json">json</a>
+  <a id="matrix" href="/blog.rss">rss</a>
+  <a id="matrix" href="/blog.json">json</a>
 </span>
 </h1>
 
@@ -20,7 +20,7 @@ Blog Articles
 <ul>
   {{ for article of search.pages("type=article", "order=asc date=desc")}}
   <li class="flex">
-    <a class="text-right font-mono" style="margin-right:calc(var(--spacing)*2)" href="{{ article.url }}">
+    <a id="matrix" class="text-right font-mono" style="margin-right:calc(var(--spacing)*2)" href="{{ article.url }}">
       {{ article.date.toISOString().slice(2, 10).replaceAll("-", " ") }}
     </a>
 
@@ -28,3 +28,59 @@ Blog Articles
   </li>
   {{ /for }}
 </ul>
+
+<script>
+  let typed = "";
+  const target = "m";
+
+  document.addEventListener("keydown", (event) => {
+    typed += event.key.toLowerCase();
+
+    if (typed.length > target.length) typed = typed.slice(-target.length);
+
+    if (typed === target) {
+      toggleMatrix();
+      typed = "";
+    }
+  });
+
+  let matrix = {};
+
+  const toggleMatrix = () => {
+    if (Object.keys(matrix).length > 0) {
+      Object.values(matrix).forEach(({ interval, element, original }) => {
+        clearInterval(interval);
+
+        element.innerHTML = original;
+
+        element.style.color = "";
+        element.style.textShadow = "";
+        element.style.filter = "";
+      });
+
+      matrix = {};
+      return;
+    }
+
+    document.querySelectorAll("#matrix").forEach((element, index) => {
+      const original = element.textContent;
+
+      const randomize = () => {
+        const dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+        const color     = dark ? "#00ff00" : "#00cc00";
+        const glowColor = dark ? "#00ff00" : "#00ff00";
+
+        element.style.color = color;
+        element.style.filter = `drop-shadow(0 0 5px ${glowColor})`;
+
+        element.innerHTML = original.replace(/\d/g, () => `<span${Math.random() > 0.5 ? "" : ` style="text-shadow: 0 0 2px ${glowColor}"`}>${Math.floor(Math.random() * 10)}</span>`);
+      };
+
+      randomize();
+      const interval = setInterval(randomize, 100);
+
+      matrix[index] = { interval, element, original };
+    });
+  };
+</script>
