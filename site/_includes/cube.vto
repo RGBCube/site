@@ -52,22 +52,14 @@
     },
 
     scale(factor) {
-      return Vec(
-        this.x * factor,
-        this.y * factor,
-        this.z * factor,
-      );
+      return Vec(this.x * factor, this.y * factor, this.z * factor);
     },
 
     normalize() {
       let length = this.length();
       length = length == 0 ? 1 : length;
 
-      return Vec(
-        this.x / length,
-        this.y / length,
-        this.z / length,
-      );
+      return Vec(this.x / length, this.y / length, this.z / length);
     },
   });
 
@@ -119,7 +111,7 @@
 
   const friction = 3;
   const sensitivityMouse = 0.01;
-  const sensitivityWheel = 0.005;
+  const sensitivityWheel = 0.006;
 
   // One minute.
   const screensaverTimeoutMs = 1 * 60 * 1000;
@@ -137,8 +129,9 @@
     set(q) {
       this.quat = q;
 
-      this.element.style.transform =
-        `rotate3d(${q.x}, ${q.y}, ${q.z}, ${Math.acos(q.w) * 2}rad)`;
+      this.element.style.transform = `rotate3d(${q.x}, ${q.y}, ${q.z}, ${
+        Math.acos(q.w) * 2
+      }rad)`;
     },
 
     get() {
@@ -191,7 +184,6 @@
     impulseThisFrame = Vec.sum(impulseThisFrame, axis);
 
     const rotation = Quat.fromAxis(axis);
-
     orient.set(Quat.mul(rotation, orient.get()));
   };
 
