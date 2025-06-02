@@ -30,57 +30,170 @@ Blog Articles
 </ul>
 
 <script>
-  let typed = "";
-  const target = "m";
+  {
+    let typed = "";
+    const target = "mat";
 
-  document.addEventListener("keydown", (event) => {
-    typed += event.key.toLowerCase();
+    document.addEventListener("keydown", (event) => {
+      typed += event.key.toLowerCase();
 
-    if (typed.length > target.length) typed = typed.slice(-target.length);
+      if (typed.length > target.length) typed = typed.slice(-target.length);
 
-    if (typed === target) {
-      toggleMatrix();
-      typed = "";
-    }
-  });
+      if (typed === target) {
+        toggle();
+        typed = "";
+      }
+    });
 
-  let matrix = {};
+    let data = null;
 
-  const toggleMatrix = () => {
-    if (Object.keys(matrix).length > 0) {
-      Object.values(matrix).forEach(({ interval, element, original }) => {
-        clearInterval(interval);
+    const toggle = () => {
+      if (data) {
+        Object.values(data).forEach(({ interval, element, original }) => {
+          clearInterval(interval);
 
-        element.innerHTML = original;
+          element.innerHTML = original;
 
-        element.style.color = "";
-        element.style.textShadow = "";
-        element.style.filter = "";
+          element.style.color = "";
+          element.style.textShadow = "";
+          element.style.filter = "";
+        });
+
+        data = null;
+        return;
+      }
+
+      data = {};
+
+      document.querySelectorAll("#matrix").forEach((element, index) => {
+        const original = element.textContent;
+
+        const randomize = () => {
+          const dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+          const color     = dark ? "#00ff00" : "#00cc00";
+          const glowColor = dark ? "#00ff00" : "#00ff00";
+
+          element.style.color = color;
+          element.style.filter = `drop-shadow(0 0 5px ${glowColor})`;
+
+          element.innerHTML = original.replace(/\d/g, () => `<span${Math.random() > 0.5 ? "" : ` style="text-shadow: 0 0 2px ${glowColor}"`}>${Math.floor(Math.random() * 10)}</span>`);
+        };
+
+        randomize();
+        const interval = setInterval(randomize, 100);
+
+        data[index] = { interval, element, original };
       });
+    };
+  }
+</script>
 
-      matrix = {};
-      return;
-    }
+<script>
+  {
+    let typed = "";
+    const target = "rix";
 
-    document.querySelectorAll("#matrix").forEach((element, index) => {
-      const original = element.textContent;
+    document.addEventListener("keydown", (event) => {
+      typed += event.key.toLowerCase();
 
-      const randomize = () => {
-        const dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      if (typed.length > target.length) typed = typed.slice(-target.length);
 
-        const color     = dark ? "#00ff00" : "#00cc00";
-        const glowColor = dark ? "#00ff00" : "#00ff00";
+      if (typed === target) {
+        toggle();
+        typed = "";
+      }
+    });
 
-        element.style.color = color;
-        element.style.filter = `drop-shadow(0 0 5px ${glowColor})`;
+    let data = null;
 
-        element.innerHTML = original.replace(/\d/g, () => `<span${Math.random() > 0.5 ? "" : ` style="text-shadow: 0 0 2px ${glowColor}"`}>${Math.floor(Math.random() * 10)}</span>`);
+    const strips = Array.from({ length: 60 }, () => ({
+      x:    Math.floor(Math.random() * window.innerWidth * 1.05),
+      y:    -100,
+      dY:   Math.floor(Math.random() * 7) + 3,
+      size: Math.floor(Math.random() * 16) + 8,
+    }));
+
+    const toggle = () => {
+      if (data) {
+        clearInterval(data.interval);
+
+        data.element.remove();
+
+        data = null;
+        return;
+      }
+
+      data = {};
+
+      const canvas = document.body.appendChild(document.createElement("canvas"));
+
+      canvas.style.position      = "fixed";
+      canvas.style.top           = "0";
+      canvas.style.left          = "0";
+      canvas.style.width         = "100dvw";
+      canvas.style.height        = "100dvh";
+      canvas.style.zIndex        = "999999999";
+      canvas.style.pointerEvents = "none";
+
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      data.element = canvas;
+
+      const context = canvas.getContext("2d");
+      context.globalCompositeOperation = "lighter";
+
+      const drawStrip = (strip) => {
+        let { x, y } = strip;
+
+        for (let i = 0; i < 20; i++) {
+          switch (i) {
+            case 0:  context.fillStyle = "#cefbe4"; break;
+            case 1:  context.fillStyle = "#81ec72"; break;
+            case 3:  context.fillStyle = "#5cd646"; break;
+            case 7:  context.fillStyle = "#54d13c"; break;
+            case 13: context.fillStyle = "#4ccc32"; break;
+            case 17: context.fillStyle = "#43c728"; break;
+          }
+
+          const characters = ["诶", "比", "西", "迪", "伊", "吉", "艾", "杰", "开", "哦", "屁", "提", "维"];
+          const character = characters[Math.floor(Math.random()*characters.length)];
+
+          context.fillText(character, x, y);
+
+          // Deterministic but still random.
+          y -= strips[i].size;
+        }
+      }
+
+      const draw = () => {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.shadowOffsetX = 0;
+        context.shadowOffsetY = 0;
+        context.shadowBlur = 8;
+        context.shadowColor = "#94f475";
+  
+        for (const strip of strips) {
+          context.font = `${strip.size}px sans`;
+          context.textBaseline = "top";
+          context.textAlign = "center";
+    
+          if (strip.y > canvas.height * 1.7) {
+            strip.x = Math.floor(Math.random() * canvas.width);
+            strip.y = -100;
+            strip.dY = Math.floor(Math.random() * 7) + 3;
+            strip.size = Math.floor(Math.random() * 16) + 8;
+          }
+
+          drawStrip(strip);
+    
+          strip.y += strip.dY;
+        }
       };
 
-      randomize();
-      const interval = setInterval(randomize, 100);
-
-      matrix[index] = { interval, element, original };
-    });
-  };
+      draw();
+      data.interval = setInterval(draw, 70);
+    };
+  }
 </script>
