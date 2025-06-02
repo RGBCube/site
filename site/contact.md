@@ -35,5 +35,5 @@ Here are some other useful links as well:
 
   const element = document.getElementById("bot-block");
   element.href = real;
-  element.children[0].innerHTML = real.substring(7);
+  element.children[0].textContent = real.substring(7);
 </script>

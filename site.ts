@@ -1,25 +1,25 @@
 import lume from "lume/mod.ts";
-import extract_date from "lume/plugins/extract_date.ts";
-import code_highlight from "lume/plugins/code_highlight.ts";
+import extractDate from "lume/plugins/extract_date.ts";
+import codeHighlight from "lume/plugins/code_highlight.ts";
 import redirects from "lume/plugins/redirects.ts";
 import tailwindcss from "lume/plugins/tailwindcss.ts";
 import lightningcss from "lume/plugins/lightningcss.ts";
-import resolve_urls from "lume/plugins/resolve_urls.ts";
-import slugify_urls from "lume/plugins/slugify_urls.ts";
-import check_urls from "lume/plugins/check_urls.ts";
+import resolveUrls from "lume/plugins/resolve_urls.ts";
+import slugifyUrls from "lume/plugins/slugify_urls.ts";
+import checkUrls from "lume/plugins/check_urls.ts";
 import inline from "lume/plugins/inline.ts";
 import feed from "lume/plugins/feed.ts";
 import sitemap from "lume/plugins/sitemap.ts";
-import minify_html from "lume/plugins/minify_html.ts";
+import minifyHtml from "lume/plugins/minify_html.ts";
 
-const site_name = "RGBCube";
-const site_description =
+const siteName = "RGBCube";
+const siteDescription =
   "The home directory and journal of RGBCube and his work.";
 
 const author = "RGBCube";
 const color = "#00FFFF";
 
-const path_assets = "/assets";
+const pathAssets = "/assets";
 
 const site = lume({
   src: "./site",
@@ -31,9 +31,9 @@ const site = lume({
 
 site.data("layout", "default.vto");
 
-site.data("site_name", site_name);
-site.data("title", site_name);
-site.data("description", site_description);
+site.data("site_name", siteName);
+site.data("title", siteName);
+site.data("description", siteDescription);
 site.data("author", author);
 site.data("color", color);
 
@@ -69,20 +69,44 @@ site.process([".html"], (pages) => {
       element.parentNode!.insertBefore(wrapper, element);
       wrapper.appendChild(element);
     });
+
+    document
+      .querySelectorAll(".text-content :where(h1, h2, h3, h4, h5, h6)")
+      .forEach((header) => {
+        if (header.id || header.closest("a") || header.querySelector("a")) {
+          return;
+        }
+
+        const textNormalized = header
+          .textContent!
+          .toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, "")
+          .replace(/\s+/g, "-")
+          .replace(/-+/g, "-")
+          .trim();
+
+        header.id = textNormalized;
+
+        const link = document.createElement("a");
+        link.href = "#" + textNormalized;
+
+        header.parentNode!.insertBefore(link, header);
+        link.appendChild(header);
+      });
   });
 });
 
-site.use(extract_date());
+site.use(extractDate());
 site.use(redirects());
 
 site.use(tailwindcss());
-site.use(code_highlight());
+site.use(codeHighlight());
 
-site.use(resolve_urls());
-site.use(slugify_urls({
+site.use(resolveUrls());
+site.use(slugifyUrls({
   extensions: "*",
 }));
-site.use(check_urls({
+site.use(checkUrls({
   strict: true,
   throw: true,
 }));
@@ -95,12 +119,12 @@ site.use(feed({
   limit: Infinity,
 
   info: {
-    title: site_name,
-    description: site_description,
+    title: siteName,
+    description: siteDescription,
     authorName: author,
 
-    image: `${path_assets}/icons/icon.webp`,
-    icon: `${path_assets}/icons/icon.webp`,
+    image: `${pathAssets}/icons/icon.webp`,
+    icon: `${pathAssets}/icons/icon.webp`,
 
     color,
 
@@ -122,7 +146,7 @@ site.use(sitemap({
 site.use(lightningcss()); // TODO: LightningCSS doesn't handle inline styles.
 site.use(inline());
 
-site.use(minify_html({
+site.use(minifyHtml({
   options: {
     // TODO: This breaks tailwind.
     // minify_css: true,

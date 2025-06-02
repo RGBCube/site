@@ -160,19 +160,35 @@
   }
 
   a {
-    @apply inline-block wrap-anywhere text-[red] dark:text-[yellow] px-1 pb-0.75
-      border-2 border-[transparent] border-dashed;
+    @apply px-1 pb-0.75;
 
     * {
       @apply wrap-anywhere;
     }
 
-    &:hover {
-      @apply border-[red] dark:border-[yellow];
+    & :where(h1, h2, h3, h4, h5, h6) {
+      @apply before:underline before:underline-offset-4;
+
+      * {
+        @apply inline-block;
+      }
+
+      &:hover::before {
+        @apply italic text-[red] dark:text-[yellow];
+      }
     }
 
-    &:active {
-      @apply border-[fuchsia] dark:border-[springgreen] animate-to-the-future;
+    &:not(:has(h1, h2, h3, h4, h5, h6)) {
+      @apply inline-block wrap-anywhere text-[red] dark:text-[yellow] border-2
+        border-[transparent] border-dashed;
+
+      &:hover {
+        @apply border-[red] dark:border-[yellow];
+      }
+
+      &:active {
+        @apply border-[fuchsia] dark:border-[springgreen] animate-to-the-future;
+      }
     }
   }
 
