@@ -88,7 +88,7 @@ site.process([".html"], (pages) => {
         header.id = textNormalized;
 
         const link = document.createElement("a");
-        link.href = "#" + textNormalized;
+        link.setAttribute("href", "#" + textNormalized);
 
         header.parentNode!.insertBefore(link, header);
         link.appendChild(header);
