@@ -189,10 +189,18 @@
 
   document.addEventListener("mousemove", handleMove);
   document.addEventListener("touchmove", (event) => {
-    const delta = event.changedTouches[0];
+    const { x, y } = Array
+      .from(event.touches)
+      .reduce(
+        (acc, touch) => ({
+          x: acc.x + touch.clientX,
+          y: acc.y + touch.clientY,
+        }),
+        { x: 0, y: 0 }
+      );
 
-    event.clientX = delta.clientX;
-    event.clientY = delta.clientY;
+    event.clientX = x / event.touches.length;
+    event.clientY = y / event.touches.length;
 
     handleMove(event);
   });
