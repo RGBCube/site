@@ -90,7 +90,7 @@ Blog Articles
 </script>
 
 <script>
-  {
+{
     let typed = "";
     const target = "rix";
 
@@ -105,20 +105,23 @@ Blog Articles
       }
     });
 
-    let data = null;
+    const randomStrip = () => ({
+      xFactor: Math.random() * 0.95,
+      y:       Math.random() * -window.innerHeight - 100,
+      deltaY:  Math.random() * 1.7 + 1,
+      size:    Math.floor(Math.random() * 16) + 8,
+    });
 
-    const strips = Array.from({ length: 60 }, () => ({
-      x:    Math.floor(Math.random() * window.innerWidth * 1.05),
-      y:    -100,
-      dY:   Math.floor(Math.random() * 7) + 3,
-      size: Math.floor(Math.random() * 16) + 8,
-    }));
+    const strips = Array.from({ length: 60 }, () => randomStrip());
+
+    let data = null;
 
     const toggle = () => {
       if (data) {
-        clearInterval(data.interval);
+        cancelAnimationFrame(data.animationFrameId);
+        data.canvas.remove();
 
-        data.element.remove();
+        window.removeEventListener("resize", data.handleResize);
 
         data = null;
         return;
@@ -126,8 +129,8 @@ Blog Articles
 
       data = {};
 
-      const canvas = document.body.appendChild(document.createElement("canvas"));
-
+      data.canvas = document.body.appendChild(document.createElement("canvas"));
+      const { canvas } = data;
       canvas.style.position      = "fixed";
       canvas.style.top           = "0";
       canvas.style.left          = "0";
@@ -136,64 +139,64 @@ Blog Articles
       canvas.style.zIndex        = "999999999";
       canvas.style.pointerEvents = "none";
 
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-
-      data.element = canvas;
-
-      const context = canvas.getContext("2d");
+      data.context = canvas.getContext("2d");
+      const { context } = data;
       context.globalCompositeOperation = "lighter";
 
-      const drawStrip = (strip) => {
-        let { x, y } = strip;
+      const handleResize = () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      };
 
-        for (let i = 0; i < 20; i++) {
-          switch (i) {
-            case 0:  context.fillStyle = "#cefbe4"; break;
-            case 1:  context.fillStyle = "#81ec72"; break;
-            case 3:  context.fillStyle = "#5cd646"; break;
-            case 7:  context.fillStyle = "#54d13c"; break;
-            case 13: context.fillStyle = "#4ccc32"; break;
-            case 17: context.fillStyle = "#43c728"; break;
-          }
+      handleResize();
+      window.addEventListener("resize", handleResize);
+      data.handleResize = handleResize;
 
-          const characters = ["诶", "比", "西", "迪", "伊", "吉", "艾", "杰", "开", "哦", "屁", "提", "维"];
-          const character = characters[Math.floor(Math.random()*characters.length)];
+      const animate = () => {
+        const { canvas, context } = data;
 
-          context.fillText(character, x, y);
-
-          // Deterministic but still random.
-          y -= strips[i].size;
-        }
-      }
-
-      const draw = () => {
         context.clearRect(0, 0, canvas.width, canvas.height);
         context.shadowOffsetX = 0;
         context.shadowOffsetY = 0;
         context.shadowBlur = 8;
         context.shadowColor = "#94f475";
+        context.textBaseline = "top";
+        context.textAlign = "center";
   
         for (const strip of strips) {
           context.font = `${strip.size}px sans`;
-          context.textBaseline = "top";
-          context.textAlign = "center";
-    
-          if (strip.y > canvas.height * 1.7) {
-            strip.x = Math.floor(Math.random() * canvas.width);
-            strip.y = -100;
-            strip.dY = Math.floor(Math.random() * 7) + 3;
-            strip.size = Math.floor(Math.random() * 16) + 8;
+
+          if (strip.y > canvas.height + (strip.size * 30)) {
+            Object.assign(strip, randomStrip())
           }
 
-          drawStrip(strip);
-    
-          strip.y += strip.dY;
+          let { y: yCopy } = strip;
+          for (let i = 0; i < 20; i++) {
+            switch (true) {
+              case i < 1:  context.fillStyle = "#cefbe4"; break;
+              case i < 2:  context.fillStyle = "#81ec72"; break;
+              case i < 4:  context.fillStyle = "#5cd646"; break;
+              case i < 8:  context.fillStyle = "#54d13c"; break;
+              case i < 14: context.fillStyle = "#4ccc32"; break;
+              case i < 18: context.fillStyle = "#43c728"; break;
+            }
+
+            const characters = ["诶", "比", "西", "迪", "伊", "吉", "艾", "杰", "开", "哦", "屁", "提", "维"];
+            const character = characters[Math.floor(Math.random() * characters.length)];
+
+            context.fillText(character, strip.xFactor * canvas.width, yCopy);
+
+            // Deterministic but still random.
+            yCopy -= strips[i].size;
+          }
+
+          strip.y += strip.deltaY;
         }
+        
+        data.animationFrameId = requestAnimationFrame(animate);
       };
 
-      draw();
-      data.interval = setInterval(draw, 70);
+      animate();
     };
   }
 </script>
