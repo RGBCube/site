@@ -194,6 +194,10 @@
     @apply border-black dark:border-white;
   }
 
+  pre code {
+    @apply whitespace-pre;
+  }
+
   div:has(> pre code) {
     @apply outline-1 outline-dotted outline-offset-1 outline-[#444] border-1
       border-black p-2 bg-[#eee] dark:outline-[#bbb] dark:border-white
