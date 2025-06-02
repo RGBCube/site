@@ -11,23 +11,20 @@ layout: default.vto
   absolute w-[inherit] z-999
   overflow-x-auto
 ">
-  <div class="transform-[rotateX(180deg)] flex items-start justify-evenly">
+  <div class="transform-[rotateX(180deg)] flex items-start justify-evenly mx-px">
     {{> const style = `
       flex-auto text-center px-3 pt-3 pb-2
-      bg-white font-[ecrou] border-2 border-black
-      origin-bottom
+      bg-white font-[ecrou]
+      border-2 -mx-px border-black
       md:hover:text-[300%] ease-[cubic-bezier(1,-0.07,0.57,1.56)] md:duration-200
-
       md:hover:not-active:after:content-['?']
       md:active:after:content-['!!'] active:after:italic
-
       nuclear
     ` }}
-    <style>.right-delete:has(+ *:hover) { border-right-width: 0; }</style>
-    <a class="nav-link {{ style }} right-delete" href="/">home</a>
-    <a class="nav-link {{ style }} right-delete not-hover:border-l-0" href="/about/">about</a>
-    <a class="nav-link {{ style }} right-delete not-hover:border-l-0" href="/blog/">blog</a>
-    <a class="nav-link {{ style }}              not-hover:border-l-0" href="/contact/">contact</a>
+    <a class="{{ style }}" href="/">home</a>
+    <a class="{{ style }}" href="/about/">about</a>
+    <a class="{{ style }}" href="/blog/">blog</a>
+    <a class="{{ style }}" href="/contact/">contact</a>
   </div>
 </nav>
 
