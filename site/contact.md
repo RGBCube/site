@@ -26,7 +26,8 @@ Here are some other useful links as well:
     [8,  12], // tact
     [15, 16], // @
     [4,   7], // rgb
-    [12, 13], // cu
+    [12, 13], // c
+    [1,   2], // u
     [0,   1], // .
     [2,   4], // be
   ].map(([start, end]) => ".ubergbetactcon@toilma:".substring(start, end))
