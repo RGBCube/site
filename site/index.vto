@@ -3,14 +3,20 @@ prevent_zoom: true
 ---
 
 <style>
-  cube-face::after {
-    z-index: -1;
-    content: "";
+  cube-face {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    height: inherit;
-    width: inherit;
+    &::after {
+      z-index: -1;
+      content: "";
 
-    position: absolute;
+      height: inherit;
+      width: inherit;
+
+      position: absolute;
+    }
   }
 
   .cube-face-front {

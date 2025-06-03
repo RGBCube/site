@@ -8,6 +8,13 @@
     overscroll-behavior: none;
   }
 
+  cube-face {
+    height: var(--cube-width);
+    width: var(--cube-width);
+
+    position: absolute;
+  }
+
   /* Guess what? Yeah, you guessed right. Safari can't render shit. */
   .cube-face-front  { transform: rotateY(0deg)                  translateZ(calc(var(--cube-width) / 2 - 1px)); }
   .cube-face-top    { transform: rotateX( 89.99999999999999deg) translateZ(calc(var(--cube-width) / 2 - 1px)); }
@@ -26,16 +33,12 @@
     size-(--cube-width)
     transform-3d transform-[translateZ(-calc(var(--cube-width)/2-1px))]
   ">
-    {{> const style = `
-      size-(--cube-width) absolute
-      flex items-center justify-center
-    ` }}
-    <cube-face draggable="false" class="{{ style }} cube-face-front">  {{ cube_face_front }}  </cube-face>
-    <cube-face draggable="false" class="{{ style }} cube-face-back">   {{ cube_face_back }}   </cube-face>
-    <cube-face draggable="false" class="{{ style }} cube-face-left">   {{ cube_face_left }}   </cube-face>
-    <cube-face draggable="false" class="{{ style }} cube-face-right">  {{ cube_face_right }}  </cube-face>
-    <cube-face draggable="false" class="{{ style }} cube-face-top">    {{ cube_face_top }}    </cube-face>
-    <cube-face draggable="false" class="{{ style }} cube-face-bottom"> {{ cube_face_bottom }} </cube-face>
+    <cube-face draggable="false" class="cube-face-front">  {{ cube_face_front }}  </cube-face>
+    <cube-face draggable="false" class="cube-face-back">   {{ cube_face_back }}   </cube-face>
+    <cube-face draggable="false" class="cube-face-left">   {{ cube_face_left }}   </cube-face>
+    <cube-face draggable="false" class="cube-face-right">  {{ cube_face_right }}  </cube-face>
+    <cube-face draggable="false" class="cube-face-top">    {{ cube_face_top }}    </cube-face>
+    <cube-face draggable="false" class="cube-face-bottom"> {{ cube_face_bottom }} </cube-face>
   </cube-itself>
 </cube-scene>
 
