@@ -76,6 +76,14 @@
         this.z - that.z,
       );
     },
+
+    mul(that) {
+      return Vec(
+        this.x * that.x,
+        this.y * that.y,
+        this.z * that.z,
+      );
+    },
   });
 
   Vec.ZERO = Vec(0, 0, 0);
@@ -163,7 +171,7 @@
 
   window.addEventListener("beforeunload", () => {
     localStorage.setItem("mouseDown", JSON.stringify(mouse.down));
-    localStorage.setItem("mouseLastMove", JSON.stringify(-(window.performance.now() - mouse.lastMove)));
+    localStorage.setItem("mouseLastMove", JSON.stringify(-(globalThis.performance.now() - mouse.lastMove)));
     localStorage.setItem("mousePrevious", JSON.stringify([
       mouse.previous.x,
       mouse.previous.y,
@@ -191,6 +199,49 @@
     ]));
 
     localStorage.setItem("lastSave", JSON.stringify(Date.now()));
+  });
+
+  document.addEventListener("keydown", (event) => {
+    const shift = event.shiftKey ? Vec(-1, -1, -1) : Vec(1, 1, 1);
+
+    let effect;
+
+    switch (event.key) {
+      case "Enter":
+        effect = Vec(0, 0, 4).mul(shift);
+        break;
+
+      case " ":
+        effect = Vec(4, 0, 0).mul(shift);
+        break;
+
+      case "h":
+      case "ArrowLeft":
+        effect = Vec(0, -4, 0);
+        break;
+
+      case "j":
+      case "ArrowDown":
+        effect = Vec(-4, 0, 0);
+        break;
+
+      case "k":
+      case "ArrowUp":
+        effect = Vec(4, 0, 0);
+        break;
+
+      case "l":
+      case "ArrowRight":
+        effect = Vec(0, 4, 0);
+        break;
+
+      default:
+        return;
+    }
+
+    velocity = velocity.sum(effect);
+
+    mouse.lastMove = globalThis.performance.now();
   });
 
   const handleUp = () => {
