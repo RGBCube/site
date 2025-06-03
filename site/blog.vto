@@ -106,7 +106,7 @@ Blog Articles
     });
 
     const randomStrip = () => ({
-      xFactor: Math.random() * 0.95,
+      xFactor: Math.random() * 0.90 + (1 - 0.90) / 2,
       y:       Math.random() * -window.innerHeight - 100,
       deltaY:  Math.random() * 1.7 + 1,
       size:    Math.floor(Math.random() * 16) + 8,
