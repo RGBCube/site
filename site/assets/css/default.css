@@ -230,8 +230,10 @@ html, body {
   code:not(pre > code) {
     @apply border-1 border-dotted px-2 py-0.5 border-black dark:border-white;
 
-    a:hover &, a:active & {
-      @apply border-transparent;
+    &:not(a code) {
+      a:hover &, a:active & {
+        @apply border-transparent;
+      }
     }
   }
 
