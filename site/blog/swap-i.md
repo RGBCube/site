@@ -66,7 +66,7 @@ use the `tr-swapped-i` XKB layout.
 
 In Hyprland (The WM I use) you can do it like this:
 
-```cpp
+```py
 # In ~/.config/hypr/hyprland.conf
 input {
   kb_layout = "tr-swapped-i"
@@ -83,7 +83,7 @@ different. Looking at the `kbd` package, it uses a format called `.map`.
 Here is a `.map` file that overrides the `trq` layout and swaps the `ı` and `i`
 keys:
 
-```cpp
+```py
 include "/usr/share/keymaps/i386/qwerty/trq.map"
 
 keycode 23 = i
