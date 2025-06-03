@@ -1,9 +1,4 @@
 <style>
-  html {
-    font-size: min(9svw, 9svh, 4.5rem);
-    overscroll-behavior: none;
-  }
-
   cube-face {
     height: {{ cube_size }};
     width: {{ cube_size }};
@@ -21,9 +16,9 @@
 </style>
 
 <cube-scene class="
-  h-dvh w-dvw
   flex items-center justify-center
   perspective-[calc({{ cube_size.replaceAll(" ", "_") }}*3)]
+  overscroll-none
 ">
   <cube-itself class="
     size-[{{ cube_size }}]

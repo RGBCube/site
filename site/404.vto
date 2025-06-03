@@ -4,6 +4,15 @@ prevent_zoom: true
 ---
 
 <style>
+  html {
+    font-size: min(9svw, 9svh, 4.5rem);
+    overscroll-behavior: none;
+  }
+
+  cube-scene {
+    height: 100dvh;
+  }
+
   cube-face {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
