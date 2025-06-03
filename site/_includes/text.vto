@@ -37,7 +37,13 @@ layout: default.vto
 
 <footer class="flex justify-center text-sm pt-1 pb-2 wrap-anywhere">
   Copyright {{ Temporal.Now.plainDateISO().year }} ©
-  <a href="/"><img class="pl-0.5 pt-0.25 size-5" src="/assets/icons/icon.gif" alt="RGBCube"></a>
+
+  <a class="flex items-center pl-2" href="/">
+  {{ set cube_size = "0.75rem" }}
+  {{ set cube_small = true }}
+  {{ set cube_last = true }}
+  {{ include "rgbcube.vto" }}
+  </a>
 </footer>
 
 </div>

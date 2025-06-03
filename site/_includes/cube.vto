@@ -1,3 +1,5 @@
+{{ set cube_minus_px = cube_small ? "" : "- 1px" }}
+
 {{ if cube_last }}
 <style>
   cube-face {
@@ -8,12 +10,12 @@
   }
 
   /* Guess what? Yeah, you guessed right. Safari can't render shit. */
-  .cube-face-front  { transform: rotateY(0deg)                  translateZ(calc({{ cube_size }} / 2 - 1px)); }
-  .cube-face-top    { transform: rotateX( 89.99999999999999deg) translateZ(calc({{ cube_size }} / 2 - 1px)); }
-  .cube-face-back   { transform: rotateY(180deg)                translateZ(calc({{ cube_size }} / 2 - 1px)); }
-  .cube-face-bottom { transform: rotateX(-89.99999999999999deg) translateZ(calc({{ cube_size }} / 2 - 1px)); }
-  .cube-face-right  { transform: rotateY( 89.99999999999999deg) translateZ(calc({{ cube_size }} / 2 - 1px)); }
-  .cube-face-left   { transform: rotateY(-89.99999999999999deg) translateZ(calc({{ cube_size }} / 2 - 1px)); }
+  .cube-face-front  { transform: rotateY(0deg)                  translateZ(calc({{ cube_size }} / 2 {{ cube_minus_px }})); }
+  .cube-face-top    { transform: rotateX( 89.99999999999999deg) translateZ(calc({{ cube_size }} / 2 {{ cube_minus_px }})); }
+  .cube-face-back   { transform: rotateY(180deg)                translateZ(calc({{ cube_size }} / 2 {{ cube_minus_px }})); }
+  .cube-face-bottom { transform: rotateX(-89.99999999999999deg) translateZ(calc({{ cube_size }} / 2 {{ cube_minus_px }})); }
+  .cube-face-right  { transform: rotateY( 89.99999999999999deg) translateZ(calc({{ cube_size }} / 2 {{ cube_minus_px }})); }
+  .cube-face-left   { transform: rotateY(-89.99999999999999deg) translateZ(calc({{ cube_size }} / 2 {{ cube_minus_px }})); }
 </style>
 {{ /if }}
 
@@ -24,7 +26,7 @@
 ">
   <cube-itself class="
     size-[{{ cube_size }}]
-    transform-3d transform-[translateZ(-calc({{ cube_size.replaceAll(" ", "_") }}/2-1px))]
+    transform-3d transform-[translateZ(calc({{ cube_size.replaceAll(" ", "_") }}_/_-2))]
   ">
     <cube-face draggable="false" class="cube-face-front">  {{ cube_face_front }}  </cube-face>
     <cube-face draggable="false" class="cube-face-back">   {{ cube_face_back }}   </cube-face>
