@@ -29,7 +29,7 @@ I plan on creating a build system that uses Cab to build anything and
 everything, a universal build system. This includes Linux/Darwin/Windows
 distributions, all under the same tool.
 
-If you want to contact me, or see what I ramble about, follow either of these
+If you want to see what I ramble about, or contact me, follow either of these
 links:
 
 - [Blog](/blog/)
