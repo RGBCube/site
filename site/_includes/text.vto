@@ -2,8 +2,8 @@
 layout: default.vto
 ---
 
-<div class="flex justify-center">
-<div class="block text-xl w-[min(100vw,50rem)]">
+<div class="flex justify-center h-[inherit]">
+<div class="block text-xl w-[min(100vw,50rem)] h-[inherit]">
 
 <nav class="
   transform-[rotateX(180deg)]
@@ -28,14 +28,12 @@ layout: default.vto
   </div>
 </nav>
 
-{{> const padding = 4 }} <!-- Keep in sync with -mx-N in default.css. -->
+{{> const padding = 4 }}
 <div class="text-content p-{{ padding }} pt-{{ padding + 12 }}">
   {{ content }}
 </div>
 
-<hr class="border-2 border-black dark:border-white">
-
-<footer class="flex justify-center text-sm pt-1 pb-2 wrap-anywhere">
+<footer class="flex justify-center text-sm p-1.5 pb-2 wrap-anywhere border-t-3 border-x-4">
   Copyright {{ Temporal.Now.plainDateISO().year }} ©
 
   <a draggable="false" class="flex items-center pl-2" href="/">

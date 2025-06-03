@@ -261,8 +261,7 @@ html, body {
   }
 
   hr {
-    @apply border-1 border-black dark:border-white
-      -mx-4; /* Keep in sync with p-N in text.vto. */
+    @apply border-1 border-black dark:border-white;
   }
 
   blockquote {
