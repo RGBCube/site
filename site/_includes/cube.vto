@@ -120,16 +120,28 @@
 
   // 15 seconds.
   const screensaverTimeoutMs = 15 * 1000;
+  // 10 minutes.
+  const stateDeleteTimeoutMs = 10 * 60 * 1000;
+
+  const lastSave = JSON.parse(localStorage.getItem("lastSave"));
+  if (!lastSave || Date.now() - lastSave > stateDeleteTimeoutMs) {
+    localStorage.removeItem("mouseDown");
+    localStorage.removeItem("mouseLastMove");
+    localStorage.removeItem("mousePrevious");
+    localStorage.removeItem("cubeOrient");
+    localStorage.removeItem("velocity");
+    localStorage.removeItem("impulseThisFrame");
+  }
 
   const mouse = {
-    down: false,
-    lastMove: -screensaverTimeoutMs,
-    previous: Vec.ZERO,
-  };
+      down:     JSON.parse(localStorage.getItem("mouseDown"))            ?? false,
+      lastMove: JSON.parse(localStorage.getItem("mouseLastMove"))        ?? -screensaverTimeoutMs,
+      previous: Vec(...JSON.parse(localStorage.getItem("mousePrevious")) ?? [0, 0, 0, 1]),
+    };
 
   const orient = {
     elements: document.querySelectorAll("cube-itself"),
-    quat: Quat(0, 0, 0, 1),
+    quat: Quat(...JSON.parse(localStorage.getItem("cubeOrient")) ?? [0, 0, 0, 1]),
 
     set(q) {
       this.quat = q;
@@ -145,9 +157,41 @@
     },
   };
 
-  let velocity = Vec.ZERO;
-  let impulseThisFrame = Vec.ZERO;
-  let impulseIdle = Vec(2, 2, -2);
+  let velocity = Vec(...JSON.parse(localStorage.getItem("velocity")) ?? [0, 0, 0]);
+
+  let impulseThisFrame = Vec(...JSON.parse(localStorage.getItem("impulseThisFrame")) ?? [0, 0, 0]);
+
+  window.addEventListener("beforeunload", () => {
+    localStorage.setItem("mouseDown", JSON.stringify(mouse.down));
+    localStorage.setItem("mouseLastMove", JSON.stringify(-(window.performance.now() - mouse.lastMove)));
+    localStorage.setItem("mousePrevious", JSON.stringify([
+      mouse.previous.x,
+      mouse.previous.y,
+      mouse.previous.z,
+      mouse.previous.w,
+    ]));
+
+    localStorage.setItem("cubeOrient", JSON.stringify([
+      orient.quat.x,
+      orient.quat.y,
+      orient.quat.z,
+      orient.quat.w,
+    ]));
+
+    localStorage.setItem("velocity", JSON.stringify([
+      velocity.x,
+      velocity.y,
+      velocity.z,
+    ]));
+
+    localStorage.setItem("impulseThisFrame", JSON.stringify([
+      impulseThisFrame.x,
+      impulseThisFrame.y,
+      impulseThisFrame.z,
+    ]));
+
+    localStorage.setItem("lastSave", JSON.stringify(Date.now()));
+  });
 
   const handleUp = () => {
     mouse.down = false;
@@ -261,6 +305,7 @@
     }
 
     if (globalThis.performance.now() - mouse.lastMove > screensaverTimeoutMs) {
+      const impulseIdle = Vec(2, 2, -2);
       velocity = velocity.sum(impulseIdle.scale(effectiveDelta));
     }
 

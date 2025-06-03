@@ -162,12 +162,12 @@ Blog Articles
         context.shadowColor = "#94f475";
         context.textBaseline = "top";
         context.textAlign = "center";
-  
+
         for (const strip of strips) {
           context.font = `${strip.size}px sans`;
 
           if (strip.y > canvas.height + (strip.size * 40)) {
-            Object.assign(strip, randomStrip())
+            Object.assign(strip, randomStrip());
           }
 
           let { y: yCopy } = strip;
@@ -192,7 +192,7 @@ Blog Articles
 
           strip.y += strip.deltaY;
         }
-        
+
         data.animationFrameId = requestAnimationFrame(animate);
       };
 

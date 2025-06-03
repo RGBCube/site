@@ -3,7 +3,7 @@
 !.gitignore
 
 !site/
-!site/**/ 
+!site/**/
 
 !*.nu
 
