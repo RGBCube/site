@@ -141,6 +141,7 @@
 
   let velocity = Vec.ZERO;
   let impulseThisFrame = Vec.ZERO;
+  let impulseIdle = Vec(0.7, 0.7, -0.7);
 
   const handleUp = () => {
     mouse.down = false;
@@ -254,8 +255,7 @@
     }
 
     if (globalThis.performance.now() - mouse.lastMove > screensaverTimeoutMs) {
-      const impulse = Vec(0.7, 0.7, -0.7);
-      velocity = Vec.sum(impulse.scale(effectiveDelta * 3), velocity);
+      velocity = Vec.sum(impulseIdle.scale(effectiveDelta * 3), velocity);
     }
 
     const axis = Vec(velocity.x, velocity.y, velocity.z)
