@@ -60,27 +60,40 @@
 
       return Vec(this.x / length, this.y / length, this.z / length);
     },
+
+    sum(that) {
+      return Vec(
+        this.x + that.x,
+        this.y + that.y,
+        this.z + that.z,
+      );
+    },
+
+    sub(that) {
+      return Vec(
+        this.x - that.x,
+        this.y - that.y,
+        this.z - that.z,
+      );
+    },
   });
 
   Vec.ZERO = Vec(0, 0, 0);
-
-  Vec.sum = (a, b) => Vec(
-    a.x + b.x,
-    a.y + b.y,
-    a.z + b.z,
-  );
-
-  Vec.sub = (a, b) => Vec(
-    a.x - b.x,
-    a.y - b.y,
-    a.z - b.z,
-  );
 
   const Quat = (x, y, z, w) => ({
     x,
     y,
     z,
     w,
+
+    mul(that) {
+      return Quat(
+        this.w * that.x + this.x * that.w + this.y * that.z - this.z * that.y,
+        this.w * that.y - this.x * that.z + this.y * that.w + this.z * that.x,
+        this.w * that.z + this.x * that.y - this.y * that.x + this.z * that.w,
+        this.w * that.w - this.x * that.x - this.y * that.y - this.z * that.z,
+      );
+    }
   });
 
   Quat.fromAxis = (axis) => {
@@ -100,13 +113,6 @@
 
     return Quat(x, y, z, w);
   };
-
-  Quat.mul = (a, b) => Quat(
-    a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y,
-    a.w * b.y - a.x * b.z + a.y * b.w + a.z * b.x,
-    a.w * b.z + a.x * b.y - a.y * b.x + a.z * b.w,
-    a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z,
-  );
 
   const friction = 3;
   const sensitivityMouse = 0.01;
@@ -141,7 +147,7 @@
 
   let velocity = Vec.ZERO;
   let impulseThisFrame = Vec.ZERO;
-  let impulseIdle = Vec(0.7, 0.7, -0.7);
+  let impulseIdle = Vec(2, 2, -2);
 
   const handleUp = () => {
     mouse.down = false;
@@ -172,7 +178,7 @@
       mouse.previous = newMouse;
     }
 
-    const delta = Vec.sub(newMouse, mouse.previous);
+    const delta = newMouse.sub(mouse.previous);
 
     mouse.previous = newMouse;
     mouse.lastMove = globalThis.performance.now();
@@ -182,10 +188,10 @@
       .scale(delta.length())
       .scale(sensitivityMouse);
 
-    impulseThisFrame = Vec.sum(impulseThisFrame, axis);
+    impulseThisFrame = impulseThisFrame.sum(axis);
 
     const rotation = Quat.fromAxis(axis);
-    orient.set(Quat.mul(rotation, orient.get()));
+    orient.set(rotation.mul(orient.get()));
   };
 
   document.addEventListener("mousemove", handleMove);
@@ -212,10 +218,10 @@
     const axis = Vec(event.deltaY, -event.deltaX, 0)
       .scale(sensitivityWheel);
 
-    impulseThisFrame = Vec.sum(impulseThisFrame, axis);
+    impulseThisFrame = impulseThisFrame.sum(axis);
 
     const rotation = Quat.fromAxis(axis);
-    orient.set(Quat.mul(rotation, orient.get()));
+    orient.set(rotation.mul(orient.get()));
   };
 
   document.addEventListener("wheel", handleWheel, { passive: false });
@@ -255,7 +261,7 @@
     }
 
     if (globalThis.performance.now() - mouse.lastMove > screensaverTimeoutMs) {
-      velocity = Vec.sum(impulseIdle.scale(effectiveDelta * 3), velocity);
+      velocity = velocity.sum(impulseIdle.scale(effectiveDelta));
     }
 
     const axis = Vec(velocity.x, velocity.y, velocity.z)
@@ -264,7 +270,7 @@
 
     const rotation = Quat.fromAxis(axis);
 
-    orient.set(Quat.mul(rotation, orient.get()));
+    orient.set(rotation.mul(orient.get()));
 
     requestAnimationFrame(updateFrame);
   };
