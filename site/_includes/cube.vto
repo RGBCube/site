@@ -1,37 +1,33 @@
 <style>
-  :root {
-    --cube-width: 5rem;
-  }
-
   html {
     font-size: min(9svw, 9svh, 4.5rem);
     overscroll-behavior: none;
   }
 
   cube-face {
-    height: var(--cube-width);
-    width: var(--cube-width);
+    height: {{ cube_size }};
+    width: {{ cube_size }};
 
     position: absolute;
   }
 
   /* Guess what? Yeah, you guessed right. Safari can't render shit. */
-  .cube-face-front  { transform: rotateY(0deg)                  translateZ(calc(var(--cube-width) / 2 - 1px)); }
-  .cube-face-top    { transform: rotateX( 89.99999999999999deg) translateZ(calc(var(--cube-width) / 2 - 1px)); }
-  .cube-face-back   { transform: rotateY(180deg)                translateZ(calc(var(--cube-width) / 2 - 1px)); }
-  .cube-face-bottom { transform: rotateX(-89.99999999999999deg) translateZ(calc(var(--cube-width) / 2 - 1px)); }
-  .cube-face-right  { transform: rotateY( 89.99999999999999deg) translateZ(calc(var(--cube-width) / 2 - 1px)); }
-  .cube-face-left   { transform: rotateY(-89.99999999999999deg) translateZ(calc(var(--cube-width) / 2 - 1px)); }
+  .cube-face-front  { transform: rotateY(0deg)                  translateZ(calc({{ cube_size }} / 2 - 1px)); }
+  .cube-face-top    { transform: rotateX( 89.99999999999999deg) translateZ(calc({{ cube_size }} / 2 - 1px)); }
+  .cube-face-back   { transform: rotateY(180deg)                translateZ(calc({{ cube_size }} / 2 - 1px)); }
+  .cube-face-bottom { transform: rotateX(-89.99999999999999deg) translateZ(calc({{ cube_size }} / 2 - 1px)); }
+  .cube-face-right  { transform: rotateY( 89.99999999999999deg) translateZ(calc({{ cube_size }} / 2 - 1px)); }
+  .cube-face-left   { transform: rotateY(-89.99999999999999deg) translateZ(calc({{ cube_size }} / 2 - 1px)); }
 </style>
 
 <cube-scene class="
   h-dvh w-dvw
   flex items-center justify-center
-  perspective-[calc(var(--cube-width)*3)]
+  perspective-[calc({{ cube_size.replaceAll(" ", "_") }}*3)]
 ">
   <cube-itself class="
-    size-(--cube-width)
-    transform-3d transform-[translateZ(-calc(var(--cube-width)/2-1px))]
+    size-[{{ cube_size }}]
+    transform-3d transform-[translateZ(-calc({{ cube_size.replaceAll(" ", "_") }}/2-1px))]
   ">
     <cube-face draggable="false" class="cube-face-front">  {{ cube_face_front }}  </cube-face>
     <cube-face draggable="false" class="cube-face-back">   {{ cube_face_back }}   </cube-face>
