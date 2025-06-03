@@ -1,3 +1,4 @@
+{{ if cube_last }}
 <style>
   cube-face {
     height: {{ cube_size }};
@@ -14,6 +15,7 @@
   .cube-face-right  { transform: rotateY( 89.99999999999999deg) translateZ(calc({{ cube_size }} / 2 - 1px)); }
   .cube-face-left   { transform: rotateY(-89.99999999999999deg) translateZ(calc({{ cube_size }} / 2 - 1px)); }
 </style>
+{{ /if }}
 
 <cube-scene class="
   flex items-center justify-center
@@ -33,6 +35,7 @@
   </cube-itself>
 </cube-scene>
 
+{{ if cube_last }}
 <script>
   "use strict";
 
@@ -117,15 +120,16 @@
   };
 
   const orient = {
-    element: document.querySelector("cube-itself"),
+    elements: document.querySelectorAll("cube-itself"),
     quat: Quat(0, 0, 0, 1),
 
     set(q) {
       this.quat = q;
 
-      this.element.style.transform = `rotate3d(${q.x}, ${q.y}, ${q.z}, ${
-        Math.acos(q.w) * 2
-      }rad)`;
+      for (const element of this.elements) {
+        element.style.transform =
+          `rotate3d(${q.x}, ${q.y}, ${q.z}, ${Math.acos(q.w) * 2}rad)`;
+      }
     },
 
     get() {
@@ -265,3 +269,4 @@
 
   updateFrame(0);
 </script>
+{{ /if }}
