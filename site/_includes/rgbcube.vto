@@ -1,0 +1,72 @@
+<style>
+  cube-face {
+    display: flex;
+
+    &::after {
+      z-index: -1;
+      content: "";
+
+      height: inherit;
+      width: inherit;
+
+      position: absolute;
+    }
+  }
+
+  .cube-face-front {
+    background: linear-gradient(to bottom, cyan, blue);
+
+    &::after {
+      background: linear-gradient(to bottom, white, magenta);
+      mask-image: linear-gradient(to left, magenta, transparent);
+    }
+  }
+
+  .cube-face-top {
+    background: linear-gradient(to bottom, lime, cyan);
+
+    &::after {
+      background: linear-gradient(to bottom, yellow, white);
+      mask-image: linear-gradient(to left, white, transparent);
+    }
+  }
+
+  .cube-face-back {
+    background: linear-gradient(to bottom, yellow, red);
+
+    &::after {
+      background: linear-gradient(to bottom, lime, black);
+      mask-image: linear-gradient(to left, black, transparent);
+    }
+  }
+
+  .cube-face-bottom {
+    background: linear-gradient(to bottom, blue, black);
+
+    &::after {
+      background: linear-gradient(to bottom, magenta, red);
+      mask-image: linear-gradient(to left, red, transparent);
+    }
+  }
+
+  .cube-face-right {
+    background: linear-gradient(to bottom, white, magenta);
+
+    &::after {
+      background: linear-gradient(to bottom, yellow, red);
+      mask-image: linear-gradient(to left, red, transparent);
+    }
+  }
+
+  .cube-face-left {
+    background: linear-gradient(to bottom, lime, black);
+
+    &::after {
+      background: linear-gradient(to bottom, cyan, blue);
+      mask-image: linear-gradient(to left, blue, transparent);
+    }
+  }
+</style>
+
+{{ include "cube.vto" }}
+
