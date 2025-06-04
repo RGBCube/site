@@ -1,6 +1,6 @@
 ---
 layout: text.vto
-title: about:rgbcube
+title: A B O U T
 ---
 
 <div class="flex justify-center">

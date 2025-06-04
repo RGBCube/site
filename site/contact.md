@@ -1,6 +1,6 @@
 ---
 layout: text.vto
-title: about:telecommunication
+title: C O N T A C T
 ---
 
 You can contact me via:
