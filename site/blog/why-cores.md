@@ -254,5 +254,15 @@ It turns out that CPU It's common for chip manufacturers to disable faulty or
 degraded cores before shipping. Or if a lower tier SKU[^Stock Keeping Unit] is
 selling more, cores of higher tier SKUs are disabled to match expectations.
 
-Most likely the 32 core CPU I was testing this on was actually just the 64 core
-version with a bunch of the cores disabled.
+This process is called `binning`, and it exists to not waste silicon. Since
+silicon manufacturing is not perfect, some CPUs are more faulty, thus slower
+than others. The process determintes how faulty a CPU is and sorts them into
+"bins". This is also why lower tier CPUs who are almost exactly the same as
+higher tier CPUs exist.
+
+The likelyhood of faulty silicon also increases with the smaller the
+architechture size gets (the Apple M4 is 4m, which is crazy), so this method of
+recycling worse chips is becoming much more valuable by the day.
+
+So, in summary the 32 core CPU I was testing this on was most likely just the 64
+core version with a bunch of the cores disabled.
