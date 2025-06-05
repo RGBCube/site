@@ -3,6 +3,9 @@ title: "Why more `/sys/class/hwmon/*/temp*_label` than CPU cores?"
 
 date: 2025-06-05
 
+color: "#99CF9F"
+thumbnail: /assets/images/cpu-dumb-maybe.webp
+
 keywords:
 - hardware
 ---
