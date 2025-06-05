@@ -171,7 +171,7 @@ html, body {
       @apply wrap-anywhere;
     }
 
-    &:not(:has(> code:only-child)) {
+    &:not(:has(> code:only-child)):not(:has(> img)) {
       @apply px-1;
 
       &:not(.font-mono) {
@@ -230,8 +230,8 @@ html, body {
   code:not(pre > code) {
     @apply border-1 border-dotted px-2 py-0.5 border-black dark:border-white;
 
-    a:hover &:not(:is(h1, h2, h3, h4, h5, h6) *),
-    a:active &:not(:is(h1, h2, h3, h4, h5, h6) *) {
+    a:hover &:not(:only-child, :is(h1, h2, h3, h4, h5, h6) *),
+    a:active &:not(:only-child, :is(h1, h2, h3, h4, h5, h6) *) {
       @apply border-transparent;
     }
   }
@@ -252,9 +252,7 @@ html, body {
     }
 
     & li::before {
-      @apply pr-1;
-
-      content: "[" counter(item) "]";
+      content: counter(item) ". ";
     }
   }
 

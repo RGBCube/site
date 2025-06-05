@@ -15,12 +15,10 @@ it a reputation of being arcane and hard to use.
 I'll be explaining the contents of the following iceberg chart, which includes
 some truly arcane examples of Nix code.
 
-Some knowledge of Nix is required, you may get confused in the terminology if
-you've never used it.
+Some knowledge of Nix is required, you may get confused with the terminology if
+you've never used Nix.
 
-![The Nix Iceberg](/assets/images/nix-iceberg.webp)
-
-[Here's the original source for this image, on cohost.](https://cohost.org/leftpaddotpy/post/3885451-the-nix-iceberg)
+[![The Nix Iceberg](/assets/images/nix-iceberg.webp)](https://cohost.org/leftpaddotpy/post/3885451-the-nix-iceberg)
 
 Let's start:
 
@@ -53,7 +51,7 @@ So, what are we doing in this snippet?
 2. Creating a derivation that runs an echo command, which writes a Nix
    expression to the output file.
 3. Then we import the output file, forcing the derivation to be realized as we
-   accessed the contents of it.
+   just accessed the contents of it.
 
 > Wait, what does _realization_ mean?
 
@@ -518,14 +516,14 @@ known.
 
 # Tier 3: `assigned nix hacker at employment`
 
-<h2>
+<h2><small>
 
 ```sh
 #!/usr/bin/env nix-shell
 #!nix-shell -i python3 -p python3
 ```
 
-</h2>
+</small></h2>
 
 _(taken verbatim from `man nix-shell`)_
 
@@ -564,7 +562,16 @@ print t
 
 ## `--accept-flake-config` more like `--pwn-me-mommy`
 
-TODO
+The
+[`accept-flake-config`](https://nix.dev/manual/nix/2.29/command-ref/conf-file#conf-accept-flake-config)
+Nix configuration variable or `--accept-flake-config` flag in Nix commands
+allows Nix to unconditionally accept flake `nixConfig`'s.
+
+This is dangerous, because this can enable `builtins.importNative` by enabling
+the
+[`allow-unsafe-native-code-during-evaluation`](https://nix.dev/manual/nix/2.29/command-ref/conf-file#conf-allow-unsafe-native-code-during-evaluation)
+option, which then allows Nix expresions to load arbitrary dynamic libraries,
+which can do anything as they are not confined to the Nix evaluation sandbox.
 
 ## Zilch
 
@@ -716,8 +723,7 @@ But if two attribute sets that are compared have the same memory location, Nix
 ignores this and does a pointer comparison, totally ignoring all members. This
 is a hack.
 
-[Link to code that does this.](https://github.com/NixOS/nix/blob/aa165301d1ae3b306319a6a834dc1d4e340a7112/src/libexpr/eval.cc#L2525-L2528)
-Here's the snippet:
+[Here's the snippet:](https://github.com/NixOS/nix/blob/aa165301d1ae3b306319a6a834dc1d4e340a7112/src/libexpr/eval.cc#L2525-L2528)
 
 ```cpp
 bool EvalState::eqValues(Value & v1, Value & v2, const PosIdx pos, std::string_view errorCtx)
@@ -778,10 +784,11 @@ impure binaries to the Nix store.
 
 ## `rec { a = 5; b = a + 1; __overrides.a = 6; }`
 
-There is a special field named `__overrides` in recursive attrset expressions,
-which simply overrides the parent attribute set with the keys inside it. This is
-different from the update operator (`//`) because that will not override the
-self-references in the recursive attribute set.
+There is a special field named `__overrides` in keyed expressions (attribute
+sets, `let-in`'s and as secret third thing), which simply overrides the parent
+attribute set with the keys inside it. This is different from the update
+operator (`//`) because that will not override the self-references in the
+recursive attribute set.
 
 `rec { a = 5; b = a + 1; __overrides.a = 6; }.b` will evaluate to 7, while
 `(rec { a = 5; b = a + 1; } // { a = 6; }).b` will evaluate to 6.
@@ -813,7 +820,58 @@ TODO
 
 ## `let a = _: -1; or = 6; in [ a or 9 ]`
 
-TODO
+The Nix parser is weird.
+
+Normally, `or` is used for attribute path selection defaults:
+
+```nix
+{ foo = 123; }.not-here.not-here-either or 123
+```
+
+That above evaluates to `123`.
+
+But when parsing an expression that is not an attribute-select, `or` is treated
+as an identifier. This means that in the following `let-in`, we are passing `or`
+to `a`.
+
+```nix
+let
+  a = _: -1;
+  or = 6;
+in a or
+```
+
+But there is another piece of weirdness. Function applications that use the
+literal `or` have higher precedence than the spaces when parsing lists, so these
+two codeblocks are not equivalent:
+
+```nix
+let
+  a = _: -1;
+  or = 6;
+in [ a or ]
+```
+
+> This evaluates to `[ -1 ]`
+
+```nix
+let
+  a = _: -1;
+  foo = 6;
+in [ a foo ]
+```
+
+> This evaluates to `[ <LAMBDA> 6 ]`
+
+However, this behaviour might get removed in the future. But currently, in the
+Nix version that I am using which is `2.28.3`, it prints this warning instead:
+
+```text
+warning: at «string»:4:6: This expression uses `or` as an identifier in a way that will change in a future Nix release.
+Wrap this entire expression in parentheses to preserve its current meaning:
+    (a or)
+Give feedback at https://github.com/NixOS/nix/pull/11121
+```
 
 ## eelco's home address is in nixpkgs
 
@@ -821,15 +879,24 @@ TODO
 
 ## `restrict-eval`
 
-TODO
+[From the Nix manual:](https://nix.dev/manual/nix/2.29/command-ref/conf-file.html?highlight=restrict-eval#conf-restrict-eval)
+
+> If set to true, the Nix evaluator will not allow access to any files outside
+> of `builtins.nixPath`, or to URIs outside of `allowed-uris`.
 
 ## nix2
 
 ## `__noChroot`
 
-TODO
+When the
+[`sandbox`](https://nix.dev/manual/nix/2.29/command-ref/conf-file.html?highlight=__nos#conf-sandbox)
+Nix configuration value is set to `relaxed`, fixed-output derivations (FODs)
+that have the `__noChroot` attribute set to `true` will not run in the Nix
+sandbox.
 
 ## cloud scale hydra
+
+TODO
 
 ## `(_:_) != (_:_)` but `(a:a) == (a:a)`
 
@@ -854,3 +921,112 @@ TODO
 This is the legacy `let` syntax. Equivalent to `let huh = "?"; in huh`.
 
 ## Tier 6: `has meowed before`
+
+### `let { body = 1; __overrides.body = 2; }`
+
+This is a combination of [`__override`](#rec-a-5-b-a-1-overridesa-6-) for keyed
+experessions and the [`legacy let syntax`](#let-huh-body-huh-).
+
+### function identity is load bearing on importing nixpkgs
+
+Since
+[attribute sets with function members compare function identities (memory locations)](#let-f-a-a-s-ff-in-f-f-s-s),
+comparing any attribute set that contains a function is load-bearing on the
+function's identity.
+
+The way this affects importing nixpkgs is that nixpkgs internally compares
+stdenvs, which contain functions, to determine whether if we are
+cross-compiling.nixpkgs internally compares stdenvs, which contain functions, to
+determine whether if we are cross-compiling.
+
+Therefore, function identity really **is** load bearing on importing nixpkgs.
+
+### `import <nix/fetchurl.nix>`
+
+This looks like we are importing <nix>, and getting the `fetchurl.nix` file in
+it.
+
+Let's see if that is true:
+
+```nix
+nix-repl> builtins.readDir <nix>
+```
+
+<!-- TODO: Say: There doesn't seem to be a `fetchurl.nix` file here. After it doesn't exist. -->
+
+This is because `<nix>` is actually `corepkgs`, which is a Nix path
+[defined inside Nix itself.](https://github.com/NixOS/nix/blob/2afc84fddf463b22196aeb70587bc0c9259e330f/src/libexpr/eval.cc#L321)
+
+[Later, the `fetchurl.nix` path is defined in `corepkgs`](https://github.com/NixOS/nix/blob/2afc84fddf463b22196aeb70587bc0c9259e330f/src/libexpr/eval.cc#L363)
+and its contents are set to a
+[generated C++ header.](https://github.com/NixOS/nix/blob/2afc84fddf463b22196aeb70587bc0c9259e330f/src/libexpr/meson.build#L129-L135)
+
+### test suite of nix wasn't run
+
+TODO
+
+### fixed-output derivation sandboxing
+
+TODO
+
+### `importNative`
+
+[`builtins.importNative`](https://nix.dev/manual/nix/2.24/command-ref/conf-file.html#conf-allow-unsafe-native-code-during-evaluation)
+allows Nix expressions to import arbitrary dynamic libraries to produce Nix
+expressions.
+
+Of course, this is turned off by default as it is a security risk. You probably
+shouldn't use this.
+
+### `chromium recompressTarball`
+
+TODO
+
+### more than 1 million chars of indents breaks things
+
+The weird Nix parser
+[hard codes `1000000`](https://github.com/NixOS/nix/blob/2afc84fddf463b22196aeb70587bc0c9259e330f/src/libexpr/include/nix/expr/parser-state.hh#L250)
+instead of `SIZE_MAX` when determining the minimum indent to strip in strings
+spanning multiple lines.
+
+So when you have a line with more than a million spaces for the indent, it is
+ignored and not included in the minimum indent calculation.
+
+## Tier 7: `wears animal ears to NixCon`
+
+<h2><small>
+
+```nix
+nix-repl> builtins.fromJSON ''{"uwu\u0000": 1, "uwu": 2}''
+{ uwu = 2; "uwu" = 1; }
+```
+
+</small></h2>
+
+TODO
+
+## `(_: builtins.break _)`
+
+TODO
+
+## multiplayer tic-tac-toe in nix repl
+
+TODO
+
+## `let e="e"; in [001.2e01e.30.4]`
+
+TODO
+
+## `/__corepkgs__/`
+
+[Already explained previously.](#import-nixfetchurlnix)
+
+## `some-expr`
+
+TODO
+
+## `__darwinAllowLocalNetworking`
+
+TODO
+
+## `builtins.derivationStrict`
