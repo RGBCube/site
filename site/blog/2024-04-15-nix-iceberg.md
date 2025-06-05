@@ -744,7 +744,7 @@ want with this information.
 
 As surprising as it sounds, Nix does indeed supports plugins. You can load
 plugins using the
-[`plugin-files`](https://nix.dev/manual/nix/2.22/command-ref/conf-file#conf-plugin-files)
+[`plugin-files`](https://nix.dev/manual/nix/2.29/command-ref/conf-file.html#conf-plugin-files)
 configuration option.
 
 From the configuration reference:
@@ -776,7 +776,7 @@ Some example plugins are [`nix-doc`](https://github.com/lf-/nix-doc) and
 ## `/bin/sh` and sandbox impurity
 
 By setting the
-[`sandbox-paths`](https://nix.dev/manual/nix/2.22/command-ref/conf-file#conf-sandbox-paths)
+[`sandbox-paths`](https://nix.dev/manual/nix/2.29/command-ref/conf-file#conf-sandbox-paths)
 option to `/bin/sh=/bin/sh`, Nix will bind the `/bin/sh` path in the build
 sandbox (left) to the `/bin/sh` path in the host (right). This is of course
 impure, but is useful for bootstrapping from absolute scratch without copying
@@ -971,7 +971,7 @@ TODO
 
 ### `importNative`
 
-[`builtins.importNative`](https://nix.dev/manual/nix/2.24/command-ref/conf-file.html#conf-allow-unsafe-native-code-during-evaluation)
+[`builtins.importNative`](https://nix.dev/manual/nix/2.29/command-ref/conf-file.html#conf-allow-unsafe-native-code-during-evaluation)
 allows Nix expressions to import arbitrary dynamic libraries to produce Nix
 expressions.
 
