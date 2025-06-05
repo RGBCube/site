@@ -2,8 +2,6 @@
 title: Cosmic Drift
 description: Or how I missed the school bus because of a cosmic ray.
 
-date: 2024-04-02
-
 keywords:
   - time
   - unix-timestamps

@@ -2,7 +2,6 @@
 title: Explaining the Nix iceberg
 description: And revealing how cursed Nix is.
 
-date: 2024-04-15
 draft: true
 
 keywords:

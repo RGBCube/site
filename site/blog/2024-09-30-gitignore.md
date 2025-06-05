@@ -5,8 +5,6 @@ description: And how to roll the rock over the edge.
 color: "#A5804C"
 thumbnail: /assets/images/sisyphus-ds-store.webp
 
-date: 2024-09-30
-
 keywords:
 - vcs
 ---
