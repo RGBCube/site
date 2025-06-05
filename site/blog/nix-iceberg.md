@@ -27,7 +27,7 @@ Let's start:
 
 # Tier 1: `btw I use NixOS`
 
-## IFD blocks evaulation
+## IFD blocks evaluation
 
 IFD (**I**mport-**F**rom-**D**erivation) is when you import a Nix expression
 from a derivation in the Nix store.
@@ -185,7 +185,7 @@ derivations differ with colored output.
 
 ## `nix-shell -p` gives you a compiler
 
-[As mentione before](#nix-shell-and-nix-shell-are-completely-different)
+[As mentioned before](#nix-shell-and-nix-shell-are-completely-different)
 `nix-shell -p` is the nixpkgs stdenv plus the specified packages.
 
 And since the stdenv includes a C compiler, so does the shell you enter after
@@ -208,7 +208,7 @@ The original source was deleted, so I've seeded it on radicle.
 
 ## `--debugger`
 
-The `--debugger` flag is used to halt evaulation and enter the Nix REPL when
+The `--debugger` flag is used to halt evaluation and enter the Nix REPL when
 evaluating a Nix expression.
 
 You set breakpoints using the `builtins.break` function:
@@ -219,7 +219,7 @@ let
   bar = "baz";
 
   # Nix will stop right here, just before
-  # evaulating the attrset passed into
+  # evaluating the attrset passed into
   # `builtins.break`. We are able to access
   # `foo` and `bar`.
 in builtins.break {
@@ -227,7 +227,7 @@ in builtins.break {
 }
 ```
 
-Evaulate this expression with `nix eval --debugger --expr/--file` and see.
+Evaluate this expression with `nix eval --debugger --expr/--file` and see.
 
 <!-- TODO: Mention that this didn't use to work. -->
 
@@ -275,7 +275,7 @@ in pkgs.fetchurl {
 
 The [`boolean-option` GitHub organization](https://github.com/boolean-option)
 allows flakes to be configured. Let's say you have a flake that provides a
-binary. Let's also assume you can run it with the following Nix CLI invokation:
+binary. Let's also assume you can run it with the following Nix CLI invocation:
 
 ```sh
 nix run github:me/hello-world
@@ -507,7 +507,7 @@ true
 
 This syntax is a way to check for the existence of a key in an attribute set.
 
-`{ foo = 42; } ? foo` evaulates to `true`. The same applies for
+`{ foo = 42; } ? foo` evaluates to `true`. The same applies for
 `{ foo = 42; } ? "foo"`, which is just using a string identifier instead.
 
 You can also do `{ foo.bar = 13; } ? foo.bar`, though this isn't that well
@@ -662,7 +662,7 @@ get something similar to this:
 
 `__functor` is a magic attribute that attribute sets can have which makes them
 callable. The lambda you assign to it must accept 2 arguments[^Technically,
-lambdas in Nix always take a sigle argument. But for clarity, I'll just refere
+lambdas in Nix always take a single argument. But for clarity, I'll just refer
 to lambdas that return lambdas as taking `N` argument, where N is the lambda
 count.]. The first being the attribute set itself (commonly named `self") and
 the second being the argument that was passed in.
@@ -714,7 +714,7 @@ Normally, Functions in Nix cannot be compared. Comparing two functions will
 _always_ return false, at least when done directly.
 
 But if two attribute sets that are compared have the same memory location, Nix
-ignores this and does a pointer comparision, totally ignoring all members. This
+ignores this and does a pointer comparison, totally ignoring all members. This
 is a hack.
 
 [Link to code that does this.](https://github.com/NixOS/nix/blob/aa165301d1ae3b306319a6a834dc1d4e340a7112/src/libexpr/eval.cc#L2525-L2528)
@@ -732,12 +732,12 @@ bool EvalState::eqValues(Value & v1, Value & v2, const PosIdx pos, std::string_v
     if (&v1 == &v2) return true;
 ```
 
-This "temporary hack" was commited in 15 years ago. You can do whatever you want
-with this information.
+This "temporary hack" was committed in 15 years ago. You can do whatever you
+want with this information.
 
 ## `nix plugins`
 
-As suprising as it sounds, Nix does indeed supports plugins. You can load
+As surprising as it sounds, Nix does indeed supports plugins. You can load
 plugins using the
 [`plugin-files`](https://nix.dev/manual/nix/2.22/command-ref/conf-file#conf-plugin-files)
 configuration option.
@@ -782,7 +782,7 @@ impure binaries to the Nix store.
 There is a special field named `__overrides` in recursive attrset expressions,
 which simply overrides the parent attribute set with the keys inside it. This is
 different from the update operator (`//`) because that will not override the
-self-refereneces in the recursive attribute set.
+self-references in the recursive attribute set.
 
 `rec { a = 5; b = a + 1; __overrides.a = 6; }.b` will evaluate to 7, while
 `(rec { a = 5; b = a + 1; } // { a = 6; }).b` will evaluate to 6.

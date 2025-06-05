@@ -138,7 +138,7 @@ We also got support for other types for free, as well!
 These are all the hidden builtins that
 [HTMNIX](https://github.com/RGBCube/HTMNIX) depends on and extends upon, making
 HTML in Nix an actually usable reality. It also has extra logic like turning
-attribute sets into HTML tags, which is fairly trivial compared to actaully
+attribute sets into HTML tags, which is fairly trivial compared to actually
 discovering these hidden builtins in the first place.
 
 You can read more about it in the project's README and see
