@@ -1,0 +1,258 @@
+---
+title: "Why more `/sys/class/hwmon/*/temp*_label` than CPU cores?"
+
+date: 2025-06-05
+
+keywords:
+- hardware
+---
+
+So, I am currently working on a Linux tool+daemon to replace
+[`auto-cpufreq`](https://github.com/AdnanHodzic/auto-cpufreq) with a more
+efficient, tunable and observable alternative.
+
+And obviously, to tune a CPU well, knowing how hot it is is a requirement.
+
+Then, how do you actually see how hot your CPU is in Linux? Using
+`/sys/class/hwmon` of course.
+
+This path contains hardware monitoring devices. In the laptop I'm testing this
+on, `hwmon4` under this directory corresponds to the CPU.
+
+Let's run a `tree`:
+
+```text
+/sys/class/hwmon/hwmon4 -> ../../devices/platform/coretemp.0/hwmon/hwmon4
+├── device -> ../../../coretemp.0
+│   ├── driver_override
+│   ├── hwmon
+│   ├── modalias
+│   ├── power
+│   ├── subsystem -> ../../../bus/platform
+│   └── uevent
+├── name
+├── power
+│   ├── autosuspend_delay_ms
+│   ├── control
+│   ├── runtime_active_time
+│   ├── runtime_status
+│   └── runtime_suspended_time
+├── subsystem -> ../../../../../class/hwmon  [recursive, not followed]
+├── temp10_crit
+├── temp10_crit_alarm
+├── temp10_input
+├── temp10_label
+├── temp10_max
+├── temp14_crit
+├── temp14_crit_alarm
+├── temp14_input
+├── temp14_label
+├── temp14_max
+├── temp18_crit
+├── temp18_crit_alarm
+├── temp18_input
+├── temp18_label
+├── temp18_max
+├── temp1_crit
+├── temp1_crit_alarm
+├── temp1_input
+├── temp1_label
+├── temp1_max
+├── temp22_crit
+├── temp22_crit_alarm
+├── temp22_input
+├── temp22_label
+├── temp22_max
+├── temp26_crit
+├── temp26_crit_alarm
+├── temp26_input
+├── temp26_label
+├── temp26_max
+├── temp2_crit
+├── temp2_crit_alarm
+├── temp2_input
+├── temp2_label
+├── temp2_max
+├── temp30_crit
+├── temp30_crit_alarm
+├── temp30_input
+├── temp30_label
+├── temp30_max
+├── temp34_crit
+├── temp34_crit_alarm
+├── temp34_input
+├── temp34_label
+├── temp34_max
+├── temp35_crit
+├── temp35_crit_alarm
+├── temp35_input
+├── temp35_label
+├── temp35_max
+├── temp36_crit
+├── temp36_crit_alarm
+├── temp36_input
+├── temp36_label
+├── temp36_max
+├── temp37_crit
+├── temp37_crit_alarm
+├── temp37_input
+├── temp37_label
+├── temp37_max
+├── temp38_crit
+├── temp38_crit_alarm
+├── temp38_input
+├── temp38_label
+├── temp38_max
+├── temp39_crit
+├── temp39_crit_alarm
+├── temp39_input
+├── temp39_label
+├── temp39_max
+├── temp40_crit
+├── temp40_crit_alarm
+├── temp40_input
+├── temp40_label
+├── temp40_max
+├── temp41_crit
+├── temp41_crit_alarm
+├── temp41_input
+├── temp41_label
+├── temp41_max
+├── temp42_crit
+├── temp42_crit_alarm
+├── temp42_input
+├── temp42_label
+├── temp42_max
+├── temp43_crit
+├── temp43_crit_alarm
+├── temp43_input
+├── temp43_label
+├── temp43_max
+├── temp44_crit
+├── temp44_crit_alarm
+├── temp44_input
+├── temp44_label
+├── temp44_max
+├── temp45_crit
+├── temp45_crit_alarm
+├── temp45_input
+├── temp45_label
+├── temp45_max
+├── temp46_crit
+├── temp46_crit_alarm
+├── temp46_input
+├── temp46_label
+├── temp46_max
+├── temp47_crit
+├── temp47_crit_alarm
+├── temp47_input
+├── temp47_label
+├── temp47_max
+├── temp48_crit
+├── temp48_crit_alarm
+├── temp48_input
+├── temp48_label
+├── temp48_max
+├── temp49_crit
+├── temp49_crit_alarm
+├── temp49_input
+├── temp49_label
+├── temp49_max
+├── temp6_crit
+├── temp6_crit_alarm
+├── temp6_input
+├── temp6_label
+├── temp6_max
+└── uevent
+```
+
+Let's `cat` all the `_label` files:
+
+```text
+/sys/class/hwmon/hwmon4/temp1_label:
+Package id 0
+/sys/class/hwmon/hwmon4/temp2_label:
+Core 0
+/sys/class/hwmon/hwmon4/temp6_label:
+Core 4
+/sys/class/hwmon/hwmon4/temp10_label:
+Core 8
+/sys/class/hwmon/hwmon4/temp14_label:
+Core 12
+/sys/class/hwmon/hwmon4/temp18_label:
+Core 16
+/sys/class/hwmon/hwmon4/temp22_label:
+Core 20
+/sys/class/hwmon/hwmon4/temp26_label:
+Core 24
+/sys/class/hwmon/hwmon4/temp30_label:
+Core 28
+/sys/class/hwmon/hwmon4/temp34_label:
+Core 32
+/sys/class/hwmon/hwmon4/temp35_label:
+Core 33
+/sys/class/hwmon/hwmon4/temp36_label:
+Core 34
+/sys/class/hwmon/hwmon4/temp37_label:
+Core 35
+/sys/class/hwmon/hwmon4/temp38_label:
+Core 36
+/sys/class/hwmon/hwmon4/temp39_label:
+Core 37
+/sys/class/hwmon/hwmon4/temp40_label:
+Core 38
+/sys/class/hwmon/hwmon4/temp41_label:
+Core 39
+/sys/class/hwmon/hwmon4/temp42_label:
+Core 40
+/sys/class/hwmon/hwmon4/temp43_label:
+Core 41
+/sys/class/hwmon/hwmon4/temp44_label:
+Core 42
+/sys/class/hwmon/hwmon4/temp45_label:
+Core 43
+/sys/class/hwmon/hwmon4/temp46_label:
+Core 44
+/sys/class/hwmon/hwmon4/temp47_label:
+Core 45
+/sys/class/hwmon/hwmon4/temp48_label:
+Core 46
+/sys/class/hwmon/hwmon4/temp49_label:
+Core 47
+```
+
+Notice something? I do:
+
+- `temp1_label` is `Package id 0` - what is that?
+- Other core numbers make no sense. This device only has 32 cores, there
+  shouldn't be any gaps within numbers and the numbers shouldn't go that high.
+
+The explanation for the first point is simple, looking at the kernel
+[`coretemp.c`](https://github.com/torvalds/linux/blob/ec7714e4947909190ffb3041a03311a975350fe0/drivers/hwmon/coretemp.c#L348)
+implementation, we can see that it is the temperature of the CPU as a whole:
+
+```c
+static ssize_t show_label(
+  struct device *dev,
+  struct device_attribute *devattr,
+  char *buf
+) {
+  struct platform_data *pdata = dev_get_drvdata(dev);
+  struct temp_data *tdata = container_of(devattr, struct temp_data, sd_attrs[ATTR_LABEL]);
+
+  if (is_pkg_temp_data(tdata))
+    return sprintf(buf, "Package id %u\n", pdata->pkg_id);
+
+  return sprintf(buf, "Core %u\n", tdata->cpu_core_id);
+}
+```
+
+That leaves us the second question. Why do we have CPUs 1, 2, 6, 10, 14, 18, 22,
+26, 30, 34-49, instead of the expected 0-31?
+
+It turns out that CPU It's common for chip manufacturers to disable faulty or
+degraded cores before shipping. Or if a lower tier SKU[^Stock Keeping Unit] is
+selling more, cores of higher tier SKUs are disabled to match expectations.
+
+Most likely the 32 core CPU I was testing this on was actually just the 64 core
+version with a bunch of the cores disabled.
