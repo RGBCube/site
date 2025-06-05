@@ -154,12 +154,12 @@ site.use(sitemap({
 site.use(lightningcss()); // TODO: LightningCSS doesn't handle inline styles.
 site.use(inline());
 
-site.use(minifyHtml({
-  options: {
-    // TODO: This breaks tailwind.
-    // minify_css: true,
-    minify_js: true,
-  },
-}));
+// site.use(minifyHtml({
+//   options: {
+//     // TODO: This breaks tailwind.
+//     // minify_css: true,
+//     minify_js: true,
+//   },
+// }));
 
 export default site;

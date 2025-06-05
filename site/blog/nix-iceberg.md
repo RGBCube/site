@@ -9,24 +9,28 @@ keywords:
 - nix
 ---
 
-I was surfing the web a few weeks ago, and I came across this iceberg chart:
+Everyone who has ever interacted with Nix tooling knows that it keeps some
+secrets. It even keeps some so well hidden that it hinders its adoption, giving
+it a reputation of being arcane and hard to use.
+
+I'll be explaining the contents of the following iceberg chart, which includes
+some truly arcane examples of Nix code.
+
+Some knowledge of Nix is required, you may get confused in the terminology if
+you've never used it.
 
 ![The Nix Iceberg](/assets/images/nix-iceberg.webp)
 
-[Here's the original source for this image,
-created by @leftpaddotpy, @puckipedia,
-@wiggles and @qyriad on cohost.](https://cohost.org/leftpaddotpy/post/3885451-the-nix-iceberg)
+[Here's the original source for this image, on cohost.](https://cohost.org/leftpaddotpy/post/3885451-the-nix-iceberg)
 
-In this post, I'll be explaining every item in this iceberg with sufficient
-depth. Let's start:
+Let's start:
 
-# Tier 1: I use NixOS (BTW)
+# Tier 1: `btw I use NixOS`
 
 ## IFD blocks evaulation
 
-> IFD stands for import-from-derivation.
-
-IFD is when you import a Nix expression from a derivation in the Nix store.
+IFD (**I**mport-**F**rom-**D**erivation) is when you import a Nix expression
+from a derivation in the Nix store.
 
 For example:
 
@@ -38,8 +42,8 @@ let
     echo '{ a = "b"; }' > $out
   '';
 
-  mySet = import myNixExprDeriv;
-in mySet.a
+  myAttributes = import myNixExprDeriv;
+in myAttributes.a
 ```
 
 This will evaluate to `"b"`.
@@ -49,13 +53,13 @@ So, what are we doing in this snippet?
 1. Importing `<nixpkgs>` and getting the packages out of it.
 2. Creating a derivation that runs an echo command, which writes a Nix
    expression to the output file.
-3. Then we import the expression, forcing the derivation to be realized as we
+3. Then we import the output file, forcing the derivation to be realized as we
    accessed the contents of it.
 
 > Wait, what does _realization_ mean?
 
-It means to actually build a `.drv` file, using the builder, arguments and
-inputs described in it.
+It means to actually build a derivation, using the builder, arguments and inputs
+described within.
 
 Nix does not realize derivations until you access the contents of them or force
 them to be evaluated using the `:b` command in the Nix REPL, see these two
@@ -68,9 +72,9 @@ nix-repl> pkgs.runCommand "foo" {} "echo 'bar' > $out"
 «derivation /nix/store/h27fzbivcxw0cc1bxyyyqyivpw9rsz6k-foo.drv»
 ```
 
-Here, it did create a `.drv` file. But that's it. There is no
-`/nix/store/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA-foo` with contents `bar` to be
-seen.
+Here, it created a `.drv` file, which is how derivations are represented. But
+that's it. There is no `/nix/store/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA-foo` with
+contents `bar` to be seen.
 
 ```nix
 nix-repl> :b pkgs.runCommand "foo" {} "echo 'bar' > $out"
@@ -86,15 +90,15 @@ Where were we again? Right, the 3rd point:
 be realized as we accessed the contents of it.`
 
 The 3rd point is the important part. A typical Nix expression does not depend on
-the output contents of any derivation, which in turn makes evaluating a Nix
-expression not require realizing _any_ derivations.
+the output of any derivation, which in turn makes evaluating a Nix expression
+not require realizing _any_ derivations whatsoever.
 
 But with IFD, you have to realize a derivation to even finish the evaluation of
 your Nix expression. This will block Nix evaluation for a long time, as Nix is
-evaluated on a single thread and realizing the derivation needed takes a
-non-trivial amount of time.
+evaluated on a single thread and realizing any derivation takes a non-trivial
+amount of time.
 
-TL;DR: IFD blocks evaluation because:
+### TL;DR: IFD blocks evaluation because:
 
 1. Evaluation is single threaded, so naturally everything blocks it.
 2. You're trying to access a derivation _output_, so obviously you need to
@@ -111,45 +115,43 @@ the `--packages/-p` argument for `nix-shell`
 
 `nix-shell -p` is similar to `nix shell`. But they are not the same.
 
-`nix-shell -p` creates a shell using the stdenv by calling `pkgs.mkShell`, which
-includes all packages in the nixpkgs stdenv plus the ones you specified.
+`nix-shell -p` creates a shell using the nixpkgs stdenv (and thus depends on
+nixpkgs) by calling `pkgs.mkShell`, which includes all packages in the nixpkgs
+stdenv plus the ones you specified.
 
 `nix shell` only appends the packages you passed in to the `PATH` environment
-variable. It is much lighter, as a natural result of not using the stdenv. It
-also isn't a questionable templated Nix expression and is implemented in the Nix
-CLI natively.
+variable. It is much lighter, as a natural result of not using nixpkgs or its
+stdenv. It also doesn't have as much of a questionable implementation, as it is
+in C++ and in Nix natively instead of being a Perl script that uses string
+interpolation to produce Nix expressions.
 
-## Hydra is 17,000 lines of Perl
+## hydra is 17 000 lines of perl
 
-As the title says, [Hydra](http://github.com/NixOS/hydra), the Nix-based
-continuous build system is almost 17,000 lines of Perl.
+[Hydra](http://github.com/NixOS/hydra), the Nix-based continuous build system is
+almost 17,000 lines of Perl.
 
 Here is the `tokei` output for its GitHub repository:
 
-| Language         | Files | Lines       | Code  | Comments | Blanks |
-| ---------------- | ----- | ----------- | ----- | -------- | ------ |
-| Autoconf         | 2     | 38          | 37    | 0        | 1      |
-| Automake         | 13    | 175         | 150   | 0        | 25     |
-| C++              | 9     | 4659        | 3448  | 406      | 805    |
-| C++ Header       | 5     | 757         | 485   | 74       | 198    |
-| CSS              | 3     | 505         | 388   | 35       | 82     |
-| JavaScript       | 6     | 337         | 265   | 37       | 35     |
-| Nix              | 38    | 2029        | 1732  | 77       | 220    |
-| Nix (Markdown)   | 2     | 12          | 12    | 0        | 0      |
-| Perl             | 125   | 16754 (!!!) | 12055 | 649      | 4050   |
-| Python           | 1     | 35          | 25    | 1        | 9      |
-| Shell            | 24    | 371         | 279   | 35       | 57     |
-| Shell (Markdown) | 1     | 3           | 2     | 1        | 0      |
-| SQL              | 85    | 1406        | 989   | 202      | 215    |
-| SVG              | 6     | 6           | 6     | 0        | 0      |
-| Plain Text       | 4     | 164         | 0     | 102      | 62     |
-| YAML             | 1     | 1137        | 1094  | 0        | 43     |
-| XML (Markdown)   | 2     | 25          | 25    | 0        | 0      |
-| Markdown         | 18    | 2312        | 0     | 1744     | 568    |
-| Markdown (Total) | 18    | 2352        | 39    | 1745     | 568    |
-| Total            | 340   | 30685       | 20953 | 3362     | 6370   |
+| Language   | Files | Lines                                       | Code  | Comments | Blanks |
+| ---------- | ----- | ------------------------------------------- | ----- | -------- | ------ |
+| Autoconf   | 2     | 38                                          | 37    | 0        | 1      |
+| C++        | 8     | 4140                                        | 3068  | 360      | 712    |
+| C++ Header | 5     | 768                                         | 492   | 75       | 201    |
+| CSS        | 3     | 505                                         | 388   | 35       | 82     |
+| JavaScript | 6     | 343                                         | 270   | 37       | 36     |
+| JSON       | 1     | 24                                          | 24    | 0        | 0      |
+| Meson      | 10    | 328                                         | 293   | 9        | 26     |
+| Nix        | 48    | 2266                                        | 1948  | 84       | 234    |
+| Perl       | 127   | [**17023**](#hydra-is-17-000-lines-of-perl) | 12258 | 663      | 4102   |
+| Python     | 1     | 35                                          | 25    | 1        | 9      |
+| Shell      | 24    | 371                                         | 279   | 35       | 57     |
+| SQL        | 85    | 1406                                        | 989   | 202      | 215    |
+| SVG        | 6     | 6                                           | 6     | 0        | 0      |
+| Plain Text | 4     | 164                                         | 0     | 102      | 62     |
+| YAML       | 1     | 1137                                        | 1094  | 0        | 43     |
+| Total      | 349   | 30927                                       | 21210 | 3358     | 6359   |
 
-## Nix Pills
+## nix pills
 
 From <https://nixos.org/guides/nix-pills/>:
 
@@ -164,27 +166,27 @@ From <https://nixos.org/guides/nix-pills/>:
 
 ## `inherit`
 
-`inherit` is a keyword in the Nix language that brings a variable into an
-attribute set. It can also be used in `let in`s.
+`inherit` is a keyword in the Nix language that brings a variable into an keyed
+expression, such as an attribute set or `let in`.
 
 Check out the
-[Nix reference page](https://nixos.org/manual/nix/stable/language/constructs.html#inheriting-attributes)
-that explains the keyword in depth.
+[Nix reference page](https://nix.dev/tutorials/nix-language.html#inherit) that
+explains the keyword in depth.
 
 ## `nix-tree`
 
 [`nix-tree`](https://github.com/utdemir/nix-tree) is a tool to interactively
-browse dependency graphs of derivations. Made in Haskell, of course.
+browse dependency graphs of derivations.
 
 ## `nix-diff`
 
 [`nix-diff`](https://github.com/Gabriella439/nix-diff) is a tool to see how two
-derivations differ with colored output. Again, in Haskell.
+derivations differ with colored output.
 
 ## `nix-shell -p` gives you a compiler
 
-As mentioned in the `nix-shell and nix shell are completely different` section,
-`nix-shell -p` is the nixpkgs stdenv plus your packages.
+[As mentione before](#nix-shell-and-nix-shell-are-completely-different)
+`nix-shell -p` is the nixpkgs stdenv plus the specified packages.
 
 And since the stdenv includes a C compiler, so does the shell you enter after
 calling `nix-shell -p hello`.
@@ -193,19 +195,21 @@ calling `nix-shell -p hello`.
 
 [`nix-output-monitor`](https://github.com/maralorn/nix-output-monitor), also
 known as `NOM` is a neat visualizer for Nix builds. See it in action:
-<https://asciinema.org/a/604200>
 
-It is also programmed in Haskell. Whew.
+<script src="https://asciinema.org/a/604200.js" id="asciicast-604200" async="true"></script>
 
 ## `nix-top`
 
-[`nix-top`] is a simple Ruby script to help people see what is building in the
-local Nix daemon. to help people see what is building in the local Nix daemon.
+[`nix-top`](https://app.radicle.xyz/nodes/seed.radicle.garden/rad:z35T5UvM72Y41aJCAUuQj1cjbaVaL)
+is a simple Ruby script to help people see what is building in the local Nix
+daemon.
+
+The original source was deleted, so I've seeded it on radicle.
 
 ## `--debugger`
 
 The `--debugger` flag is used to halt evaulation and enter the Nix REPL when
-evaluating a Nix file or expression.
+evaluating a Nix expression.
 
 You set breakpoints using the `builtins.break` function:
 
@@ -214,36 +218,37 @@ let
   foo = 123;
   bar = "baz";
 
-  # Nix will stop right here, just before evaulating the attrset
-  # passed into `builtins.break`. We should be able to access
-  # `foo` and `bar`. But it doesn't work!
+  # Nix will stop right here, just before
+  # evaulating the attrset passed into
+  # `builtins.break`. We are able to access
+  # `foo` and `bar`.
 in builtins.break {
   inherit foo bar;
 }
 ```
 
-> Evaulate this file with `nix eval --debugger --file <filename>` and see.
+Evaulate this expression with `nix eval --debugger --expr/--file` and see.
 
-It is also _supposed_ to bring the variables in the scope `break` was called
-into the Nix REPL. However, this does not work. Keep on reading and you'll see
-why & what do to do bypass this bug!
+<!-- TODO: Mention that this didn't use to work. -->
 
 ## `tvix`
 
 [Tvix](https://tvix.dev/) is an alternate implementation of Nix written in Rust.
 
 It aims to have a modular implementation while also reusing already-written Nix
-crates in the Rust ecosystem so other people can reuse code instead of
-reimplementing it! It is licensed under the GPLv3 license.
+crates in the Rust ecosystem. It is licensed under the GPLv3 license.
 
-## Eelco's Thesis
+It has since slowed down in development, but the [Snix](https://snix.dev/), a
+fork of Tvix, still goes on.
 
-Eelco's thesis is about The Purely Functional Software Deployment Model. Which
+## eelco's thesis
+
+Eelco's thesis is about _The Purely Functional Software Deployment Model_. Which
 also happens to be about Nix.
 
 You can read the thesis [here](https://edolstra.github.io/pubs/phd-thesis.pdf).
 
-## Fixed-Output derivations do not rebuild with a changed URL
+## fixed-output derivations not rebuilt with changed URL
 
 Fixed output derivations (also called FODs) do not get rebuilt even if you
 change any inputs passed to them (a URL string is also an input). The reason for
@@ -253,24 +258,35 @@ Nix will see that the output is the same, and since there already is a
 derivation with the same output in the Nix store, it will assume it is cached
 and will use that derivation.
 
-# Tier 2: Package Maintainer
+Try changing the URL in the following expression and building it:
+
+```nix
+let
+  pkgs = import <nixpkgs> {};;
+in pkgs.fetchurl {
+  url = "https://raw.githubusercontent.com/NixOS/nixpkgs/56d6bf5daced702e0099e3a15f0b743363ae429d/README.md";
+  hash = "sha256-/Lrhot+ejBBfXsPEyWtzScROLkCmdRjb4LBRcHHn+IE=";
+}
+```
+
+# Tier 2: `package maintainer`
 
 ## `github:boolean-option/true`
 
 The [`boolean-option` GitHub organization](https://github.com/boolean-option)
-allows flakes to be configured in "flake compile time". Let's say you have a
-flake that provides a binary. Let's also assume you can run it with the
-following Nix CLI invokation:
+allows flakes to be configured. Let's say you have a flake that provides a
+binary. Let's also assume you can run it with the following Nix CLI invokation:
 
 ```sh
 nix run github:me/hello-world
 ```
 
 This is great, you are able to run the binary. But, there is no way for a flake
-to accept any configuration arguments. If you wanted to run in debug mode, you
-have to create another output (like `packages.x86_64-linux.{release,debug}`).
-Same for compiling without support for X/Y/Z. This results in two to the N power
-of outputs, where N is the feature toggle count.
+to accept any configuration arguments. If you wanted to run your program in
+debug mode, you have to create another output (like
+`packages.x86_64-linux.{release,debug}`). Same for compiling without support for
+X/Y/Z. This results in two to the N power of outputs, N being the feature toggle
+count.
 
 A dumb flake input like `github:boolean-option/true` fixes this, even though it
 is an ugly hack. You can do this in your flake:
@@ -293,13 +309,13 @@ is an ugly hack. You can do this in your flake:
 And override the `debug-mode` input like so, to run a debug binary instead:
 
 ```sh
-nix run github:me/hello-world --override debug-mode github:boolean-option/true
+nix run github:me/hello-world --override-input debug-mode github:boolean-option/true
 ```
 
 [`nix-systems`](https://github.com/nix-systems/nix-systems) is the same idea as
-`boolean-option`, but for systems instead.
+`boolean-option`, but for systems.
 
-[See some example usages here.](https://github.com/search?q=boolean-option+language%3ANix&type=code&l=Nix)
+[Example usages.](https://github.com/search?q=boolean-option+language%3ANix&type=code&l=Nix)
 
 These hacks wouldn't be needed if Nix allowed users to put arbitrary values in
 inputs -
@@ -323,12 +339,12 @@ This results in the literal string `"export BAR_OR_BAZ=${BAR:-BAZ}"`, without
 string interpolation.
 
 Nix will ignore an invalid `\` escape after the `''` escape in an indent string.
-Or if it is a valid one, it will just append the `\` escape to the string,
-ignoring the `''` escape.
+Or if the `\` escape is valid , it will just append the `\` escape to the
+string, ignoring the `''` escape.
 
 ## `(x: x x) (x: x x)`
 
-This expression is a way to make Nix recurse forever and stack overflow. Nix
+This expression is a way to make Nix recurse forever and overflow its stack. Nix
 can't detect it either, as the evaluated thunk is always different.
 
 ## Derivations are just memoized `execve`
@@ -450,7 +466,7 @@ explained in the man page like so:
 > provided by the currently installed version of Nix. This option disables
 > building a new Nix.
 
-And the `--target-host` flag is also documented (rare!), like so:
+And the `--target-host` flag is also documented, like so:
 
 > Specifies the NixOS target host. By setting this to something other than an
 > empty string, the system activation will happen on the remote host instead of
@@ -468,13 +484,13 @@ And the `--target-host` flag is also documented (rare!), like so:
 > the nixpkgs.crossSystem setting has to match the target platform or else
 > activation will fail.
 
-## Nix supports floats
+## nix supports floats
 
 Yup, you heard it. Nix has floats, too!
 
 Though, note that not every number in Nix is a float. Integers in Nix are stored
 as 64-bit integers. Floats are also 64-bit.
-[Here's the Nix source code that denotes this](https://github.com/NixOS/nix/blob/d2a07a96ba6275e570b7d84092d08cbe85a2091b/src/libexpr/value.hh#L77-L78)
+[Here's the Nix source code that denotes this.](https://github.com/NixOS/nix/blob/d2a07a96ba6275e570b7d84092d08cbe85a2091b/src/libexpr/value.hh#L77-L78)
 
 ```nix
 nix-repl> 0.1 + 0.2
@@ -494,11 +510,14 @@ This syntax is a way to check for the existence of a key in an attribute set.
 `{ foo = 42; } ? foo` evaulates to `true`. The same applies for
 `{ foo = 42; } ? "foo"`, which is just using a string identifier instead.
 
-## Flakes invented for Target Corporation
+You can also do `{ foo.bar = 13; } ? foo.bar`, though this isn't that well
+known.
+
+## flakes invented for Target Corporation
 
 [The development of flakes was partially funded by Target Corporation.](https://www.tweag.io/blog/2020-07-31-nixos-flakes/#conclusion)
 
-# Tier 3: Assigned Nix Hacker at Employment
+# Tier 3: `assigned nix hacker at employment`
 
 <h2>
 
@@ -568,15 +587,16 @@ Nix converts `true` to `"1"` and `false` to `"" (empty string)` when asked to
 convert a boolean to a string.
 
 And when you convert a list to a string, it converts individual items and then
-joins them with a space character (0xA).
+joins them with a space character (`0xA`).
 
 So `builtins.toString [true false true]` makes `1  1`
 
 ## `__structuredAttrs`
 
 `__structuredAttrs`, when set to `true` in a derivation argument, will set the
-`NIX_ATTRS_JSON_FILE` and `NIX_ATTRS_SH_FILE` file paths to that arguments
-contents serialized in the respective format.
+`NIX_ATTRS_JSON_FILE` and `NIX_ATTRS_SH_FILE` environment variables in the build
+environment to file paths to the derivation argument contents in the respective
+format.
 
 Here is an example:
 
@@ -640,9 +660,12 @@ get something similar to this:
 
 ## `__functor`
 
-`__functor` is a magic attribute you can add on a set to make it callable. The
-lambda you assign to it must "accept 2 arguments". The first being itself
-(commonly named "self") and the second being the argument that was passed in.
+`__functor` is a magic attribute that attribute sets can have which makes them
+callable. The lambda you assign to it must accept 2 arguments[^Technically,
+lambdas in Nix always take a sigle argument. But for clarity, I'll just refere
+to lambdas that return lambdas as taking `N` argument, where N is the lambda
+count.]. The first being the attribute set itself (commonly named `self") and
+the second being the argument that was passed in.
 
 Here's an example:
 
@@ -663,11 +686,11 @@ This outputs the following:
 { __functor = <LAMBDA>; accum = 120; }
 ```
 
-(oh no - we just emulated OOP in Nix)
+> Oh no. We just emulated OOP in Nix!
 
 ## `--output-format bar-with-logs` on old CLI
 
-(later renamed to `--output-format`)
+(later renamed to `--log-format`)
 
 You know how the new `nix-command` CLI has that bar at the bottom, which looks
 like `[4/0/804 built, 7.7/112.5 MiB DL] downloading '...'`?
@@ -681,7 +704,7 @@ This option allows you to have that output format in the old CLI by passing in
 `--trace-verbose` to the Nix CLI. If you don't pass in that option, it
 completely ignores the first argument and returns the second one.
 
-# Tier 4: Nix is Easy We Promise
+# Tier 4: `nix is easy we promise`
 
 ## `let f = a: a; s = {f=f;}; in [(f == f) (s == s)]`
 
@@ -690,9 +713,9 @@ This evaluates to `[ false true ]`. Why?
 Normally, Functions in Nix cannot be compared. Comparing two functions will
 _always_ return false, at least when done directly.
 
-But if two attribute sets that are compared have the same address, Nix ignores
-this and does a pointer comparision, totally ignoring all members. This is a
-hack.
+But if two attribute sets that are compared have the same memory location, Nix
+ignores this and does a pointer comparision, totally ignoring all members. This
+is a hack.
 
 [Link to code that does this.](https://github.com/NixOS/nix/blob/aa165301d1ae3b306319a6a834dc1d4e340a7112/src/libexpr/eval.cc#L2525-L2528)
 Here's the snippet:
@@ -709,10 +732,10 @@ bool EvalState::eqValues(Value & v1, Value & v2, const PosIdx pos, std::string_v
     if (&v1 == &v2) return true;
 ```
 
-This "temporary hack" was commited in 14 years ago. You can do whatever you want
+This "temporary hack" was commited in 15 years ago. You can do whatever you want
 with this information.
 
-## Nix Plugins
+## `nix plugins`
 
 As suprising as it sounds, Nix does indeed supports plugins. You can load
 plugins using the
@@ -759,27 +782,76 @@ impure binaries to the Nix store.
 There is a special field named `__overrides` in recursive attrset expressions,
 which simply overrides the parent attribute set with the keys inside it. This is
 different from the update operator (`//`) because that will not override the
-self-referneces in the recursive attribute set.
+self-refereneces in the recursive attribute set.
 
 `rec { a = 5; b = a + 1; __overrides.a = 6; }.b` will evaluate to 7, while
 `(rec { a = 5; b = a + 1; } // { a = 6; }).b` will evaluate to 6.
 
 ## `let __div = c: map (__mul c); in 2 / [ 1 2 3 ]`
 
-As mentioned in my [HTMNIX blog post](/blog/htmnix), Nix operators get desugared
-into normal function calls before execution. All operators have their "hidden"
-equivalents that they get desugared into (`__div` is for `/`, etc.), so you can
-override them using `let in`.
+Previously mentioned in my [HTMNIX blog post](/blog/htmnix), Nix operators get
+desugared into normal function calls before execution. All operators have their
+"hidden" equivalents that they get desugared into (`__div` is for `/`, etc.), so
+you can override them using `let in`.
 
 `let __div = c: map (__mul c); in 2 / [ 1 2 3 ]` is equivalent to
 `map (x: 2 * x) [ 1 2 3 ]` which evaluates to `[ 2 4 6 ]`.
 
 You can also check what a Nix snippet desugars into using
-`nix-instantiate --parse --expr 'expression here'`
+`nix-instantiate --parse --expr/--file`
 
 ## `let __lessThan = a: b: b - a; in 1 > 2`
 
-As mentioned above, this expression will desugar into
-`let __lessThan = a: b: b - a; in __lessThan 1 2` which will evaluate to 1.
+[As mentioned above](#let-div-c-map-mul-c-in-2-1-2-3-), this expression will
+desugar into `let __lessThan = a: b: b - a; in __lessThan 1 2` which will
+evaluate to 1.
 
 ## `__impure`
+
+TODO
+
+# Tier 5: `normal and can be trusted with nix`
+
+## `let a = _: -1; or = 6; in [ a or 9 ]`
+
+TODO
+
+## eelco's home address is in nixpkgs
+
+[s/used to be/is in/g.](TODO)
+
+## `restrict-eval`
+
+TODO
+
+## nix2
+
+## `__noChroot`
+
+TODO
+
+## cloud scale hydra
+
+## `(_:_) != (_:_)` but `(a:a) == (a:a)`
+
+Evaluating `(_:_) == (_:_)`, we see that it is `false`, which means the two
+functions aren't equal to eachother, as we are comparing them directly and when
+compared directly, functions return false.
+
+But then why does `(a:a) == (a:a)` return `true`? Aren't they both functions?
+
+**Nope!**
+
+`a:a` is a
+[legacy URL literal](https://nix.dev/manual/nix/2.29/development/experimental-features.html?highlight=url%20literal#no-url-literals),
+which can be disabled using the `no-url-literals` Nix feature.
+
+## de betekenis van @niksnut
+
+TODO
+
+## `let { huh = "?"; body = huh }`
+
+This is the legacy `let` syntax. Equivalent to `let huh = "?"; in huh`.
+
+## Tier 6: `has meowed before`
