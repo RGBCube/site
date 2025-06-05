@@ -818,7 +818,7 @@ TODO
 
 ## eelco's home address is in nixpkgs
 
-[s/used to be/is in/g.](TODO)
+[s/used to be/is in/g.](https://github.com/NixOS/nixpkgs/commit/164b4d65ff976c11999172592e634bf3742537f8)
 
 ## `restrict-eval`
 
