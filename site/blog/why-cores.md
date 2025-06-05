@@ -227,8 +227,8 @@ Core 47
 Notice something? I do:
 
 - `temp1_label` is `Package id 0` - what is that?
-- Other core numbers make no sense. This device only has 32 cores, there
-  shouldn't be any gaps within numbers and the numbers shouldn't go that high.
+- The core numbers make no sense. This device only has 32 cores, there shouldn't
+  be any gaps within numbers and the numbers shouldn't go that high.
 
 The explanation for the first point is simple, looking at the kernel
 [`coretemp.c`](https://github.com/torvalds/linux/blob/ec7714e4947909190ffb3041a03311a975350fe0/drivers/hwmon/coretemp.c#L348)
