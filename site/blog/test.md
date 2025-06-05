@@ -7,7 +7,7 @@ draft: true
 
 # Test
 
-I randomly test CSS styles here. That means nothing to see.
+I randomly test CSS styles here. That means nothing to see.[^footer nr 1][^11]
 
 | pid   | ppid  | name                                                                                                                       | status   | cpu                | mem      | virtual  |
 | ----- | ----- | -------------------------------------------------------------------------------------------------------------------------- | -------- | ------------------ | -------- | -------- |

@@ -89,7 +89,7 @@ site.process([".html"], (pages) => {
         let counter = 1;
 
         while (document.getElementById(textUnique)) {
-          counter++;
+          counter += 1;
           textUnique = `${textNormalized}-${counter}`;
         }
 
@@ -101,6 +101,60 @@ site.process([".html"], (pages) => {
         header.parentNode!.insertBefore(link, header);
         link.appendChild(header);
       });
+
+    const footnotes = document.querySelector("#footnotes");
+    if (footnotes) {
+      let counter = 0;
+
+      document.querySelectorAll("p").forEach((paragraph) => {
+        const matches = paragraph.innerHTML.match(/\[\^([^\]]*)\]/g);
+        if (!matches) return;
+
+        let newHTML = paragraph.innerHTML;
+
+        matches.forEach((match) => {
+          const footnoteText = match.slice(2, -1);
+
+          let number;
+          let addFooter;
+
+          if (footnoteText.match(/^[1-9]+$/g)) {
+            number = parseInt(footnoteText);
+            addFooter = false;
+          } else {
+            counter += 1;
+            number = counter;
+            addFooter = true;
+          }
+
+          const anchorId = `ref:${counter}`;
+          const footnoteId = `fn:${counter}`;
+
+          const link =
+            `<sup><a id="${anchorId}" href="#${footnoteId}">^${number}</a></sup>`;
+          newHTML = newHTML.replace(match, link);
+
+          if (addFooter) {
+            const hr = document.createElement("hr");
+            hr.classList.add("my-1.5");
+
+            const li = document.createElement("li");
+            li.id = footnoteId;
+            li.innerHTML =
+              `${footnoteText}<sub><a href="#${anchorId}">..?</a></sub>`;
+
+            footnotes.appendChild(hr);
+            footnotes.appendChild(li);
+          }
+        });
+
+        paragraph.innerHTML = newHTML;
+      });
+
+      if (counter === 0) {
+        footnotes.remove();
+      }
+    }
   });
 });
 
