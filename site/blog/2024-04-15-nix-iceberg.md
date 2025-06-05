@@ -950,16 +950,53 @@ Let's see if that is true:
 
 ```nix
 nix-repl> builtins.readDir <nix>
+{
+  ".clang-format" = "regular";
+  ".clang-tidy" = "regular";
+  ".dir-locals.el" = "regular";
+  ".editorconfig" = "regular";
+  ".github" = "directory";
+  ".gitignore" = "regular";
+  ".mergify.yml" = "regular";
+  ".shellcheckrc" = "regular";
+  ".version" = "regular";
+  ".version-determinate" = "regular";
+  "CITATION.cff" = "regular";
+  "CONTRIBUTING.md" = "regular";
+  COPYING = "regular";
+  "HACKING.md" = "symlink";
+  "README.md" = "regular";
+  contrib = "directory";
+  doc = "directory";
+  "docker.nix" = "regular";
+  "flake.lock" = "regular";
+  "flake.nix" = "regular";
+  maintainers = "directory";
+  "meson.build" = "regular";
+  "meson.options" = "regular";
+  misc = "directory";
+  nix-meson-build-support = "directory";
+  packaging = "directory";
+  "precompiled-headers.h" = "regular";
+  scripts = "directory";
+  src = "directory";
+  tests = "directory";
+}
 ```
 
-<!-- TODO: Say: There doesn't seem to be a `fetchurl.nix` file here. After it doesn't exist. -->
+There doesn't seem to be a `fetchurl.nix` file here.
 
-This is because `<nix>` is actually `corepkgs`, which is a Nix path
+This is because
+[`<nix/*>` actually falls back to `corepkgs`](https://github.com/NixOS/nix/blob/2afc84fddf463b22196aeb70587bc0c9259e330f/src/libexpr/eval.cc#L3117-L3118),
+which is a Nix path
 [defined inside Nix itself.](https://github.com/NixOS/nix/blob/2afc84fddf463b22196aeb70587bc0c9259e330f/src/libexpr/eval.cc#L321)
 
 [Later, the `fetchurl.nix` path is defined in `corepkgs`](https://github.com/NixOS/nix/blob/2afc84fddf463b22196aeb70587bc0c9259e330f/src/libexpr/eval.cc#L363)
 and its contents are set to a
 [generated C++ header.](https://github.com/NixOS/nix/blob/2afc84fddf463b22196aeb70587bc0c9259e330f/src/libexpr/meson.build#L129-L135)
+
+You do not need to be in impure evaluation mode to use `corepkgs`, aka
+`<nix/*>`.
 
 ### test suite of nix wasn't run
 
