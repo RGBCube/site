@@ -910,7 +910,9 @@ Give feedback at https://github.com/NixOS/nix/pull/11121
 
 ## nix2
 
-TODO
+`nix2` is commonly used to refer to `nix-<action>` style commands, such as
+`nix-build`, `nix-shell` while `nix3` is used to refer to `nix <action>` style
+commands, such as `nix build`, `nix develop`, and so on.
 
 ## `__noChroot`
 
