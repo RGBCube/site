@@ -981,7 +981,7 @@ Therefore, function identity really **is** load bearing on importing nixpkgs.
 
 ## `import <nix/fetchurl.nix>`
 
-This looks like we are importing <nix>, and getting the `fetchurl.nix` file in
+This looks like we are importing `<nix>`, and getting the `fetchurl.nix` file in
 it.
 
 Let's see if that is true:
