@@ -564,8 +564,8 @@ print t
 
 The
 [`accept-flake-config`](https://nix.dev/manual/nix/2.29/command-ref/conf-file#conf-accept-flake-config)
-Nix configuration variable or `--accept-flake-config` flag in Nix commands
-allows Nix to unconditionally accept flake `nixConfig`'s.
+Nix configuration variable or `--option accept-flake-config true` flag in Nix
+commands allows Nix to unconditionally accept flake `nixConfig`'s.
 
 This is dangerous, because this can enable `builtins.importNative` by enabling
 the
