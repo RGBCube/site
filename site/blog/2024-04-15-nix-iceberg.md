@@ -581,7 +581,13 @@ It was created by [t184256](https://github.com/t184256) on GitHub, here is the
 
 ## `set.a or "meow"` is set-specific
 
-TODO
+[As mentioned previously,](#let-a-1-or-6-in-a-or-9-) the Nix parser is weird and
+treats `or` as an identifier when it is not right after an attribute selection
+expression.
+
+So, the `or` in `set.key or default` is the keyword, but in `set or default` it
+is not, and the latter expression is actually a double function application,
+where we apply `or` to `set`, and then `default` to the result of that.
 
 ## `builtins.toString [true false true] == "1  1"`
 
