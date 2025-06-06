@@ -1108,7 +1108,26 @@ instead of `builtins.break` itself.
 
 ## multiplayer tic-tac-toe in nix repl
 
-TODO
+You want to read this blog post:
+[Are Nix Expressions Pacman-Complete?](https://stuebinm.eu/posts/nix-tic-tac-toe-complete.html)
+
+You can run it using the following bash/zsh/etc (any shell that implements
+`$(( RANDOM ))`):
+
+```sh
+git clone https://stuebinm.eu/git/playground nix-tic-tac-toe
+
+# In first shell:
+nix-build --argstr seed $(( RANDOM )) nix-tic-tac-toe/nix-turing/game.nix
+
+# In second shell, in parallel:
+move=0
+while true; do
+  read -p "move: " content
+  echo "$content" > "/tmp/input-${move}"
+  ((move++))
+done
+```
 
 ## `let e="e"; in [001.2e01e.30.4]`
 
