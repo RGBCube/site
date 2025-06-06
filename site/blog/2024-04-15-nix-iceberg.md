@@ -226,8 +226,6 @@ in builtins.break {
 
 Evaluate this expression with `nix eval --debugger --expr/--file` and see.
 
-<!-- TODO: Mention that this didn't use to work. -->
-
 ## `tvix`
 
 [Tvix](https://tvix.dev/) is an alternate implementation of Nix written in Rust.
