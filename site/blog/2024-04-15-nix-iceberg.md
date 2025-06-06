@@ -953,7 +953,7 @@ If you can't find the mentions in these pages, check the archives out.
 
 Evaluating `(_:_) == (_:_)`, we see that it is `false`, which means the two
 functions aren't equal to eachother, as we are comparing them directly and when
-compared directly, function comparisions return false.
+compared directly, function comparisons return false.
 
 But then why does `(a:a) == (a:a)` return `true`? Aren't we still comparing
 functions?
