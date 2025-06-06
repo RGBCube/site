@@ -11,20 +11,23 @@ def --wrapped sync [...arguments] {
 
 # Applies the changes to the site by uploading it to the VPS.
 def main [] {
+  const dest_directory = "_site_production"
+  const deno_arguments = [ "task", "build", "--dest", $dest_directory, "--location", "https://rgbcu.be/" ]
+
   if (pwd | str starts-with "/data/data/com.termux") {
     sync ./ nine:site
 
-    ssh -tt nine "
+    ssh -tt nine $"
       cd site
-      LUME_DRAFTS=false nix run default#deno -- task build --location https://rgbcu.be/
+      LUME_DRAFTS=false nix run nixpkgs#deno -- ($deno_arguments | str join ' ')
     "
 
-    sync nine:site/_site ./
+    sync ("nine:site/" + $dest_directory) ./
   } else {
-    LUME_DRAFTS=false deno task build --location https://rgbcu.be/
+    LUME_DRAFTS=false deno ...$deno_arguments
   }
 
-  cd _site
+  cd $dest_directory
 
   let host = "root@best";
 
