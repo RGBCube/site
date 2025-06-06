@@ -571,6 +571,13 @@ the
 option, which then allows Nix expressions to load arbitrary dynamic libraries,
 which can do anything as they are not confined to the Nix evaluation sandbox.
 
+However, a malicious flake doesn't even have to go that far. It can define an
+evil substituter using the `extra-substituters` key in `nixConfig`, and you may
+get served malicious packages.
+
+This is why you should generally be wary of using this option or typing in `Y`
+when asked to trust a substituter/enable a setting in interactive mode.
+
 ## Zilch
 
 ZilchOS is a decidedly tiny Nix-based distro. It is a great project to see how
