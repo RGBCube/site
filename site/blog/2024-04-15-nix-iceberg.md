@@ -570,7 +570,7 @@ allows Nix to unconditionally accept flake `nixConfig`'s.
 This is dangerous, because this can enable `builtins.importNative` by enabling
 the
 [`allow-unsafe-native-code-during-evaluation`](https://nix.dev/manual/nix/2.29/command-ref/conf-file#conf-allow-unsafe-native-code-during-evaluation)
-option, which then allows Nix expresions to load arbitrary dynamic libraries,
+option, which then allows Nix expressions to load arbitrary dynamic libraries,
 which can do anything as they are not confined to the Nix evaluation sandbox.
 
 ## Zilch
@@ -814,7 +814,20 @@ evaluate to 1.
 
 ## `__impure`
 
-TODO
+With the
+[`impure-derivations`](https://nix.dev/manual/nix/2.29/development/experimental-features.html#xp-feature-impure-derivations)
+experimental Nix feature, you can set the `__impure` attribute to `true` within
+derivations to mark them "impure".
+
+What this does is:
+
+1. Let the derivation build have access to the network.
+2. Prevent the impure derivation from becoming a
+   [content-addressed](https://nix.dev/manual/nix/2.29/development/experimental-features.html?highlight=experimental%20featyre#xp-feature-ca-derivations)
+   derivation.
+
+Impure derivations can also only be used by other impure derivations or
+fixed-output derivations (FODs).
 
 # Tier 5: `normal and can be trusted with nix`
 
@@ -886,6 +899,8 @@ Give feedback at https://github.com/NixOS/nix/pull/11121
 
 ## nix2
 
+TODO
+
 ## `__noChroot`
 
 When the
@@ -896,7 +911,30 @@ sandbox.
 
 ## cloud scale hydra
 
-TODO
+[Cloudscale hydra](https://web.archive.org/web/20220624223053/https://cloudscalehydra.com/)
+was
+Graham[^![Graham "Determinate" Christensen](/assets/images/graham-sickos-resized.webp)]
+Christensen's previous failed project.
+
+He then went on to create [FlakeHub](https://flakehub.com/), which could be said
+is the successor to Cloudscale Hydra.
+
+It is curious that the following links are the only non-automated mentions of
+the project on the open internet:
+
+- [Meeting about nixpkgs `cudaPackages` from February 13th, 2025.](https://pad.lassul.us/p/KXm3h1AS-?print-pdf#/)
+  ([archive](https://archive.is/fbNMP)) (Search for `cloud-scale hydra`)
+
+- [A link to a now-defunct Hydra instance hosted by Cloudscale Hydra, in the Determinate Systems blog.](https://determinate.systems/posts/hydra-deployment-source-of-truth/)
+  ([archive](https://web.archive.org/web/20250319031645/https://determinate.systems/posts/hydra-deployment-source-of-truth/))
+  (Search for `cloudscalehydra`)
+
+- [A tweet from the Determinate Systems, about the availability of Cloudscale Hydra](https://x.com/DeterminateSys/status/1445785369941889024)
+  ([archive, actually check this one out! it's from 2021](https://web.archive.org/web/20220112074900/https://twitter.com/DeterminateSys/status/1445785369941889024))
+
+If you can't find the mentions in these pages, check the archives out.
+
+![Cloudscale Hydra landing page sketch](/assets/images/cloudscale-hydra.webp)
 
 ## `(_:_) != (_:_)` but `(a:a) == (a:a)`
 
@@ -925,7 +963,7 @@ This is the legacy `let` syntax. Equivalent to `let huh = "?"; in huh`.
 ### `let { body = 1; __overrides.body = 2; }`
 
 This is a combination of [`__override`](#rec-a-5-b-a-1-overridesa-6-) for keyed
-experessions and the [`legacy let syntax`](#let-huh-body-huh-).
+expressions and the [`legacy let syntax`](#let-huh-body-huh-).
 
 ### function identity is load bearing on importing nixpkgs
 
@@ -1044,7 +1082,14 @@ TODO
 
 ## `(_: builtins.break _)`
 
-TODO
+Historically, the [`builtins.break`](#-debugger) function used to not work
+reliably in some cases, such as `let-in`'s and function calls.
+
+This was fixed in [this merge request](https://github.com/NixOS/nix/pull/9917),
+in February 8, 2024.
+
+But before that fix, you would use `(_: builtins.break _)` or an equivalent
+instead of `builtins.break` itself.
 
 ## multiplayer tic-tac-toe in nix repl
 
