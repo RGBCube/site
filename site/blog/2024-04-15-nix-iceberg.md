@@ -821,7 +821,7 @@ What this does is:
 
 1. Let the derivation build have access to the network.
 2. Prevent the impure derivation from becoming a
-   [content-addressed](https://nix.dev/manual/nix/2.29/development/experimental-features.html?highlight=experimental%20featyre#xp-feature-ca-derivations)
+   [content-addressed](https://nix.dev/manual/nix/2.29/development/experimental-features.html#xp-feature-ca-derivations)
    derivation.
 
 Impure derivations can also only be used by other impure derivations or
@@ -890,7 +890,7 @@ Give feedback at https://github.com/NixOS/nix/pull/11121
 
 ## `restrict-eval`
 
-[From the Nix manual:](https://nix.dev/manual/nix/2.29/command-ref/conf-file.html?highlight=restrict-eval#conf-restrict-eval)
+[From the Nix manual:](https://nix.dev/manual/nix/2.29/command-ref/conf-file.html#conf-restrict-eval)
 
 > If set to true, the Nix evaluator will not allow access to any files outside
 > of `builtins.nixPath`, or to URIs outside of `allowed-uris`.
@@ -902,7 +902,7 @@ TODO
 ## `__noChroot`
 
 When the
-[`sandbox`](https://nix.dev/manual/nix/2.29/command-ref/conf-file.html?highlight=__nos#conf-sandbox)
+[`sandbox`](https://nix.dev/manual/nix/2.29/command-ref/conf-file.html#conf-sandbox)
 Nix configuration value is set to `relaxed`, fixed-output derivations (FODs)
 that have the `__noChroot` attribute set to `true` will not run in the Nix
 sandbox.
@@ -946,9 +946,9 @@ functions?
 **Nope!**
 
 `a:a` is a
-[legacy URL literal](https://nix.dev/manual/nix/2.29/development/experimental-features.html?highlight=url%20literal#no-url-literals),
+[legacy URL literal](https://nix.dev/manual/nix/2.29/development/experimental-features.html#no-url-literals),
 which can be disabled using the
-[`no-url-literals` experimental Nix feature.](https://nix.dev/manual/nix/2.29/development/experimental-features.html?highlight=no-url-#xp-feature-no-url-literals)
+[`no-url-literals` experimental Nix feature.](https://nix.dev/manual/nix/2.29/development/experimental-features.html#xp-feature-no-url-literals)
 
 ## de betekenis van @niksnut
 
@@ -1112,3 +1112,5 @@ TODO
 TODO
 
 ## `builtins.derivationStrict`
+
+TODO
