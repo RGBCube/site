@@ -938,15 +938,17 @@ If you can't find the mentions in these pages, check the archives out.
 
 Evaluating `(_:_) == (_:_)`, we see that it is `false`, which means the two
 functions aren't equal to eachother, as we are comparing them directly and when
-compared directly, functions return false.
+compared directly, function comparisions return false.
 
-But then why does `(a:a) == (a:a)` return `true`? Aren't they both functions?
+But then why does `(a:a) == (a:a)` return `true`? Aren't we still comparing
+functions?
 
 **Nope!**
 
 `a:a` is a
 [legacy URL literal](https://nix.dev/manual/nix/2.29/development/experimental-features.html?highlight=url%20literal#no-url-literals),
-which can be disabled using the `no-url-literals` Nix feature.
+which can be disabled using the
+[`no-url-literals` experimental Nix feature.](https://nix.dev/manual/nix/2.29/development/experimental-features.html?highlight=no-url-#xp-feature-no-url-literals)
 
 ## de betekenis van @niksnut
 
@@ -956,14 +958,14 @@ TODO
 
 This is the legacy `let` syntax. Equivalent to `let huh = "?"; in huh`.
 
-## Tier 6: `has meowed before`
+# Tier 6: `has meowed before`
 
-### `let { body = 1; __overrides.body = 2; }`
+## `let { body = 1; __overrides.body = 2; }`
 
 This is a combination of [`__override`](#rec-a-5-b-a-1-overridesa-6-) for keyed
 expressions and the [`legacy let syntax`](#let-huh-body-huh-).
 
-### function identity is load bearing on importing nixpkgs
+## function identity is load bearing on importing nixpkgs
 
 Since
 [attribute sets with function members compare function identities (memory locations)](#let-f-a-a-s-ff-in-f-f-s-s),
@@ -977,7 +979,7 @@ determine whether if we are cross-compiling.
 
 Therefore, function identity really **is** load bearing on importing nixpkgs.
 
-### `import <nix/fetchurl.nix>`
+## `import <nix/fetchurl.nix>`
 
 This looks like we are importing <nix>, and getting the `fetchurl.nix` file in
 it.
@@ -1034,15 +1036,15 @@ and its contents are set to a
 You do not need to be in impure evaluation mode to use `corepkgs`, aka
 `<nix/*>`.
 
-### test suite of nix wasn't run
+## test suite of nix wasn't run
 
 TODO
 
-### fixed-output derivation sandboxing
+## fixed-output derivation sandboxing
 
 TODO
 
-### `importNative`
+## `importNative`
 
 [`builtins.importNative`](https://nix.dev/manual/nix/2.29/command-ref/conf-file.html#conf-allow-unsafe-native-code-during-evaluation)
 allows Nix expressions to import arbitrary dynamic libraries to produce Nix
@@ -1051,11 +1053,11 @@ expressions.
 Of course, this is turned off by default as it is a security risk. You probably
 shouldn't use this.
 
-### `chromium recompressTarball`
+## `chromium recompressTarball`
 
 TODO
 
-### more than 1 million chars of indents breaks things
+## more than 1 million chars of indents breaks things
 
 The weird Nix parser
 [hard codes `1000000`](https://github.com/NixOS/nix/blob/2afc84fddf463b22196aeb70587bc0c9259e330f/src/libexpr/include/nix/expr/parser-state.hh#L250)
@@ -1065,7 +1067,7 @@ spanning multiple lines.
 So when you have a line with more than a million spaces for the indent, it is
 ignored and not included in the minimum indent calculation.
 
-## Tier 7: `wears animal ears to NixCon`
+# Tier 7: `wears animal ears to NixCon`
 
 <h2><small>
 
