@@ -2,9 +2,9 @@
 title: Explaining the Nix iceberg
 description: And revealing how cursed Nix is.
 
-draft: true
+unlisted: true
 
-keywords:
+tags:
 - nix
 ---
 
