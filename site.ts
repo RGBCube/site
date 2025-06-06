@@ -176,7 +176,7 @@ site.use(checkUrls({
 site.use(feed({
   output: ["/blog.rss", "/blog.json"],
 
-  query: "type=article",
+  query: "type=article unlisted!=true",
   sort: "date=asc",
   limit: Infinity,
 
