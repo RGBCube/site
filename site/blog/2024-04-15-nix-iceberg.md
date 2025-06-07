@@ -895,7 +895,7 @@ in [ a foo ]
 However, this behaviour might get removed in the future. But currently, in the
 Nix version that I am using which is `2.28.3`, it prints this warning instead:
 
-```text
+```
 warning: at «string»:4:6: This expression uses `or` as an identifier in a way that will change in a future Nix release.
 Wrap this entire expression in parentheses to preserve its current meaning:
     (a or)
