@@ -114,13 +114,18 @@ the `--packages/-p` argument for `nix-shell`
 
 `nix-shell -p` creates a shell using the nixpkgs stdenv (and thus depends on
 nixpkgs) by calling `pkgs.mkShell`, which includes all packages in the nixpkgs
-stdenv plus the ones you specified.
+stdenv plus the ones you specified. It also places you in a Bash shell, and is
+integrated with Bash only.
 
 `nix shell` only appends the packages you passed in to the `PATH` environment
 variable. It is much lighter, as a natural result of not using nixpkgs or its
 stdenv. It also doesn't have as much of a questionable implementation, as it is
 in C++ and in Nix natively instead of being a Perl script that uses string
 interpolation to produce Nix expressions.
+
+However, `nix shell` does NOT replace `nix-shell`, the `nix-shell` replacement
+is `nix develop`, which does not expose a `--packages` option or assume anything
+about the way you are creating the devshell passed into it. It also uses flakes.
 
 ## hydra is 17 000 lines of perl
 
@@ -927,13 +932,18 @@ sandbox.
 [Cloudscale hydra](https://web.archive.org/web/20220624223053/https://cloudscalehydra.com/)
 was
 Graham[^![Graham "Determinate" Christensen](/assets/images/graham-sickos-resized.webp)]
-Christensen's previous failed project.
+Christensen's previous venture.
+
+It wasn't exactly a "failed" project, the reason it did not make it far was
+because Graham, in his infinite wisdom, realized that it wasn't particularly
+smart trying to manage 17kloc of Perl for a thousand or more users (yes, he did
+get >1000 pre-registrations!).
 
 He then went on to create [FlakeHub](https://flakehub.com/), which could be said
-is the successor to Cloudscale Hydra.
+is the successor to the ideals of Cloudscale Hydra.
 
-It is curious that the following links are the only non-automated mentions of
-the project on the open internet:
+It however is quite curious that the following links are the only non-automated
+mentions of the project on the open internet:
 
 - [Meeting about nixpkgs `cudaPackages` from February 13th, 2025.](https://pad.lassul.us/p/KXm3h1AS-?print-pdf#/)
   ([archive](https://archive.is/fbNMP)) (Search for `cloud-scale hydra`)
@@ -946,6 +956,8 @@ the project on the open internet:
   ([archive, actually check this one out! it's from 2021](https://web.archive.org/web/20220112074900/https://twitter.com/DeterminateSys/status/1445785369941889024))
 
 If you can't find the mentions in these pages, check the archives out.
+
+Here is a screenshot of the Cloudscale Hydra landing page:
 
 ![Cloudscale Hydra landing page sketch](/assets/images/cloudscale-hydra.webp)
 
