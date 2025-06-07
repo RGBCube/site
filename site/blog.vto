@@ -18,13 +18,13 @@ Blog Articles
 
 <style>ul * { overflow-wrap:anywhere !important; }</style>
 <ul>
-  {{ for article of search.pages("type=article unlisted!=true", "order=asc date=desc")}}
+  {{ for entry of search.pages("url^=/blog/ unlisted!=true", "order=asc date=desc")}}
   <li class="flex">
-    <a id="matrix" class="text-right font-mono" style="margin-right:calc(var(--spacing)*2)" href="{{ article.url }}">
-      {{ article.date.toISOString().slice(2, 10).replaceAll("-", " ") }}
+    <a id="matrix" class="text-right font-mono" style="margin-right:calc(var(--spacing)*2)" href="{{ entry.url }}">
+      {{ entry.date.toISOString().slice(2, 10).replaceAll("-", " ") }}
     </a>
 
-    {{ article.title |> md }}
+    {{ entry.title |> md }}
   </li>
   {{ /for }}
 </ul>

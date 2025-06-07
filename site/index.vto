@@ -29,6 +29,10 @@ prevent_zoom: true
   <a draggable="false" class="{{ style }}" href="/about/">about</a>
 {{ /set }}
 
+{{ set cube_face_back }}
+  <a draggable="false" class="{{ style }}" href="/dump/">dump</a>
+{{ /set }}
+
 {{ set cube_face_top }}
   <a draggable="false" class="{{ style }}" href="https://github.com/RGBCube">github</a>
 {{ /set }}
@@ -41,6 +45,7 @@ prevent_zoom: true
   <a draggable="false" class="{{ style }}" href="/blog/">blog</a>
 {{ /set }}
 
-{{ set cube_size = "5rem" }}
-{{ set cube_last = true }}
-{{ include "rgbcube.vto" }}
+{{ include "rgbcube.vto" {
+  cube_size: "5rem",
+  cube_last: true,
+} }}

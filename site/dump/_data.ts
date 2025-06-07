@@ -1,5 +1,5 @@
 export default {
-  layout: "text.vto",
+  layout: "dump.vto",
   type: "article",
 
   title: null,

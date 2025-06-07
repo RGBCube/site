@@ -164,7 +164,7 @@ html, body {
     }
   }
 
-  a {
+  a:not(.reset) {
     @apply m-0;
 
     * {
@@ -256,7 +256,7 @@ html, body {
     }
   }
 
-  li {
+  li:not(.reset) {
     @apply relative pl-4;
 
     ul &::before {

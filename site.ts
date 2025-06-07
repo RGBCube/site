@@ -1,16 +1,17 @@
 import lume from "lume/mod.ts";
-import extractDate from "lume/plugins/extract_date.ts";
-import codeHighlight from "lume/plugins/code_highlight.ts";
-import redirects from "lume/plugins/redirects.ts";
-import tailwindcss from "lume/plugins/tailwindcss.ts";
-import lightningcss from "lume/plugins/lightningcss.ts";
-import resolveUrls from "lume/plugins/resolve_urls.ts";
-import slugifyUrls from "lume/plugins/slugify_urls.ts";
 import checkUrls from "lume/plugins/check_urls.ts";
-import inline from "lume/plugins/inline.ts";
+import codeHighlight from "lume/plugins/code_highlight.ts";
+import extractDate from "lume/plugins/extract_date.ts";
 import feed from "lume/plugins/feed.ts";
+import inline from "lume/plugins/inline.ts";
+import lightningcss from "lume/plugins/lightningcss.ts";
+// import minifyHtml from "lume/plugins/minify_html.ts";
+import nav from "lume/plugins/nav.ts";
+import redirects from "lume/plugins/redirects.ts";
+import resolveUrls from "lume/plugins/resolve_urls.ts";
 import sitemap from "lume/plugins/sitemap.ts";
-import minifyHtml from "lume/plugins/minify_html.ts";
+import slugifyUrls from "lume/plugins/slugify_urls.ts";
+import tailwindcss from "lume/plugins/tailwindcss.ts";
 
 const siteName = "RGBCube";
 const siteDescription =
@@ -173,10 +174,12 @@ site.use(checkUrls({
   throw: true,
 }));
 
+site.use(nav());
+
 site.use(feed({
   output: ["/blog.rss", "/blog.json"],
 
-  query: "type=article unlisted!=true",
+  query: "url^=/blog/ url!=/blog/ unlisted!=true",
   sort: "date=asc",
   limit: Infinity,
 

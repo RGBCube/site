@@ -31,13 +31,14 @@ prevent_zoom: true
   <a class="size-[100%] bg-black     hover:bg-[olive]"       href={{ "/" |> url(true) }}></a>
 {{ /set }}
 
-{{ set cube_face_front  = cube_face }}
-{{ set cube_face_back   = cube_face }}
-{{ set cube_face_left   = cube_face }}
-{{ set cube_face_right  = cube_face }}
-{{ set cube_face_top    = cube_face }}
-{{ set cube_face_bottom = cube_face }}
+{{ include "cube.vto" {
+  cube_face_front:  cube_face,
+  cube_face_back:   cube_face,
+  cube_face_left:   cube_face,
+  cube_face_right:  cube_face,
+  cube_face_top:    cube_face,
+  cube_face_bottom: cube_face,
 
-{{ set cube_size = "5rem" }}
-{{ set cube_last = true }}
-{{ include "cube.vto" }}
+  cube_size: "5rem",
+  cube_last: true,
+} }}

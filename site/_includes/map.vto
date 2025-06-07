@@ -1,0 +1,70 @@
+{{ function process(entry, toplevel = false) }}
+  <div class="relative p-4{{ if !toplevel }} my-4 md:mx-8{{ /if }} border-1 bg-white dark:bg-black">
+    {{ if entry.data.title }}
+      <a
+        class="
+          reset
+
+          absolute inset-0
+          p-4
+
+          bg-white hover:bg-[pink]
+          dark:bg-black dark:hover:bg-[olive]
+
+          {{ if entry.data.url == url }}
+          border-2 border-dashed border-black dark:border-white
+          {{ /if }}
+        "
+        style="margin:0" href="{{ entry.data.url }}"
+      >{{ entry.data.mapTitle ?? entry.data.title |> md }}</a>
+      <div class="invisible">{{ entry.data.mapTitle ?? entry.data.title |> md }}</div>
+    {{ else }}
+      {{> const content = entry.data.basename.replace(/-/g, " ").replace(/\b\w/g, (char) => char.toUpperCase()) }}
+      <p
+        class="
+          absolute inset-0
+          p-4
+  
+          bg-[repeating-linear-gradient(-45deg,transparent_0rem,transparent_1rem,#ddd_1rem,#ddd_2rem)]
+          dark:bg-[repeating-linear-gradient(-45deg,transparent_0rem,transparent_1rem,#222_1rem,#222_2rem)]
+        "
+        style="
+          margin:0;
+        "
+      >{{ content }}</p>
+      <div class="invisible">{{ content }}</div>
+    {{ /if }}
+
+    {{ if entry.children && entry.children.length > 0 }}
+      <ul>
+        {{ for child of entry.children }}
+          <li class="reset">
+            {{ process(child) }}
+          </li>
+        {{ /for }}
+      </ul>
+    {{ /if }}
+  </div>
+{{ /function }}
+
+{{> const sharedPrefix = (x, y) => {
+  const length = Math.min(x.length, y.length);
+
+  let prefix = "";
+
+  for (let index = 0; index < length; index++) {
+    if (x[index] === y[index]) {
+      prefix += x[index];
+    } else {
+      break;
+    }
+  }
+
+  return prefix;
+} }}
+
+{{> const anchorUrls = search.pages("mapAnchor=true").map((page) => page.url) }}
+{{> const shared     = anchorUrls.map((anchorUrl) => sharedPrefix(anchorUrl, url)) }}
+{{> const longest    = shared.reduce((longest, current) => current.length > longest.length ? current : longest) }}
+
+{{ process(nav.menu(longest), toplevel = true) }}
