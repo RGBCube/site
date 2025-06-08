@@ -1,7 +1,3 @@
----
-title: Analytics
----
-
 This site and other websites under this domain run
 [Plausible](https://plausible.io/) analytics on a self-hosted instance at
 [shekels.rgbcu.be](https://shekels.rgbcu.be/).

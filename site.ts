@@ -40,7 +40,15 @@ site.data("color", color);
 
 site.add(".");
 
-site.process([".html"], (pages) => {
+site.preprocess([".html"], (pages) =>
+  pages.forEach((page) => {
+    page.data.title = page.data.title ??
+      page.data.basename
+        .replace(/-/g, " ")
+        .replace(/\b\w/g, (char) => char.toUpperCase());
+  }));
+
+site.process([".html"], (pages) =>
   pages.forEach((page) => {
     const document = page.document;
 
@@ -156,8 +164,7 @@ site.process([".html"], (pages) => {
         footnotes.remove();
       }
     }
-  });
-});
+  }));
 
 site.use(extractDate());
 site.use(redirects());
