@@ -7,10 +7,11 @@ Just had to deal with Go iterators and I can say that they fit the language
 well.
 
 They're push iterators. It's as if you're just appending items to an array.
-Actually much easier to explain.
+Actually much easier to explain when you are teaching the language to begginers
+while not expecting them to use it for much other than surface level utilities.
 
 They compile down to nonlocal returns to try to keep it fast, but of course it's
-still slower than a state machine. The case for every single thing in Go really.
+still slower than a state machine, in typical Go fashion
 
 And when you know slightly more than a single lick of programming, the design
 and implementation of them looks very obviously moronic and catered to
