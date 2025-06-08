@@ -25,12 +25,14 @@ prevent_zoom: true
   nuclear
 ` }}
 
+{{> const underline = `underline decoration-4 decoration-black underline-offset-9` }}
+
 {{ set cube_face_front }}
   <a draggable="false" class="{{ style }}" href="/about/">about</a>
 {{ /set }}
 
 {{ set cube_face_back }}
-  <a draggable="false" class="{{ style }}" href="/dump/">dump</a>
+  <a draggable="false" class="{{ style }} {{ underline }}" href="/dump/">dump</a>
 {{ /set }}
 
 {{ set cube_face_top }}
@@ -42,7 +44,7 @@ prevent_zoom: true
 {{ /set }}
 
 {{ set cube_face_left }}
-  <a draggable="false" class="{{ style }}" href="/blog/">blog</a>
+  <a draggable="false" class="{{ style }} {{ underline }}" href="/blog/">blog</a>
 {{ /set }}
 
 {{ set cube_face_bottom }}
