@@ -5,7 +5,7 @@ title: A B O U T
 
 <div class="flex justify-center">
 
-```
+```no-highlight
 \'.
  \ '.                     \   \\ /
   \  \                  ===+===\X  //
