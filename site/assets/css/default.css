@@ -280,31 +280,31 @@ body {
       dark:bg-[#111] dark:shadow-[4px_4px_#bbb];
   }
 
-  .hljs-attr {
+  .token-attr {
     @apply text-[darkblue] dark:text-[lightblue];
   }
-  .hljs-built_in {
+  .token-built_in {
     @apply text-[darkred] dark:text-[firebrick];
   }
-  .hljs-comment {
+  .token-comment {
     @apply italic text-[dimgray] dark:text-[darkgray];
   }
-  .hljs-keyword {
+  .token-keyword {
     @apply text-[darkred] dark:text-[firebrick];
   }
-  .hljs-number {
+  .token-number {
     @apply text-[darkslateblue] dark:text-[mediumslateblue];
   }
-  .hljs-string {
+  .token-string {
     @apply text-[darkgreen] dark:text-[limegreen];
   }
-  .hljs-symbol {
+  .token-symbol {
     @apply text-[darkgoldenrod] dark:text-[gold];
   }
-  .hljs-title {
+  .token-title {
     @apply text-[indianred] dark:text-[lightcoral];
   }
-  .hljs-type {
+  .token-type {
     @apply text-[darkcyan] dark:text-[aquamarine];
   }
 }

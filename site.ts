@@ -170,7 +170,12 @@ site.use(extractDate());
 site.use(redirects());
 
 site.use(tailwindcss());
-site.use(codeHighlight());
+site.use(codeHighlight({
+  options: {
+    classPrefix: "token-",
+    noHighlightRe: /^no-highlight$/,
+  },
+}));
 
 site.use(resolveUrls());
 site.use(slugifyUrls({
