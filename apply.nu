@@ -19,12 +19,12 @@ def main [] {
 
     ssh -tt nine $"
       cd site
-      LUME_DRAFTS=false nix run nixpkgs#deno -- ($deno_arguments | str join ' ')
+      LUME_DRAFTS=false nix run nixpkgs#deno -- ($deno_arguments | str join ' ') | ignore
     "
 
     sync ("nine:site/" + $dest_directory) ./
   } else {
-    LUME_DRAFTS=false deno ...$deno_arguments
+    LUME_DRAFTS=false deno ...$deno_arguments | ignore
   }
 
   cd $dest_directory
