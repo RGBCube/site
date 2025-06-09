@@ -36,4 +36,5 @@ links:
 - [Dump](/dump/)
 - [Contact](/contact/)
 
-I am also present in other websites, such as [X](https://x.com/HSVSphere).
+I am also present in other websites, such as
+[GitHub](https://github.com/RGBCube) and [X](https://x.com/HSVSphere).
