@@ -33,6 +33,7 @@ If you want to see what I ramble about, or contact me, follow either of these
 links:
 
 - [Blog](/blog/)
+- [Dump](/dump/)
 - [Contact](/contact/)
 
 I am also present in other websites, such as [X](https://x.com/HSVSphere).
