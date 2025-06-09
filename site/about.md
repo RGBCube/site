@@ -21,8 +21,8 @@ title: A B O U T
 
 Hey.
 
-I'm a systems programmer that loves functional programming and is trying to
-apply ideals of it in certain areas. Currently I'm working on the
+I'm a systems programmer who loves functional programming and is trying to apply
+ideals of it in certain areas. Currently I'm working on the
 [Cab contextful-expression language](https://github.com/cull-os/carcass/tree/master/cab).
 
 I plan on creating a build system that uses Cab to build anything and
