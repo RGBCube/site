@@ -18,5 +18,8 @@ site, and right click and press `Forget About This Site`.
 This will make your browser completely forget about that site and thus not be
 able to recall the HSTS header, and let you connect insecurely.
 
+> Do not do this if you value your browsing history of that site. It literally
+> says "Forget This Site", act accordingly.
+
 These instrucitons are Firefox and Firefox-based browser specific, but the
 process is same on other browsers.
