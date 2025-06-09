@@ -50,7 +50,7 @@ site.preprocess([".html"], (pages) =>
 
 site.process([".html"], (pages) =>
   pages.forEach((page) => {
-    const document = page.document;
+    const { document } = page;
 
     document.querySelectorAll("table").forEach((element) => {
       const wrapper = document.createElement("div");
@@ -66,36 +66,17 @@ site.process([".html"], (pages) =>
     });
 
     document.querySelectorAll("pre code").forEach((code) => {
-      const matches = code.innerHTML.match(/\(\(\(\d+\)\)\)/g);
-      if (matches) { // CALLOUTS
-        let newHTML = code.innerHTML;
+      const element = code.parentElement!;
+      const wrapper = document.createElement("div");
 
-        matches.forEach((match) => {
-          console.log(
-            `<span class="callout">${match.replaceAll(/\(|\)/g, "")}</span>`,
-          );
-          newHTML = newHTML.replace(
-            match,
-            `<span class="callout">${match.replaceAll(/\(|\)/g, "")}</span>`,
-          );
-        });
+      element.classList.add("transform-[rotateX(180deg)]");
+      wrapper.classList.add(
+        "transform-[rotateX(180deg)]",
+        "overflow-x-auto",
+      );
 
-        code.innerHTML = newHTML;
-      }
-
-      { // ROTATION
-        const element = code.parentElement!;
-        const wrapper = document.createElement("div");
-
-        element.classList.add("transform-[rotateX(180deg)]");
-        wrapper.classList.add(
-          "transform-[rotateX(180deg)]",
-          "overflow-x-auto",
-        );
-
-        element.parentNode!.insertBefore(wrapper, element);
-        wrapper.appendChild(element);
-      }
+      element.parentNode!.insertBefore(wrapper, element);
+      wrapper.appendChild(element);
     });
 
     document
@@ -194,6 +175,30 @@ site.use(codeHighlight({
     noHighlightRe: /^no-highlight$/,
   },
 }));
+
+site.process([".html"], (pages) =>
+  pages.forEach((page) => {
+    const { document } = page;
+
+    document.querySelectorAll("pre code").forEach((code) => {
+      const matches = code.innerHTML.match(/\(\(\(\d+\)\)\)/g);
+      if (!matches) return;
+
+      let newHTML = code.innerHTML;
+
+      matches.forEach((match) => {
+        console.log(
+          `<span class="callout">${match.replaceAll(/\(|\)/g, "")}</span>`,
+        );
+        newHTML = newHTML.replace(
+          match,
+          `<span class="callout">${match.replaceAll(/\(|\)/g, "")}</span>`,
+        );
+      });
+
+      code.innerHTML = newHTML;
+    });
+  }));
 
 site.use(resolveUrls());
 site.use(slugifyUrls({

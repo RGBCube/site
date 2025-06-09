@@ -284,6 +284,11 @@ body {
       dark:bg-[#111] dark:shadow-[4px_4px_#bbb];
   }
 
+  .callout {
+    @apply px-2.5 py-1 select-none text-white bg-black dark:text-black
+      dark:bg-white;
+  }
+
   .token-addition {
     @apply text-[green] dark:text-[mediumspringgreen];
   }
