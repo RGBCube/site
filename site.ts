@@ -66,17 +66,36 @@ site.process([".html"], (pages) =>
     });
 
     document.querySelectorAll("pre code").forEach((code) => {
-      const element = code.parentElement!;
-      const wrapper = document.createElement("div");
+      const matches = code.innerHTML.match(/\(\(\(\d+\)\)\)/g);
+      if (matches) { // CALLOUTS
+        let newHTML = code.innerHTML;
 
-      element.classList.add("transform-[rotateX(180deg)]");
-      wrapper.classList.add(
-        "transform-[rotateX(180deg)]",
-        "overflow-x-auto",
-      );
+        matches.forEach((match) => {
+          console.log(
+            `<span class="callout">${match.replaceAll(/\(|\)/g, "")}</span>`,
+          );
+          newHTML = newHTML.replace(
+            match,
+            `<span class="callout">${match.replaceAll(/\(|\)/g, "")}</span>`,
+          );
+        });
 
-      element.parentNode!.insertBefore(wrapper, element);
-      wrapper.appendChild(element);
+        code.innerHTML = newHTML;
+      }
+
+      { // ROTATION
+        const element = code.parentElement!;
+        const wrapper = document.createElement("div");
+
+        element.classList.add("transform-[rotateX(180deg)]");
+        wrapper.classList.add(
+          "transform-[rotateX(180deg)]",
+          "overflow-x-auto",
+        );
+
+        element.parentNode!.insertBefore(wrapper, element);
+        wrapper.appendChild(element);
+      }
     });
 
     document
@@ -145,7 +164,6 @@ site.process([".html"], (pages) =>
 
           if (addFooter) {
             const hr = document.createElement("hr");
-            hr.classList.add("my-1.5");
 
             const li = document.createElement("li");
             li.id = footnoteId;
