@@ -7,7 +7,7 @@ Just had to deal with Go iterators and I can say that they fit the language
 well.
 
 They're push iterators. It's as if you're just appending items to an array.
-Actually much easier to explain when you are teaching the language to begginers
+Actually much easier to explain when you are teaching the language to beginners
 while not expecting them to use it for much other than surface level utilities.
 
 They compile down to nonlocal returns to try to keep it fast, but of course it's
