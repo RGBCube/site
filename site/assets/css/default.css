@@ -136,7 +136,7 @@ body {
   * {
     @apply wrap-break-word text-pretty;
 
-    &:not(ol, ul) {
+    &:not(ul) {
       @apply space-y-3;
     }
   }
@@ -249,6 +249,10 @@ body {
   ol {
     & li {
       counter-increment: item;
+
+      > * {
+        @apply inline;
+      }
     }
 
     & li::before {
@@ -280,6 +284,12 @@ body {
       dark:bg-[#111] dark:shadow-[4px_4px_#bbb];
   }
 
+  .token-addition {
+    @apply text-[green] dark:text-[mediumspringgreen];
+  }
+  .token-deletion {
+    @apply text-[maroon] dark:text-[crimson];
+  }
   .token-attr {
     @apply text-[darkblue] dark:text-[lightblue];
   }
@@ -291,6 +301,9 @@ body {
   }
   .token-keyword {
     @apply text-[darkred] dark:text-[firebrick];
+  }
+  .token-meta {
+    @apply text-[darkmagenta] dark:text-[orchid];
   }
   .token-number {
     @apply text-[darkslateblue] dark:text-[mediumslateblue];
