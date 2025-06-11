@@ -1,14 +1,18 @@
 #!/usr/bin/env nu
 
-def --wrapped sync [...arguments] {
-  (rsync
+def --wrapped sync [...args] {
+ ( rsync
+    --archive
     --compress
+
     --delete --recursive --force
     --delete-excluded
     --delete-missing-args
-    ...$arguments)
-}
 
+    --human-readable
+    --delay-updates
+    ...$args)
+}
 # Applies the changes to the site by uploading it to the VPS.
 def main [] {
   const dest_directory = "_site_production"
@@ -29,18 +33,14 @@ def main [] {
 
   cd $dest_directory
 
-  let host = "root@best";
+  let host        = "root@best";
+  let remote_path = "/var/www/site"
 
-  ssh -tt $host "
-    rm --force --recursive /var/www/site
-    mkdir /var/www/site
-  "
-  sync --chown nginx:users ./ ($host + ":/var/www/site")
-
-  ssh -tt $host "
-    chown nginx:users -R /var/www
-    chmod 775 -R /var/www
-  "
+  (sync
+      --chown "nginx:users"
+      --chmod "Du=rwx,Dg=rwx,Do=rx,Fu=rw,Fg=r,Fo=r" # DIRS: 775, FILES: 664
+      --rsync-path $"mkdir ($remote_path); rsync"
+      ./ ($host + ":" + $remote_path))
 
   cd -
 
