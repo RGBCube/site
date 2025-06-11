@@ -183,14 +183,10 @@ site.process([".html"], (pages) =>
     document.querySelectorAll("pre code").forEach((code) => {
       const matches = code.innerHTML.match(/\{\[\([^\)]+\)\]\}/g);
       if (!matches) return;
-      console.log(matches);
 
       let newHTML = code.innerHTML;
 
       matches.forEach((match) => {
-        console.log(
-          `<span class="callout">${match.replaceAll(/[^\d]/g, "")}</span>`,
-        );
         newHTML = newHTML.replace(
           match,
           `<span class="callout">${match.replaceAll(/[^\d]/g, "")}</span>`,
