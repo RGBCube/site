@@ -1,5 +1,6 @@
 ---
 title: Disable MacOS doodoo garbage shinies with Nix Darwin
+description: FIRE ALL OF THE DESIGNERS AT APPLE I WANT USABLE AND FAST USER INTERFACES NOT 15 MINUTES OF NOVELTY
 date: 2025-06-11
 ---
 
