@@ -9,7 +9,7 @@ Use this [Nix Darwin](https://github.com/nix-darwin/nix-darwin) module:
 {
   system.defaults = {
     # Reduce window resize animation duration.
-    NSWindowResizeTime = 0.001;
+    NSGlobalDomain.NSWindowResizeTime = 0.001;
 
     # Reduce motion.
     CustomSystemPreferences."com.apple.Accessibility".ReduceMotionEnabled = 1;
