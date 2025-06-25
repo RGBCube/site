@@ -37,7 +37,7 @@ layout: default.vto
 </div>
 
 <footer class="flex justify-center text-sm wrap-anywhere mt-auto p-1.5 pb-2 border-t-4 border-x-4 border-black dark:border-white">
-  Copyright © {{ Temporal.Now.plainDateISO().year }}
+  Copyright <span class="shake-sm px-0.5"><p>©</p></span> {{ Temporal.Now.plainDateISO().year }}
 
   <a draggable="false" class="flex items-center pl-2" href="/" alt="RGBCube">
   {{ include "rgbcube.vto" {

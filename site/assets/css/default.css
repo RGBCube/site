@@ -63,7 +63,27 @@
 
   --animate-shake-y: shake-y 0.08s linear infinite;
 
-  @keyframes slide-down-shake {
+  @keyframes shake-sm-x {
+    0%, 100% {}
+
+    50% {
+      transform: translateX(2px);
+    }
+  }
+
+  --animate-shake-sm-x: shake-sm-x 0.07s linear infinite;
+
+  @keyframes shake-sm-y {
+    0%, 100% {}
+
+    50% {
+      transform: translateY(2px);
+    }
+  }
+
+  --animate-shake-sm-y: shake-sm-y 0.08s linear infinite;
+
+  @keyframes slide-down-shake-sm {
     0% {
       transform: translateY(-100%);
     }
@@ -98,6 +118,14 @@
 
   & > * {
     @apply animate-shake-y;
+  }
+}
+
+.shake-sm {
+  @apply animate-shake-sm-x;
+
+  & > * {
+    @apply animate-shake-sm-y;
   }
 }
 
