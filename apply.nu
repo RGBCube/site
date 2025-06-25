@@ -1,18 +1,19 @@
 #!/usr/bin/env nu
 
-def --wrapped sync [...args] {
- ( rsync
+def --wrapped sync [...arguments] {
+ (rsync
     --archive
     --compress
 
     --delete --recursive --force
     --delete-excluded
-    --delete-missing-args
+    --delete-missing-arguments
 
     --human-readable
     --delay-updates
-    ...$args)
+    ...$arguments)
 }
+
 # Applies the changes to the site by uploading it to the VPS.
 def main [] {
   const dest_directory = "_site_production"
