@@ -171,7 +171,7 @@ body {
       @apply wrap-anywhere;
     }
 
-    &:not(:has(> code:only-child)):not(:has(> img)) {
+    &:not(:has(> code:only-child), :has(> img)) {
       @apply px-1;
 
       &:not(.font-mono) {
@@ -230,8 +230,8 @@ body {
   code:not(pre > code) {
     @apply border-1 border-dotted px-2 py-0.5 border-black dark:border-white;
 
-    a:hover &:not(:only-child, :is(h1, h2, h3, h4, h5, h6) *),
-    a:active &:not(:only-child, :is(h1, h2, h3, h4, h5, h6) *) {
+    a:is(:hover, :active) /* TODO: :only-child selector doesn't have effect. */
+      &:not(:where(h1, h2, h3, h4, h5, h6) code):only-child {
       @apply border-transparent;
     }
   }
