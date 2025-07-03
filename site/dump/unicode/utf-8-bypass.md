@@ -8,7 +8,8 @@ slash) character in UTF-8 in 3 different ways?
 
 These were `0x2F`, or `0xC0 0xAF`, or `0xE0 0x80 0xAF`.
 
-This led to security issues and let attackers bypass validation logic.
+This led to [security issues](https://capec.mitre.org/data/definitions/80.html)
+and let attackers bypass validation logic.
 
 The Unicode specification later was revised to say that a UTF-8 encoder must
 produce the shortest possible sequence that can represent a codepoint, and a
