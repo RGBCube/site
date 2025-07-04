@@ -50,7 +50,9 @@ fn main() {
 
 The second example is a bit far fetched, but you probably answered yes.
 
-But neither do.
+But
+[neither](https://play.rust-lang.org/?version=stable&mode=debug&edition=2024&gist=0d9a89eccb4773ce32e7a3cec5cf8603)
+[do](https://play.rust-lang.org/?version=stable&mode=debug&edition=2024&gist=30233aea9cf20c3299cd5c1fc6e7ec8c).
 
 # Why not?
 
