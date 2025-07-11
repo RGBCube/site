@@ -79,6 +79,7 @@ the list of pointers to disk.
 - [(stackoverflow) Difference between `syncfs` (Linux only) and `fsync` (POSIX)](https://stackoverflow.com/questions/48171855/what-is-the-difference-between-fsync-and-syncfs)
   (TL;DR: `syncfs` is "pretty please" fsync and doesn't block until the
   operation is done)
+- [(transactional.blog) Userland Disk I/O](https://transactional.blog/how-to-learn/disk-io)
 - [(LWN) Feathersticth: Killing `fsync` softly](https://lwn.net/Articles/354861/)
 - [(stackoverflow) Your Program ---~~`fflush`~~---> Your OS ---~~`fsync`~~---> Your Disk](https://stackoverflow.com/questions/2340610/difference-between-fflush-and-fsync)
 - [(despairlabs) `fsync()` after `open()` is an elaborate no-op](https://despairlabs.com/blog/posts/2025-03-13-fsync-after-open-is-an-elaborate-no-op/)
