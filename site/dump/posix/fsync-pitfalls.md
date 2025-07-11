@@ -67,8 +67,6 @@ wrong. You can imagine a directory as a file containing a list of children, and
 the list is just pointers to inodes. So `fsync`ing a directory will just write
 the list of pointers to disk.
 
----
-
 ## More reading on `fsync`
 
 - [(danluu) Fsyncgate: Errors on `fsync` are unrecoverable](https://danluu.com/fsyncgate/)
