@@ -41,8 +41,6 @@ This is a non-comprehensive list of the pitfalls of the `fsync` syscall.
 I will expand this list as I have more questions about all the questionable
 filesystems used and created by operating system enthusiasts.
 
----
-
 ## `fsync` does not ensure that a `fsync`'d file is visible in its parent directory
 
 From the manpage:
@@ -55,8 +53,6 @@ This means that that you cannot rely on a file being in the directory after
 `fsync`ing the file itself. You have to `fsync` the directory too.
 
 Speaking about `fsync`ing a directory:
-
----
 
 ## `fsync` on a directory does not ensure children are `fsync`'d
 
