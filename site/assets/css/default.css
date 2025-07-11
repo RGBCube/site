@@ -311,8 +311,16 @@ body {
   }
 
   blockquote {
-    @apply border-1 p-2 bg-[#eee] shadow-[4px_4px_#444] dark:border-white
-      dark:bg-[#111] dark:shadow-[4px_4px_#bbb];
+    @apply border-1 border-black dark:border-white p-2 bg-[#eee]
+      shadow-[4px_4px_#444] dark:bg-[#111] dark:shadow-[4px_4px_#bbb];
+  }
+
+  details {
+    & > summary {
+      @apply inline-block border-4 border-double border-[red]
+        hover:border-[maroon] dark:border-[yellow] dark:hover:border-[goldenrod]
+        p-4 cursor-pointer;
+    }
   }
 
   .callout {
