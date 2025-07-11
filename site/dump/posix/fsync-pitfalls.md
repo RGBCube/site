@@ -71,9 +71,10 @@ wrong. You can imagine a directory as a file containing a list of children, and
 the list is just pointers to inodes. So `fsync`ing a directory will just write
 the list of pointers to disk.
 
-## More reading on `fsync`
+## More reading on `fsync` and other things related to files
 
 - [(danluu) Fsyncgate: Errors on `fsync` are unrecoverable](https://danluu.com/fsyncgate/)
+- [(danluu) Files are hard](https://danluu.com/file-consistency/)
 - [(puzpuzpuz) The secret life of `fsync`](https://puzpuzpuz.dev/the-secret-life-of-fsync)
 - [(stackoverflow) Difference between `syncfs` (Linux only) and `fsync` (POSIX)](https://stackoverflow.com/questions/48171855/what-is-the-difference-between-fsync-and-syncfs)
   (TL;DR: `syncfs` is "pretty please" fsync and doesn't block until the
