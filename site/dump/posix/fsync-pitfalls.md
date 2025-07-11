@@ -8,7 +8,11 @@ date: 2025-07-11
 This is a non-comprehensive list of the pitfalls of the `fsync` syscall.
 
 <details>
-<summary>Linux `man 2 fsync`</summary>
+<summary>
+
+Linux `man 2 fsync`
+
+</summary>
 
 > `fsync()` transfers ("flushes") all modified in-core data of (i.e., modified
 > buffer cache pages for) the file referred to by the file descriptor fd to the
