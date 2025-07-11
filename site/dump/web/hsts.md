@@ -21,5 +21,5 @@ able to recall the HSTS header, and let you connect insecurely.
 > Do not do this if you value your browsing history of that site. It literally
 > says "Forget This Site", act accordingly.
 
-These instrucitons are Firefox and Firefox-based browser specific, but the
+These instructions are Firefox and Firefox-based browser specific, but the
 process is same on other browsers.
