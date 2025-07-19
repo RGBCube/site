@@ -13,7 +13,7 @@ the most core-level bootstrapping needs is that it depends on Gnulib.
 Gnulib is a huge blob of C and 80 thousand lines of m4 that has crusted over 30+
 years and is almost impossible to build correctly, has to be manually patched in
 every single program that embeds it, [^Gnulib is not a library, but a collection
-of source files that you are supposed to embed into your library, so you can
+of source files that you are supposed to embed into your program, so you can
 expect to be pulling your hair out as it is well-rooted into most programs that
 embed it. Have fun packaging it all!] rewards bad OSes and makes good OSes
 shrivel in pain & makes packagers go bald & makes issues hard to diagnose and
