@@ -103,12 +103,12 @@ look, it's all 140 lines of code!
 
 ## But it can be even better
 
-Nixpkgs has `pkgs.buildRustCrate`, to build crates without Cargo, but currently
-doesn't use it for most packages, so it doesn't have crate-level incremental
-rebuilds. This may change in the future, and when it does, compiling Rust
-programs will take a fraction of the time because you aren't building
-dependencies over and over and over and over again, and can utilize
-`cache.nixos.org`, or any other cache.
+Nixpkgs has [`pkgs.buildRustCrate`](https://noogle.dev/f/pkgs/buildRustCrate),
+to build crates without Cargo, but currently doesn't use it for most packages,
+so it doesn't have crate-level incremental rebuilds. This may change in the
+future, and when it does, compiling Rust programs will take a fraction of the
+time because you aren't building dependencies over and over and over and over
+again, and can utilize `cache.nixos.org`, or any other cache.
 
 It will also decrease the amount of lines you'll have to write in Nixpkgs
 package specifications, because you'll no longer have to specify all external
@@ -117,6 +117,85 @@ dependencies will be configured in a
 [`per-crate basis,`](https://github.com/NixOS/nixpkgs/blob/f101cc2c243f0f3869f9a214d71b736c66b5317a/pkgs/build-support/rust/default-crate-overrides.nix)
 so a top-level Rust program that uses a crate that requires `liburing` won't
 actually see `liburing` when being compiled.
+
+<blockquote>
+
+You can actaully use this right now with
+[`cargo2nix`](https://github.com/cargo2nix/cargo2nix) or
+[`crate2nix`](https://github.com/nix-community/crate2nix), though expect some
+headaches. (I recently spent a few hours getting `crate2nix` to work on a huge
+codebase with a lot of native dependencies, and `aws-lc-sys` was the biggest
+headache on darwin)
+
+<details>
+<summary>The extra crate overrides I ended up with, if it helps.</summary>
+
+```nix
+{ pkgs, ... }:
+{
+  openssl = old: {
+    buildInputs = old.buildInputs or [ ] ++ [
+      pkgs.openssl
+    ];
+  };
+
+  openssl-sys = old: {
+    RUSTFLAGS = "--cfg ossl111 --cfg ossl110 --cfg ossl101";
+
+    "${pkgs.stdenv.buildPlatform.rust.cargoEnvVarTarget}_OPENSSL_DIR" = "${pkgs.openssl.dev}";
+    OPENSSL_NO_VENDOR = "1";
+    OPENSSL_STATIC = "0";
+  };
+
+  aws-lc-sys = old: {
+    nativeBuildInputs = old.nativeBuildInputs or [ ] ++ [
+      pkgs.cmake
+      pkgs.go
+      pkgs.libclang
+      pkgs.perl
+      pkgs.nasm
+    ];
+    env.CFLAGS = "-D_DARWIN_C_SOURCE"; # Hours of my life wasted to figure this out.
+  };
+
+  librocksdb-sys = old: {
+    buildInputs = old.buildInputs or [ ] ++ [
+      pkgs.zlib
+      pkgs.zstd
+      pkgs.bzip2
+      pkgs.lz4
+    ];
+  };
+
+  tokio = old: {
+    extraRustcOpts = old.extraRustcOpts or [ ] ++ [
+      "--cfg tokio_unstable"
+    ];
+  };
+
+  uvm_syn = old: {
+    extraRustcOpts = old.extraRustcOpts or [ ] ++ [
+      "-Awarnings"
+    ];
+  };
+
+  pyo3_build_config = old: {
+    buildInputs = old.buildInputs or [ ] ++ [
+      pkgs.python313
+    ];
+  };
+}
+```
+
+I also had to patch the `Cargo.nix` generator because it was not handling or
+even exposing a way to enable extra cfg flags separately, but maybe this is
+fixed in `cargo2nix`?
+
+Anyway, we do not talk about the general state of Nix/Nixpkgs/NixOS tooling.
+(But it's still better than every other distro out there)
+
+</details>
+</blockquote>
 
 ## Takeaway...?
 
