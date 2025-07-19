@@ -4,6 +4,11 @@ description: ...and Debian.
 date: 2025-07-19
 ---
 
+If you are a GNU maintainer and are not willing to be critizied by people sick
+of your bullshit software, do not read this post.
+
+---
+
 # Say NO to Gnulib
 
 The commonly overlooked but also very important argument for dropping GNU
@@ -20,11 +25,11 @@ shrivel in pain & makes packagers go bald & makes issues hard to diagnose and
 debug.
 
 It's so ass. It's so incredibly easy to build it wrong and create a shitty
-distro (and it is built _wrong_ by default). At least in Rust and the general
-ecosystem of Rust, `Cargo.toml` is pretty well-defined and `build.rs` scripts
-don't do anything that insane. (Hell, even the
-[C compilation tools used inside crates](https://lib.rs/cc) are shared deps and
-is well-defined).
+distro (and it is built _wrong_ by default). At least in Rust (or in other
+ecosystems, such as Go) and the general ecosystem of Rust, `Cargo.toml` is
+pretty well-defined and `build.rs` scripts don't do anything that insane. (Hell,
+even the [C compilation tools used inside crates](https://lib.rs/cc) are shared
+deps and is well-defined).
 
 I don't trust the average distro to build any toolchain made by GNU properly,
 and I do not trust them to produce a proper set of system tools eiyher because
@@ -38,6 +43,11 @@ easier to audit too & it doesn't misbehave or segfault.
 
 I hope Uutils coreutils & Uutils findutils and so on achieves near perfect
 compliance so I do not need to serve GNU tools to my users.
+
+> Also, keep in mind that it doesn't have to be Rust. I would also welcome the
+> GNU people fixing up their shitty build tooling & making their software behave
+> correctly. But that isn't happening any time soon, so we are starting from
+> scratch & fixing (quite) a few itches on the way.
 
 Read more about this on the
 [Sortix wiki.](https://gitlab.com/sortix/sortix/-/wikis/Gnulib)
@@ -73,7 +83,7 @@ Incredibly foolish. You are not supposed to package every single crate manually,
 and you should not be anyway.
 
 The way you should package any programming language that has a widely used and
-generally well-defined and static build system is to generate package
+generally well-defined and static build system is to generate (unlisted) package
 definitions from packages using a script or tool (such as
 `cargo metdata -> parse json -> puke out package manifests`), and only add extra
 configuration to packages that depend on anything external (such as a C library,
@@ -117,6 +127,14 @@ dependencies will be configured in a
 [`per-crate basis,`](https://github.com/NixOS/nixpkgs/blob/f101cc2c243f0f3869f9a214d71b736c66b5317a/pkgs/build-support/rust/default-crate-overrides.nix)
 so a top-level Rust program that uses a crate that requires `liburing` won't
 actually see `liburing` when being compiled.
+
+And here's another great part: Since the `pkgs` view is not a 1:1 map of all the
+derivations (build units, but in a fancy Nix / Functional Software Deployment
+Model way), these generated definitions won't pollute search or interfere with
+users. It's just a plus in almost every way imagineable.[^A negative would be
+the sandbox creation overhead of `nix-daemon`, but that shouldn't be significant
+most of Rust builds from scratch, and for those that are, the already-cached
+crates will mitigate the losses pretty easily.]
 
 <blockquote>
 
