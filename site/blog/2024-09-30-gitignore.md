@@ -98,18 +98,21 @@ You change your gitignore to this:
 
 !.gitignore
 
-!src/*.rs
+# whitelist `src` directories and their children, regardless of place
+!src/**/
+!src/**/*.rs
 !Cargo.{toml,lock}
 
-!pysrc/*.py
+# whitelist root `pysrc` directory
+!/pysrc/*.py
 !pyproject.toml
 !poetry.lock
 
-!cmd/*.go
+!/cmd/*.go
 !main.go
 !go.{mod,sum}
 
-!docs/*.md
+!/docs/*.md
 ```
 
 Now, nobody can accidentally commit undesired files, as git automatically
