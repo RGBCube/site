@@ -84,14 +84,14 @@ deceiving the underworld.
 ![Sisyphus pushing up a boulder that has .DS_Store written
 on it](/assets/images/sisyphus-ds-store.webp)
 
-How do you escape this endless loop of ignoring files that sneak in? Maybe by
+How will you escape this endless loop of ignoring files that sneak in? Maybe by
 educating every single merge request author? Nope, that definitely won't work,
 there should be a way to automatically handle this with tooling, rather than
 subjective human communication.
 
-Luckily, you realize that you can turn the blacklist of files (the gitignore) to
-a whitelist, by just ignoring everything and manually un-ignoring desired files.
-You change your gitignore to this:
+Luckily, you realize that you can turn the blacklist of files (the gitignore)
+into a whitelist, by just ignoring everything and manually un-ignoring desired
+files. You change your gitignore to this:
 
 ```ignore
 *
@@ -99,19 +99,23 @@ You change your gitignore to this:
 !.gitignore
 
 # whitelist `src` directories and their children, regardless of place
+!src/
 !src/**/
 !src/**/*.rs
 !Cargo.{toml,lock}
 
 # whitelist root `pysrc` directory
+!/pysrc/
 !/pysrc/*.py
 !pyproject.toml
 !poetry.lock
 
+!/cmd/
 !/cmd/*.go
 !main.go
 !go.{mod,sum}
 
+!/docs/
 !/docs/*.md
 ```
 
