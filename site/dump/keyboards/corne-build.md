@@ -1,9 +1,10 @@
 ---
 date: 2025-09-12
+description: I'm building a (few) Corne keyboard(s)
 ---
 
-I am currently building a Corne keyboard by following
-[this guide.](https://github.com/klouderone/CorneV4ProMicroEdition)
+I am currently building a [Corne keyboard](https://github.com/foostan/crkbd) by
+following [this guide.](https://github.com/klouderone/CorneV4ProMicroEdition)
 
 **bulk** = 4 keyboards. Some stuff is cheaper (such as the hot-swap sockets) if
 you build more at once, but who is building 10 keyboards for personal use?
