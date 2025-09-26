@@ -3,8 +3,8 @@ title: Cosmic Drift
 description: Or how I missed the school bus because of a cosmic ray.
 
 tags:
-- time
-- unix-timestamps
+  - time
+  - unix-timestamps
 ---
 
 So, every day I wake up at 6:55, get dressed by 7, walk to the bus stop by 7:13

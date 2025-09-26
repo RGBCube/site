@@ -3,7 +3,7 @@ title: "`#[derive(Clone)]` is broken"
 description: "Not just `#[derive(Clone)]`, but all of the standard trait derives are"
 
 tags:
-- rust
+  - rust
 ---
 
 ```rs

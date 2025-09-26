@@ -5,7 +5,7 @@ description: And revealing how cursed Nix is.
 unlisted: true
 
 tags:
-- nix/os
+  - nix/os
 ---
 
 Everyone who has ever interacted with Nix tooling knows that it keeps some

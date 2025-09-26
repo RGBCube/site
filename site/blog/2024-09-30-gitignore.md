@@ -6,7 +6,7 @@ color: "#A5804C"
 thumbnail: /assets/images/sisyphus-ds-store.webp
 
 tags:
-- vcs
+  - vcs
 ---
 
 You just started a new project. You ran `cargo init`, `poetry init` and

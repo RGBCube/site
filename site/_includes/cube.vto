@@ -291,6 +291,8 @@
 
   document.addEventListener("mousemove", handleMove);
   document.addEventListener("touchmove", (event) => {
+    if (event.touches.length <= 0) return; // Seriously, what the hell?
+
     const { x, y } = Array
       .from(event.touches)
       .reduce(
