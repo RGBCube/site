@@ -47,9 +47,9 @@ prevent_zoom: true
   <a draggable="false" class="{{ style }} {{ underline }}" href="/blog/">blog</a>
 {{ /set }}
 
-{{ set cube_face_bottom }}
-  <a draggable="false" class="{{ style }}" href="https://x.com/HSVSphere">xitter</a>
-{{ /set }}
+{{# {{ set cube_face_bottom }} #}}
+  {{# <a draggable="false" class="{{ style }}" href="https://x.com/HSVSphere">xitter</a> #}}
+{{# {{ /set }} #}}
 
 {{ include "rgbcube.vto" {
   cube_size: "5rem",
