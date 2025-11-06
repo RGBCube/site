@@ -27,29 +27,35 @@ prevent_zoom: true
 
 {{> const underline = `underline decoration-4 decoration-black underline-offset-9` }}
 
-{{ set cube_face_front }}
-  <a draggable="false" class="{{ style }}" href="/about/">about</a>
-{{ /set }}
+{{ if !index_no_links }}
+  {{ set cube_face_front }}
+    <a draggable="false" class="{{ style }}" href="/about/">about</a>
+  {{ /set }}
 
-{{ set cube_face_back }}
-  <a draggable="false" class="{{ style }} {{ underline }}" href="/dump/">dump</a>
-{{ /set }}
+  {{ set cube_face_back }}
+    <a draggable="false" class="{{ style }} {{ underline }}" href="/dump/">dump</a>
+  {{ /set }}
 
-{{ set cube_face_top }}
-  <a draggable="false" class="{{ style }}" href="https://github.com/RGBCube">github</a>
-{{ /set }}
+  {{ set cube_face_top }}
+    <a draggable="false" class="{{ style }}" href="https://github.com/RGBCube">github</a>
+  {{ /set }}
 
-{{ set cube_face_right }}
-  <a draggable="false" class="{{ style }}" href="/contact/">contact</a>
-{{ /set }}
+  {{ set cube_face_right }}
+    <a draggable="false" class="{{ style }}" href="/contact/">contact</a>
+  {{ /set }}
 
-{{ set cube_face_left }}
-  <a draggable="false" class="{{ style }} {{ underline }}" href="/blog/">blog</a>
-{{ /set }}
+  {{ set cube_face_left }}
+    <a draggable="false" class="{{ style }} {{ underline }}" href="/blog/">blog</a>
+  {{ /set }}
 
-{{# {{ set cube_face_bottom }} #}}
-  {{# <a draggable="false" class="{{ style }}" href="https://x.com/HSVSphere">xitter</a> #}}
-{{# {{ /set }} #}}
+  {{# {{ set cube_face_bottom }} #}}
+    {{# <a draggable="false" class="{{ style }}" href="https://x.com/HSVSphere">xitter</a> #}}
+  {{# {{ /set }} #}}
+
+  {{ set cube_face_bottom }}
+    <a draggable="false" class="{{ style }}" href="/nuke">nuke</a>
+  {{ /set }}
+{{ /if }}
 
 {{ include "rgbcube.vto" {
   cube_size: "5rem",
