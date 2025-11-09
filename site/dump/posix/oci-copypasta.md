@@ -1,4 +1,5 @@
 ---
+title: OCI Copypasta
 date: 2025-11-09
 ---
 
