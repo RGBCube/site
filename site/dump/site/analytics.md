@@ -14,6 +14,6 @@ You can view it here for these domains:
 
 - [rgbcu.be](https://shekels.rgbcu.be/rgbcu.be)
 - [shekels.rgbcu.be](https://shekels.rgbcu.be/shekels.rgbcu.be)
-- [git.rgbcu.be](https://shekels.rgbcu.be/git.rgbcu.be)
+- [git.rgbcu.be](https://shekels.rgbcu.be/rgbcu.be)
 
 No other domain is marked public, so don't bother searching.
