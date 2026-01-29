@@ -125,6 +125,9 @@ type Event = ReturnType<typeof Event>;
 const Event = (raw: XmlEvent, room: string, year: number) => ({
   raw,
   room,
+  get id(): string {
+    return raw["@id"];
+  },
   get title(): string {
     return raw.title;
   },
@@ -330,6 +333,12 @@ const EventBlock = (
         event.persons.length ? "\n" + event.persons.join(", ") : ""
       }`}
     >
+      <input
+        type="checkbox"
+        class="ev-star"
+        data-event-id={event.id}
+        onclick="toggleStar(event)"
+      />
       <span class="ev-time">
         {startStr}&#8211;{endStr}
       </span>
@@ -607,8 +616,8 @@ const setRemPerMinute = (value) => {
 setRemPerMinute(+zoom.value);
 zoom.addEventListener('input', (event) => setRemPerMinute(+event.target.value));
 
-document.querySelectorAll('.day').forEach((day) => {
-  day.addEventListener('wheel', (event) => {
+document.querySelectorAll('.grid-scroll').forEach((grid) => {
+  grid.addEventListener('wheel', (event) => {
     if (!event.ctrlKey && !event.metaKey) return;
     event.preventDefault();
     setRemPerMinute(+zoom.value - event.deltaY * 0.0005);
@@ -735,6 +744,23 @@ document.querySelectorAll('.fbtn[data-track]').forEach((btn) => {
   update();
   setInterval(update, 30000);
 })();
+
+/* Stars */
+const stars = new Set(JSON.parse(localStorage.getItem(storageKey('stars')) || '[]'));
+
+const saveStars = () => localStorage.setItem(storageKey('stars'), JSON.stringify([...stars]));
+
+const toggleStar = (event) => {
+  event.stopPropagation();
+  const checkbox = event.target;
+  const id = checkbox.dataset.eventId;
+  if (checkbox.checked) stars.add(id); else stars.delete(id);
+  saveStars();
+};
+
+document.querySelectorAll('.ev-star').forEach((cb) => {
+  if (stars.has(cb.dataset.eventId)) cb.checked = true;
+});
 `;
 
 export const generate = async (

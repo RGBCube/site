@@ -48,6 +48,25 @@
   }
 }
 
+.ev-star {
+  @apply absolute top-0.5 right-0.5 appearance-none w-3.5 h-3.5
+    rounded-[calc(0.25rem-0.125rem)]
+    border border-current opacity-30 cursor-pointer z-10 shrink-0;
+
+  transition: opacity 150ms, background 150ms;
+
+  &:hover {
+    @apply opacity-60;
+  }
+
+  &:checked {
+    @apply opacity-90;
+    background: currentColor;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8l3 3 5-6' stroke='%23000' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-size: contain;
+  }
+}
+
 .ev-time {
   @apply text-[0.58rem] opacity-70 font-semibold;
 }
