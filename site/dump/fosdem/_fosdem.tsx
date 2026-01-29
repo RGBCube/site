@@ -84,6 +84,24 @@ const formatTime = (minutes: number) =>
     .map((part) => String(part).padStart(2, "0"))
     .join(":");
 
+const formatLocalTime = (date: Date, tz?: string) => {
+  const opts: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    ...(tz && { timeZone: tz }),
+  };
+  const parts = new Intl.DateTimeFormat("en-CA", opts).formatToParts(date);
+  const get = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((p) => p.type === type)!.value;
+  return `${get("year")}-${get("month")}-${get("day")} ${get("hour")}:${
+    get("minute")
+  }`;
+};
+
 const range = (from: number, to: number) =>
   Array.from({ length: to - from + 1 }, (_, index) => from + index);
 
@@ -173,15 +191,8 @@ const Conference = (raw: XmlConference) => ({
   city: () => raw.city,
   start: () => raw.start,
   end: () => raw.end,
-  dateRange: () => {
-    const fmt = (d: string) =>
-      new Date(d).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      });
-    return `${fmt(raw.start)} \u2013 ${fmt(raw.end)}`;
-  },
+  dateRange: () => `${raw.start} \u2013 ${raw.end}`,
+  timezone: () => raw.time_zone_name || "Europe/Brussels",
 });
 
 const fetchSchedule = async (year: number) => {
@@ -370,21 +381,50 @@ const YearNav = (
 ) => {
   const hasPrev = year > first;
   const hasNext = year < last;
-  const cls = "no-underline px-2.5 py-1 border border-border rounded-md text-[0.82rem] transition-colors duration-150";
+  const cls =
+    "no-underline px-2.5 py-1 border border-border rounded-md text-[0.82rem] transition-colors duration-150";
   return (
     <nav class="flex gap-2 items-center">
       {hasPrev
-        ? <a class={`${cls} text-accent hover:bg-[#1e2028]`} href={`/dump/fosdem/${year - 1}/`}>&larr; {year - 1}</a>
-        : <span class={`${cls} text-text-muted opacity-40 cursor-default`}>&larr; {year - 1}</span>}
+        ? (
+          <a
+            class={`${cls} text-accent hover:bg-[#1e2028]`}
+            href={`/dump/fosdem/${year - 1}/`}
+          >
+            &larr; {year - 1}
+          </a>
+        )
+        : (
+          <span class={`${cls} text-text-muted opacity-40 cursor-default`}>
+            &larr; {year - 1}
+          </span>
+        )}
       {hasNext
-        ? <a class={`${cls} text-accent hover:bg-[#1e2028]`} href={`/dump/fosdem/${year + 1}/`}>{year + 1} &rarr;</a>
-        : <span class={`${cls} text-text-muted opacity-40 cursor-default`}>{year + 1} &rarr;</span>}
+        ? (
+          <a
+            class={`${cls} text-accent hover:bg-[#1e2028]`}
+            href={`/dump/fosdem/${year + 1}/`}
+          >
+            {year + 1} &rarr;
+          </a>
+        )
+        : (
+          <span class={`${cls} text-text-muted opacity-40 cursor-default`}>
+            {year + 1} &rarr;
+          </span>
+        )}
     </nav>
   );
 };
 
 const Page = (
-  { conference, days, year, first, last }: { conference: Conference; days: Day[]; year: number; first: number; last: number },
+  { conference, days, year, first, last }: {
+    conference: Conference;
+    days: Day[];
+    year: number;
+    first: number;
+    last: number;
+  },
 ) => (
   <html lang="en">
     <head>
@@ -402,7 +442,8 @@ const Page = (
             </h1>
             <p class="text-text-muted text-sm">
               {conference.venue()}, {conference.city()} &mdash;{" "}
-              {conference.dateRange()}
+              {conference.dateRange()} &mdash; All times in{" "}
+              {conference.timezone()}
             </p>
           </div>
           <YearNav year={year} first={first} last={last} />
@@ -423,7 +464,7 @@ const Page = (
       </main>
       <footer class="text-text-muted text-xs text-center py-4">
         Snapshot generated on{" "}
-        <time>{new Date().toISOString().replace("T", " ")}</time>{" "}
+        <time>{formatLocalTime(new Date(), conference.timezone())}</time>{" "}
         and will be updated every once in a while.
       </footer>
       <script dangerouslySetInnerHTML={{ __html: JS }} />
@@ -497,5 +538,13 @@ export const generate = async (
   { year, first, last }: { year: number; first: number; last: number },
 ) => {
   const { conference, days } = await fetchSchedule(year);
-  return <Page conference={conference} days={days} year={year} first={first} last={last} />;
+  return (
+    <Page
+      conference={conference}
+      days={days}
+      year={year}
+      first={first}
+      last={last}
+    />
+  );
 };
