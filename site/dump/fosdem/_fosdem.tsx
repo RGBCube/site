@@ -417,7 +417,8 @@ const DaySection = ({ day }: { day: Day }) => {
       <h2 class="text-xl text-text-bright mb-2.5 pb-1.5 border-b border-border-dim flex flex-wrap items-baseline gap-x-2.5">
         Day {day.index} &mdash; {day.date}
         <span class="text-text-muted text-xs font-normal">
-          {rooms.length} rooms &middot; {day.events.length} events
+          {Object.entries(rooms).length} rooms &middot; {day.events.length}{" "}
+          events
         </span>
       </h2>
 
