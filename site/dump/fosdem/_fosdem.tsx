@@ -105,6 +105,8 @@ const wrap = <T,>(value: T | T[]): T[] =>
 const range = (from: number, to: number) =>
   Array.from({ length: to - from + 1 }, (_, index) => from + index);
 
+const minutes = (time: Temporal.PlainTime) => time.hour * 60 + time.minute;
+
 const xmlText = (value: XmlText): string =>
   typeof value === "string" ? value : value["#text"];
 
@@ -263,24 +265,28 @@ const REM_PER_MINUTE_DEFAULT = 0.1125;
 
 const MIN_VISUAL_MINUTES = 1.75 / REM_PER_MINUTE_DEFAULT;
 
-const assignColumns = (events: Event[]): [Event, number][] => {
+const assignColumns = (events: Event[]): { event: Event; column: number }[] => {
   const ends: number[] = []; // visual end time per column
+
   return events.map((event) => {
-    const start = event.start.hour * 60 + event.start.minute;
+    const start = minutes(event.start);
+
     const visualEnd = start +
       Math.max(event.duration.total("minutes"), MIN_VISUAL_MINUTES);
-    let col = ends.findIndex((end) => end <= start);
-    if (col === -1) col = ends.length;
-    ends[col] = visualEnd;
-    return [event, col];
+
+    let column = ends.findIndex((end) => end <= start);
+    if (column === -1) column = ends.length;
+    ends[column] = visualEnd;
+
+    return { event, column };
   });
 };
 
 const EventBlock = (
-  { event, col, startHour }: { event: Event; col: number; startHour: number },
+  { event, column, startHour }: { event: Event; column: number; startHour: number },
 ) => {
   const [background, foreground] = event.color;
-  const startMinutes = event.start.hour * 60 + event.start.minute;
+  const startMinutes = minutes(event.start);
   const durationMinutes = event.duration.total("minutes");
   const height =
     `max(calc(${durationMinutes} * var(--rem-per-minute)), 1.75rem)`;
@@ -294,7 +300,7 @@ const EventBlock = (
       href={event.url}
       target="_blank"
       style={`--h:${height};top:${top};min-height:${height};background:${background};color:${foreground};${
-        col > 0 ? `left:calc(0.1875rem + ${col} * 0.75rem);z-index:${col};` : ""
+        column > 0 ? `left:calc(0.1875rem + ${column} * 0.75rem);z-index:${column};` : ""
       }`}
       data-track={event.track}
       title={`${event.title}\n${startStr}\u2013${endStr} (${durationMinutes}min)\n${event.track} \u00b7 ${event.room}${
@@ -333,11 +339,11 @@ const RoomColumn = (
             } * var(--rem-per-minute))`}
           />
         ))}
-        {columns.map(([event, col]) => (
+        {columns.map(({ event, column }) => (
           <EventBlock
             key={event.url}
             event={event}
-            col={col}
+            column={column}
             startHour={startHour}
           />
         ))}
@@ -349,7 +355,7 @@ const RoomColumn = (
 const DaySection = ({ day }: { day: Day }) => {
   const startHour = day.events.length ? day.earliestStart.hour : 0;
   const endHour = day.events.length
-    ? day.latestEnd.hour + (day.latestEnd.minute > 0 ? 2 : 1)
+    ? Math.ceil(minutes(day.latestEnd) / 60) + 1
     : 1;
   const totalHeight = `calc(${
     (endHour - startHour) * 60
