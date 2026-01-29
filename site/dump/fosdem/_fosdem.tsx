@@ -102,10 +102,21 @@ type XmlSchedule = {
 const wrap = <T,>(value: T | T[]): T[] =>
   Array.isArray(value) ? value : [value];
 
-const range = (from: number, to: number) =>
-  Array.from({ length: to - from + 1 }, (_, index) => from + index);
-
 const minutes = (time: Temporal.PlainTime) => time.hour * 60 + time.minute;
+
+const timeRange = function* (
+  from: Temporal.PlainTime,
+  to: Temporal.PlainTime,
+  step: Temporal.Duration,
+) {
+  for (
+    let time = from;
+    Temporal.PlainTime.compare(time, to) <= 0;
+    time = time.add(step)
+  ) {
+    yield time;
+  }
+};
 
 const xmlText = (value: XmlText): string =>
   typeof value === "string" ? value : value["#text"];
@@ -343,17 +354,22 @@ const RoomColumn = (
     <div class="room-col">
       <div class="room-hdr">{name}</div>
       <div class="relative" style={`height:${totalHeight}`}>
-        {range(start.hour, end.hour).map((hour) => {
-          const time = Temporal.PlainTime.from({ hour, minute: 0 });
-          return (
-            <div
-              class="hour-rule"
-              style={`top:calc(${
-                time.since(start).total("minutes")
-              } * var(--rem-per-minute))`}
-            />
-          );
-        })}
+        {timeRange(start, end, Temporal.Duration.from({ minutes: 15 })).filter((
+          time,
+        ) => Temporal.PlainTime.compare(time, start) !== 0).map((
+          time,
+        ) => (
+          <div
+            class={time.minute === 0
+              ? "hour-rule"
+              : time.minute === 30
+              ? "half-rule"
+              : "quarter-rule"}
+            style={`top:calc(${
+              time.since(start).total("minutes")
+            } * var(--rem-per-minute))`}
+          />
+        )).toArray()}
         {columns.map(({ event, column }) => (
           <EventBlock
             key={event.url}
@@ -369,13 +385,10 @@ const RoomColumn = (
 
 const DaySection = ({ day }: { day: Day }) => {
   const start = day.events.length
-    ? day.earliestStart
+    ? day.earliestStart.round({ smallestUnit: "hour", roundingMode: "floor" })
     : Temporal.PlainTime.from({ hour: 0, minute: 0 });
   const end = day.events.length
-    ? Temporal.PlainTime.from({
-      hour: day.latestEnd.hour + (day.latestEnd.minute > 0 ? 2 : 1),
-      minute: 0,
-    })
+    ? day.latestEnd.round({ smallestUnit: "hour", roundingMode: "ceil" }).add({ hours: 1 })
     : Temporal.PlainTime.from({ hour: 0, minute: 0 });
   const totalHeight = `calc(${
     end.since(start).total("minutes")
@@ -426,19 +439,18 @@ const DaySection = ({ day }: { day: Day }) => {
             class={`px-1.5 py-1 text-[0.72rem] border-b border-border after:content-['\\00a0']`}
           />
           <div class="relative" style={`height:${totalHeight}`}>
-            {range(start.hour, end.hour).map((hour) => {
-              const time = Temporal.PlainTime.from({ hour, minute: 0 });
-              return (
-                <div
-                  class="hour-label"
-                  style={`top:calc(${
-                    time.since(start).total("minutes")
-                  } * var(--rem-per-minute))`}
-                >
-                  {String(hour).padStart(2, "0")}:00
-                </div>
-              );
-            })}
+            {timeRange(start, end, Temporal.Duration.from({ hours: 1 })).map((
+              time,
+            ) => (
+              <div
+                class="hour-label"
+                style={`top:calc(${
+                  time.since(start).total("minutes")
+                } * var(--rem-per-minute))`}
+              >
+                {time.toString({ smallestUnit: "minute" })}
+              </div>
+            )).toArray()}
           </div>
         </div>
         {Object.entries(rooms).map(([name, events]) => (

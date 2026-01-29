@@ -101,6 +101,24 @@
   @apply absolute left-0 right-0 h-px bg-border-faint;
 }
 
+.half-rule {
+  @apply absolute left-0 right-0 h-px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--color-border-faint) 0 4px,
+    transparent 4px 8px
+  );
+}
+
+.quarter-rule {
+  @apply absolute left-0 right-0 h-px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--color-border-faint) 0 2px,
+    transparent 2px 6px
+  );
+}
+
 .hour-label {
   @apply absolute right-1.5 text-[0.65rem] text-text-muted -translate-y-1/2
     whitespace-nowrap;
