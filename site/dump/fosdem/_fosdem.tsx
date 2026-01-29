@@ -7,19 +7,38 @@ import * as xml from "xml";
 type OneOrMany<T> = T | T[];
 type XmlText = string | { "#text": string };
 
-type XmlPerson = XmlText & { "@id": string };
-type XmlAttachment = XmlText & { "@type": string; "@href": string };
-type XmlLink = XmlText & { "@href": string };
+type XmlPerson = XmlText & {
+  "@id": string;
+  "@guid"?: string;
+};
+
+type XmlAttachment = XmlText & {
+  "@type": string;
+  "@href": string;
+};
+
+type XmlLink = XmlText & {
+  "@href": string;
+  "@type"?: string;
+  "@service"?: string;
+};
+
+type XmlRecording = {
+  license?: string;
+  optout?: string;
+};
 
 type XmlEvent = {
-  "@guid"?: string;
   "@id": string;
+  "@guid"?: string;
+  "@code"?: string;
   date?: string;
   start: string;
   duration: string;
   room: string;
   slug: string;
   url?: string;
+  logo?: string;
   title: string;
   subtitle?: string;
   track: XmlText & { "@slug"?: string };
@@ -28,6 +47,9 @@ type XmlEvent = {
   abstract?: string;
   description?: string;
   feedback_url?: string;
+  video_download_url?: string;
+  origin_url?: string;
+  recording?: XmlRecording;
   persons?: { person: OneOrMany<XmlPerson> };
   attachments?: { attachment: OneOrMany<XmlAttachment> };
   links?: { link: OneOrMany<XmlLink> };
@@ -36,6 +58,7 @@ type XmlEvent = {
 type XmlRoom = {
   "@name": string;
   "@slug"?: string;
+  "@guid"?: string;
   event?: OneOrMany<XmlEvent>;
 };
 
@@ -59,48 +82,25 @@ type XmlConference = {
   day_change?: string;
   timeslot_duration?: string;
   base_url?: string;
+  logo?: string;
+  url?: string;
   time_zone_name?: string;
+  color?: string;
 };
 
 type XmlTrack = XmlText & { "@online_qa"?: string; "@slug"?: string };
 
 type XmlSchedule = {
-  schedule: {
-    version: string;
-    conference: XmlConference;
-    tracks?: { track: OneOrMany<XmlTrack> };
-    day: OneOrMany<XmlDay>;
-  };
+  generator?: { "@name"?: string; "@version"?: string };
+  url?: string;
+  version: string;
+  conference: XmlConference;
+  tracks?: { track: OneOrMany<XmlTrack> };
+  day: OneOrMany<XmlDay>;
 };
 
 const wrap = <T,>(value: T | T[]): T[] =>
   Array.isArray(value) ? value : [value];
-
-const parseTime = (str: string) =>
-  str.split(":").map(Number).reduce((hours, mins) => hours * 60 + mins);
-
-const formatTime = (minutes: number) =>
-  [Math.floor(minutes / 60), minutes % 60]
-    .map((part) => String(part).padStart(2, "0"))
-    .join(":");
-
-const formatLocalTime = (date: Date, tz?: string) => {
-  const opts: Intl.DateTimeFormatOptions = {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-    ...(tz && { timeZone: tz }),
-  };
-  const parts = new Intl.DateTimeFormat("en-CA", opts).formatToParts(date);
-  const get = (type: Intl.DateTimeFormatPartTypes) =>
-    parts.find((p) => p.type === type)!.value;
-  return `${get("year")}-${get("month")}-${get("day")} ${get("hour")}:${
-    get("minute")
-  }`;
-};
 
 const range = (from: number, to: number) =>
   Array.from({ length: to - from + 1 }, (_, index) => from + index);
@@ -112,90 +112,102 @@ type Event = ReturnType<typeof Event>;
 const Event = (raw: XmlEvent, room: string, year: number) => ({
   raw,
   room,
-  title: () => raw.title,
-  url: () =>
-    raw.url ||
-    (year <= 2012
-      ? `https://fosdem.org/${year}/schedule/event/${raw.slug}.html`
-      : `https://fosdem.org/${year}/schedule/event/${raw.slug}/`),
-  start: () => raw.start,
-  track: () => xmlText(raw.track),
-  startMinutes: () => parseTime(raw.start),
-  durationMinutes: () => parseTime(raw.duration),
-  endMinutes: () => parseTime(raw.start) + parseTime(raw.duration),
-  endTime: () => formatTime(parseTime(raw.start) + parseTime(raw.duration)),
-  color: () => trackColor(xmlText(raw.track)),
-  persons: () =>
-    raw.persons?.person
+  get title(): string {
+    return raw.title;
+  },
+  get url(): string {
+    return raw.url ||
+      (year <= 2012
+        ? `https://fosdem.org/${year}/schedule/event/${raw.slug}.html`
+        : `https://fosdem.org/${year}/schedule/event/${raw.slug}/`);
+  },
+  get start(): Temporal.PlainTime {
+    return Temporal.PlainTime.from(raw.start);
+  },
+  get duration(): Temporal.Duration {
+    const time = Temporal.PlainTime.from(raw.duration);
+    return Temporal.Duration.from({ hours: time.hour, minutes: time.minute });
+  },
+  get end(): Temporal.PlainTime {
+    return this.start.add(this.duration);
+  },
+  get track(): string {
+    return xmlText(raw.track);
+  },
+  get color(): [string, string] {
+    return color(this.track);
+  },
+  get persons(): string[] {
+    return raw.persons?.person
       ? wrap(raw.persons.person).map(xmlText).filter(Boolean)
-      : [],
+      : [];
+  },
 });
 
 type Day = ReturnType<typeof Day>;
-const Day = (raw: XmlDay, year: number) => {
-  const rooms = () =>
-    new Map(
+const Day = (raw: XmlDay, year: number) => ({
+  raw,
+  get index(): number {
+    return raw["@index"];
+  },
+  get date(): Temporal.PlainDate {
+    return Temporal.PlainDate.from(raw["@date"]);
+  },
+  get rooms(): Record<string, Event[]> {
+    return Object.fromEntries(
       wrap(raw.room)
-        .filter((room) => room.event)
         .map((room) => [
           room["@name"],
-          wrap(room.event!)
+          wrap(room.event || [])
             .map((event) => Event(event, room["@name"], year))
             .toSorted((left, right) =>
-              left.startMinutes() - right.startMinutes()
+              Temporal.PlainTime.compare(left.start, right.start)
             ),
         ]),
     );
-  const allEvents = () => [...rooms().values()].flat();
-  const earliestStart = () =>
-    allEvents().reduce(
-      (min, event) => Math.min(min, event.startMinutes()),
-      Infinity,
-    );
-  const startHour = () =>
-    Math.floor(
-      (Number.isFinite(earliestStart()) ? earliestStart() : 0) / 60,
-    );
-  const endHour = () => {
-    const latestEnd = allEvents().reduce(
-      (max, event) => Math.max(max, event.endMinutes()),
-      earliestStart(),
-    );
-    return Math.ceil(latestEnd / 60) + 1;
-  };
-
-  return {
-    raw,
-    index: () => raw["@index"],
-    date: () => raw["@date"],
-    rooms,
-    allEvents,
-    startHour,
-    endHour,
-    sortedRooms: () =>
-      [...rooms().entries()].toSorted(([left], [right]) =>
-        left.localeCompare(right)
-      ),
-    sortedTracks: () =>
-      [...new Set(allEvents().map((event) => event.track()))].sort(),
-    eventCount: () =>
-      [...rooms().values()].reduce((sum, events) => sum + events.length, 0),
-  };
-};
+  },
+  get tracks(): string[] {
+    return [...new Set(this.events.map((event) => event.track))];
+  },
+  get events(): Event[] {
+    return Object.values(this.rooms).flat();
+  },
+  get earliestStart(): Temporal.PlainTime {
+    return this.events
+      .map((event) => event.start)
+      .reduce((a, b) => Temporal.PlainTime.compare(a, b) <= 0 ? a : b);
+  },
+  get latestEnd(): Temporal.PlainTime {
+    return this.events
+      .map((event) => event.end)
+      .reduce((a, b) => Temporal.PlainTime.compare(a, b) >= 0 ? a : b);
+  },
+});
 
 type Conference = ReturnType<typeof Conference>;
 const Conference = (raw: XmlConference) => ({
   raw,
-  title: () => raw.title,
-  venue: () => raw.venue,
-  city: () => raw.city,
-  start: () => raw.start,
-  end: () => raw.end,
-  dateRange: () => `${raw.start} \u2013 ${raw.end}`,
-  timezone: () => raw.time_zone_name || "Europe/Brussels",
+  get title(): string {
+    return raw.title;
+  },
+  get venue(): string {
+    return raw.venue;
+  },
+  get city(): string {
+    return raw.city;
+  },
+  get start(): Temporal.PlainDate {
+    return Temporal.PlainDate.from(raw.start);
+  },
+  get end(): Temporal.PlainDate {
+    return Temporal.PlainDate.from(raw.end);
+  },
+  get timezone(): string {
+    return raw.time_zone_name || "Europe/Brussels";
+  },
 });
 
-const fetchSchedule = async (year: number) => {
+const schedule = async (year: number) => {
   const url = `https://fosdem.org/${year}/schedule/xml`;
   console.error(`Fetching ${url}...`);
 
@@ -204,64 +216,59 @@ const fetchSchedule = async (year: number) => {
 
   console.error(`Fetched ${(text.length / 1024).toFixed(0)}KB of XML`);
 
-  const { schedule } = xml.parse(text) as XmlSchedule;
+  const { schedule }: { schedule: XmlSchedule } = xml.parse(text);
   const conference = Conference(schedule.conference);
   const days = wrap(schedule.day).map((day) => Day(day, year));
 
-  const total = days
-    .flatMap((day) => [...day.rooms().values()])
-    .reduce((sum, events) => sum + events.length, 0);
   console.error(
-    `Parsed ${conference.title()}: ${days.length} days, ${total} events`,
+    `Parsed ${conference.title}: ${days.length} days, ${
+      days
+        .flatMap((day) => Object.values(day.rooms))
+        .reduce((sum, events) => sum + events.length, 0)
+    } events`,
   );
 
   return { conference, days };
 };
 
-const PALETTE: [string, string][] = [
-  ["#3b2f4a", "#d4bfff"],
-  ["#2f3b4a", "#bfe0ff"],
-  ["#2f4a3b", "#bfffd4"],
-  ["#4a3b2f", "#ffd4bf"],
-  ["#4a2f3b", "#ffbfd4"],
-  ["#3b4a2f", "#d4ffbf"],
-  ["#2f4a4a", "#bffffa"],
-  ["#4a4a2f", "#fffabf"],
-  ["#3b2f3b", "#e0bfe0"],
-  ["#2f3b3b", "#bfe0e0"],
-  ["#4a3b3b", "#ffd4d4"],
-  ["#3b3b2f", "#e0e0bf"],
-  ["#402f4a", "#d9bfff"],
-  ["#2f404a", "#bfd9ff"],
-  ["#2f4a40", "#bfffd9"],
-  ["#4a402f", "#ffd9bf"],
-];
+const color = (string: string): [string, string] => {
+  const PALETTE: [string, string][] = [
+    ["#3b2f4a", "#d4bfff"],
+    ["#2f3b4a", "#bfe0ff"],
+    ["#2f4a3b", "#bfffd4"],
+    ["#4a3b2f", "#ffd4bf"],
+    ["#4a2f3b", "#ffbfd4"],
+    ["#3b4a2f", "#d4ffbf"],
+    ["#2f4a4a", "#bffffa"],
+    ["#4a4a2f", "#fffabf"],
+    ["#3b2f3b", "#e0bfe0"],
+    ["#2f3b3b", "#bfe0e0"],
+    ["#4a3b3b", "#ffd4d4"],
+    ["#3b3b2f", "#e0e0bf"],
+    ["#402f4a", "#d9bfff"],
+    ["#2f404a", "#bfd9ff"],
+    ["#2f4a40", "#bfffd9"],
+    ["#4a402f", "#ffd9bf"],
+  ];
 
-const trackColor = (track: string): [string, string] => {
-  const hash = [...track].reduce(
+  const hash = [...string].reduce(
     (acc, char) => ((acc << 5) - acc + char.charCodeAt(0)) | 0,
     0,
   );
+
   return PALETTE[Math.abs(hash) % PALETTE.length];
 };
 
-const RPM_DEFAULT = 0.1125;
+const REM_PER_MINUTE_DEFAULT = 0.1125;
 
-const timeToRem = (
-  { minutes, startHour }: { minutes: number; startHour: number },
-) => `calc(${minutes - startHour * 60} * var(--rpm))`;
-
-const durationToRem = (duration: number) =>
-  `max(calc(${duration} * var(--rpm)), 1.75rem)`;
-
-const MIN_VISUAL_MINUTES = 1.75 / RPM_DEFAULT;
+const MIN_VISUAL_MINUTES = 1.75 / REM_PER_MINUTE_DEFAULT;
 
 const assignColumns = (events: Event[]): [Event, number][] => {
   const ends: number[] = []; // visual end time per column
   return events.map((event) => {
-    const start = event.startMinutes();
+    const start = event.start.hour * 60 + event.start.minute;
     const visualEnd = start +
-      Math.max(event.durationMinutes(), MIN_VISUAL_MINUTES);
+      Math.max(event.duration.total("minutes"), MIN_VISUAL_MINUTES);
     let col = ends.findIndex((end) => end <= start);
     if (col === -1) col = ends.length;
     ends[col] = visualEnd;
@@ -272,29 +279,33 @@ const assignColumns = (events: Event[]): [Event, number][] => {
 const EventBlock = (
   { event, col, startHour }: { event: Event; col: number; startHour: number },
 ) => {
-  const [background, foreground] = event.color();
-  const height = durationToRem(event.durationMinutes());
+  const [background, foreground] = event.color;
+  const startMinutes = event.start.hour * 60 + event.start.minute;
+  const durationMinutes = event.duration.total("minutes");
+  const height =
+    `max(calc(${durationMinutes} * var(--rem-per-minute)), 1.75rem)`;
+  const top = `calc(${startMinutes - startHour * 60} * var(--rem-per-minute))`;
+  const startStr = event.start.toString({ smallestUnit: "minute" });
+  const endStr = event.end.toString({ smallestUnit: "minute" });
 
   return (
     <a
       class="ev group"
-      href={event.url()}
+      href={event.url}
       target="_blank"
-      style={`--h:${height};top:${
-        timeToRem({ minutes: event.startMinutes(), startHour })
-      };min-height:${height};background:${background};color:${foreground};${
+      style={`--h:${height};top:${top};min-height:${height};background:${background};color:${foreground};${
         col > 0 ? `left:calc(0.1875rem + ${col} * 0.75rem);z-index:${col};` : ""
       }`}
-      data-track={event.track()}
-      title={`${event.title()}\n${event.start()}\u2013${event.endTime()} (${event.durationMinutes()}min)\n${event.track()} \u00b7 ${event.room}${
-        event.persons().length ? "\n" + event.persons().join(", ") : ""
+      data-track={event.track}
+      title={`${event.title}\n${startStr}\u2013${endStr} (${durationMinutes}min)\n${event.track} \u00b7 ${event.room}${
+        event.persons.length ? "\n" + event.persons.join(", ") : ""
       }`}
     >
       <span class="ev-time">
-        {event.start()}&#8211;{event.endTime()}
+        {startStr}&#8211;{endStr}
       </span>
       <span class="ev-title">
-        {event.title()}
+        {event.title}
       </span>
     </a>
   );
@@ -317,12 +328,14 @@ const RoomColumn = (
         {range(startHour, endHour).map((hour) => (
           <div
             class="hour-rule"
-            style={`top:${timeToRem({ minutes: hour * 60, startHour })}`}
+            style={`top:calc(${
+              (hour - startHour) * 60
+            } * var(--rem-per-minute))`}
           />
         ))}
         {columns.map(([event, col]) => (
           <EventBlock
-            key={event.url()}
+            key={event.url}
             event={event}
             col={col}
             startHour={startHour}
@@ -334,23 +347,27 @@ const RoomColumn = (
 };
 
 const DaySection = ({ day }: { day: Day }) => {
-  const startHour = day.startHour();
-  const endHour = day.endHour();
-  const totalHeight = `calc(${(endHour - startHour) * 60} * var(--rpm) + 1rem)`;
-  const rooms = day.sortedRooms();
+  const startHour = day.events.length ? day.earliestStart.hour : 0;
+  const endHour = day.events.length
+    ? day.latestEnd.hour + (day.latestEnd.minute > 0 ? 2 : 1)
+    : 1;
+  const totalHeight = `calc(${
+    (endHour - startHour) * 60
+  } * var(--rem-per-minute) + 1rem)`;
+  const rooms = day.rooms;
 
   return (
     <section
-      id={`day-${day.index()}`}
+      id={`day-${day.index}`}
       class="day mb-10"
       data-start-hour={startHour}
       data-end-hour={endHour}
-      data-day={day.index()}
+      data-day={day.index}
     >
       <h2 class="text-xl text-text-bright mb-2.5 pb-1.5 border-b border-border-dim flex flex-wrap items-baseline gap-x-2.5">
-        Day {day.index()} &mdash; {day.date()}
+        Day {day.index} &mdash; {day.date}
         <span class="text-text-muted text-xs font-normal">
-          {rooms.length} rooms &middot; {day.eventCount()} events
+          {rooms.length} rooms &middot; {day.events.length} events
         </span>
       </h2>
 
@@ -361,8 +378,8 @@ const DaySection = ({ day }: { day: Day }) => {
         <button type="button" class="fbtn ctrl-btn" onclick="unselectAll(this)">
           Unselect all
         </button>
-        {day.sortedTracks().map((track) => {
-          const [background, foreground] = trackColor(track);
+        {day.tracks.map((track) => {
+          const [background, foreground] = color(track);
           return (
             <button
               type="button"
@@ -386,14 +403,16 @@ const DaySection = ({ day }: { day: Day }) => {
             {range(startHour, endHour).map((hour) => (
               <div
                 class="hour-label"
-                style={`top:${timeToRem({ minutes: hour * 60, startHour })}`}
+                style={`top:calc(${
+                  (hour - startHour) * 60
+                } * var(--rem-per-minute))`}
               >
                 {String(hour).padStart(2, "0")}:00
               </div>
             ))}
           </div>
         </div>
-        {rooms.map(([name, events]) => (
+        {Object.entries(rooms).map(([name, events]) => (
           <RoomColumn
             name={name}
             events={events}
@@ -461,25 +480,26 @@ const Page = (
     <head>
       <meta charset="utf-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <title>{conference.title()} Schedule</title>
+      <title>{conference.title} Schedule</title>
       <link href="/assets/css/fosdem.css" rel="stylesheet" inline />
     </head>
     <body
       class="font-sans bg-surface text-text min-h-screen overflow-x-hidden"
-      style={`--rpm:${RPM_DEFAULT}rem`}
-      data-tz={conference.timezone()}
+      style={`--rem-per-minute:${REM_PER_MINUTE_DEFAULT}rem`}
+      data-tz={conference.timezone}
       data-year={year}
     >
       <header class="bg-surface-alt border-b border-border px-6 py-5">
         <div class="flex flex-wrap items-start justify-between gap-4 mb-2.5">
           <div>
             <h1 class="text-[1.4rem] text-accent mb-0.5">
-              {conference.title()} Schedule
+              {conference.title} Schedule
             </h1>
             <p class="text-text-muted text-sm">
-              {conference.venue()}, {conference.city()} &mdash;{" "}
-              {conference.dateRange()} &mdash; All times in{" "}
-              {conference.timezone()}
+              {conference.venue}, {conference.city} &mdash; {conference.start}
+              {" "}
+              &ndash; {conference.end} &mdash; All times in{" "}
+              {conference.timezone}
             </p>
           </div>
           <div class="flex flex-col items-end gap-0.5">
@@ -491,7 +511,7 @@ const Page = (
                 min="0.04"
                 max="0.3"
                 step="0.005"
-                value={String(RPM_DEFAULT)}
+                value={String(REM_PER_MINUTE_DEFAULT)}
                 class="w-24 accent-accent"
               />
             </label>
@@ -504,20 +524,23 @@ const Page = (
           {days.map((day) => (
             <a
               class="text-accent no-underline px-2.5 py-1 border border-border rounded-md text-[0.82rem] transition-colors duration-150 hover:bg-[#1e2028]"
-              href={`#day-${day.index()}`}
+              href={`#day-${day.index}`}
             >
-              Day {day.index()} ({day.date()})
+              Day {day.index} ({day.date})
             </a>
           ))}
           <YearNav year={year} first={first} last={last} />
         </nav>
       </header>
       <main class="p-5">
-        {days.map((day) => <DaySection key={day.index()} day={day} />)}
+        {days.map((day) => <DaySection key={day.index} day={day} />)}
       </main>
       <footer class="text-text-muted text-xs text-center py-4">
         Snapshot generated on{" "}
-        <time>{formatLocalTime(new Date(), conference.timezone())}</time>{" "}
+        <time>
+          {Temporal.Now.zonedDateTimeISO(conference.timezone).toPlainDateTime()
+            .toString({ smallestUnit: "minute" }).replace("T", " ")}
+        </time>{" "}
         and will be updated every once in a while.
       </footer>
       <script dangerouslySetInnerHTML={{ __html: JS }} />
@@ -532,20 +555,20 @@ const zoom = document.getElementById('zoom');
 const savedZoom = localStorage.getItem(storageKey('zoom'));
 if (savedZoom != null) zoom.value = savedZoom;
 
-const setRpm = (value) => {
+const setRemPerMinute = (value) => {
   const clamped = Math.min(+zoom.max, Math.max(+zoom.min, value));
   zoom.value = clamped;
-  document.body.style.setProperty('--rpm', clamped + 'rem');
+  document.body.style.setProperty('--rem-per-minute', clamped + 'rem');
   localStorage.setItem(storageKey('zoom'), clamped);
 };
-setRpm(+zoom.value);
-zoom.addEventListener('input', (event) => setRpm(+event.target.value));
+setRemPerMinute(+zoom.value);
+zoom.addEventListener('input', (event) => setRemPerMinute(+event.target.value));
 
 document.querySelectorAll('.day').forEach((day) => {
   day.addEventListener('wheel', (event) => {
     if (!event.ctrlKey && !event.metaKey) return;
     event.preventDefault();
-    setRpm(+zoom.value - event.deltaY * 0.0005);
+    setRemPerMinute(+zoom.value - event.deltaY * 0.0005);
   }, { passive: false });
 });
 
@@ -658,7 +681,7 @@ document.querySelectorAll('.fbtn[data-track]').forEach((btn) => {
       }
       const hdr = scroll.querySelector('.room-hdr');
       const hdrHeight = hdr ? hdr.offsetHeight : 0;
-      const top = 'calc(' + hdrHeight + 'px + ' + (now - startHour * 60) + ' * var(--rpm))';
+      const top = 'calc(' + hdrHeight + 'px + ' + (now - startHour * 60) + ' * var(--rem-per-minute))';
       line.style.top = top;
     });
   };
@@ -671,7 +694,7 @@ document.querySelectorAll('.fbtn[data-track]').forEach((btn) => {
 export const generate = async (
   { year, first, last }: { year: number; first: number; last: number },
 ) => {
-  const { conference, days } = await fetchSchedule(year);
+  const { conference, days } = await schedule(year);
   return (
     <Page
       conference={conference}
