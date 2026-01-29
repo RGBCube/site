@@ -445,7 +445,7 @@ const DaySection = ({ day }: { day: Day }) => {
         })}
       </div>
 
-      <div class="grid-scroll relative flex overflow-x-auto overflow-y-hidden border border-border-dim rounded-lg bg-surface">
+      <div class="grid-scroll relative flex overflow-x-auto overflow-y-hidden border border-border-dim rounded-lg bg-surface max-sm:-mx-5 max-sm:rounded-none max-sm:border-x-0">
         <div class="w-[3.25rem] min-w-[3.25rem] bg-surface-alt border-r border-border">
           <div
             class={`px-1.5 py-1 text-[0.72rem] border-b border-border after:content-['\\00a0']`}
@@ -569,8 +569,8 @@ const Page = (
               />
             </label>
             <span class="text-text-muted text-[0.6rem] opacity-60">
-              or {"\u2318"}/Ctrl + scroll in schedule
-              or pinch to zoom, and Shift for default
+              <p>or {"\u2318"}/Ctrl + scroll in schedule</p>
+              <p>or pinch to zoom, and Shift for default</p>
             </span>
           </div>
         </div>
@@ -589,7 +589,7 @@ const Page = (
       <main class="p-5">
         {days.map((day) => <DaySection key={day.index} day={day} />)}
       </main>
-      <footer class="text-text-muted text-xs text-center py-4">
+      <footer class="text-text-muted text-xs text-center px-5 py-4 pb-8">
         Snapshot generated on{" "}
         <time>
           {Temporal.Now.zonedDateTimeISO(conference.timezone).toPlainDateTime()
