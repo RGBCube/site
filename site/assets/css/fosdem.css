@@ -36,7 +36,7 @@
   @apply [transition:filter_150ms,transform_150ms,box-shadow_150ms];
 
   &:hover {
-    @apply z-50 brightness-[1.35] -translate-y-[0.0625rem]
+    @apply !z-50 brightness-[1.35] -translate-y-[0.0625rem]
       shadow-[0.25rem_1rem_rgba(0,0,0,0.5)] overflow-visible
       max-h-[calc(var(--h)+10rem)]
       [transition:filter_150ms,transform_150ms,box-shadow_150ms,max-height_300ms];
