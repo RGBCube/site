@@ -48,7 +48,7 @@
   }
 }
 
-.ev-star {
+.ev-fav {
   @apply absolute top-0.5 right-0.5 appearance-none w-3.5 h-3.5
     rounded-[calc(0.25rem-0.125rem)]
     border border-current opacity-30 cursor-pointer z-10 shrink-0;

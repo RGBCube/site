@@ -335,9 +335,9 @@ const EventBlock = (
     >
       <input
         type="checkbox"
-        class="ev-star"
+        class="ev-fav"
         data-event-id={event.id}
-        onclick="toggleStar(event)"
+        onclick="toggleFavorite(event)"
       />
       <span class="ev-time">
         {startStr}&#8211;{endStr}
@@ -618,7 +618,7 @@ zoom.addEventListener('input', (event) => setRemPerMinute(+event.target.value));
 
 document.querySelectorAll('.grid-scroll').forEach((grid) => {
   grid.addEventListener('wheel', (event) => {
-    if (!event.ctrlKey && !event.metaKey) return;
+    if (event.shiftKey || (!event.ctrlKey && !event.metaKey)) return;
     event.preventDefault();
     setRemPerMinute(+zoom.value - event.deltaY * 0.0005);
   }, { passive: false });
@@ -637,7 +637,8 @@ const applyFilters = (container) => {
   );
   const allSelected = active.size === all.length;
   container.querySelectorAll('.ev').forEach((el) => {
-    el.classList.toggle('dimmed', !allSelected && !active.has(el.dataset.track));
+    const favorited = el.querySelector('.ev-fav:checked');
+    el.classList.toggle('dimmed', !allSelected && !favorited && !active.has(el.dataset.track));
   });
   container.querySelectorAll('.fbtn[data-track]').forEach((btn) => {
     btn.classList.toggle('inactive', !btn.classList.contains('active'));
@@ -646,10 +647,11 @@ const applyFilters = (container) => {
     if (allSelected) {
       col.classList.remove('hidden');
     } else if (active.size === 0) {
-      col.classList.add('hidden');
+      col.classList.toggle('hidden', !col.querySelector('.ev-fav:checked'));
     } else {
-      const selector = [...active].map((track) => '.ev[data-track="' + track + '"]').join(',');
-      col.classList.toggle('hidden', !col.querySelector(selector));
+      const trackSelector = [...active].map((track) => '.ev[data-track="' + track + '"]').join(',');
+      const hasFavorited = col.querySelector('.ev-fav:checked');
+      col.classList.toggle('hidden', !hasFavorited && !(trackSelector && col.querySelector(trackSelector)));
     }
   });
   saveFilters(container);
@@ -745,21 +747,23 @@ document.querySelectorAll('.fbtn[data-track]').forEach((btn) => {
   setInterval(update, 30000);
 })();
 
-/* Stars */
-const stars = new Set(JSON.parse(localStorage.getItem(storageKey('stars')) || '[]'));
+/* Favorites */
+const favorites = new Set(JSON.parse(localStorage.getItem(storageKey('favorites')) || '[]'));
 
-const saveStars = () => localStorage.setItem(storageKey('stars'), JSON.stringify([...stars]));
+const saveFavorites = () => localStorage.setItem(storageKey('favorites'), JSON.stringify([...favorites]));
 
-const toggleStar = (event) => {
+const toggleFavorite = (event) => {
   event.stopPropagation();
   const checkbox = event.target;
   const id = checkbox.dataset.eventId;
-  if (checkbox.checked) stars.add(id); else stars.delete(id);
-  saveStars();
+  if (checkbox.checked) favorites.add(id); else favorites.delete(id);
+  saveFavorites();
+  const day = checkbox.closest('.day');
+  if (day) applyFilters(day);
 };
 
-document.querySelectorAll('.ev-star').forEach((cb) => {
-  if (stars.has(cb.dataset.eventId)) cb.checked = true;
+document.querySelectorAll('.ev-fav').forEach((checkbox) => {
+  if (favorites.has(checkbox.dataset.eventId)) checkbox.checked = true;
 });
 `;
 
