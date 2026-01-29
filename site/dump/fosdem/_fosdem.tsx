@@ -340,7 +340,7 @@ const DaySection = ({ day }: { day: Day }) => {
   const rooms = day.sortedRooms();
 
   return (
-    <section id={`day-${day.index()}`} class="day mb-10">
+    <section id={`day-${day.index()}`} class="day mb-10" data-start-hour={startHour} data-end-hour={endHour}>
       <h2 class="text-xl text-text-bright mb-2.5 pb-1.5 border-b border-border-dim flex flex-wrap items-baseline gap-x-2.5">
         Day {day.index()} &mdash; {day.date()}
         <span class="text-text-muted text-xs font-normal">
@@ -371,7 +371,7 @@ const DaySection = ({ day }: { day: Day }) => {
         })}
       </div>
 
-      <div class="flex overflow-x-auto overflow-y-hidden border border-border-dim rounded-lg bg-surface">
+      <div class="grid-scroll relative flex overflow-x-auto overflow-y-hidden border border-border-dim rounded-lg bg-surface">
         <div class="w-[3.25rem] min-w-[3.25rem] bg-surface-alt border-r border-border">
           <div
             class={`px-1.5 py-1 text-[0.72rem] border-b border-border after:content-['\\00a0']`}
@@ -461,6 +461,7 @@ const Page = (
     <body
       class="font-sans bg-surface text-text min-h-screen overflow-x-hidden"
       style={`--rpm:${RPM_DEFAULT}rem`}
+      data-tz={conference.timezone()}
     >
       <header class="bg-surface-alt border-b border-border px-6 py-5">
         <div class="flex flex-wrap items-start justify-between gap-4 mb-2.5">
@@ -593,6 +594,44 @@ document.querySelectorAll('.fbtn[data-track]').forEach((btn) => {
     });
   }
 });
+
+/* Live "now" line */
+(() => {
+  const timezone = document.body.dataset.tz;
+  const getNowMinutes = () => {
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      hour: '2-digit', minute: '2-digit', hour12: false, timeZone: timezone,
+    }).formatToParts(new Date());
+    const get = (type) => +parts.find((part) => part.type === type).value;
+    return get('hour') * 60 + get('minute');
+  };
+
+  const update = () => {
+    const now = getNowMinutes();
+    document.querySelectorAll('.day').forEach((day) => {
+      const startHour = +day.dataset.startHour;
+      const endHour = +day.dataset.endHour;
+      const scroll = day.querySelector('.grid-scroll');
+      let line = scroll.querySelector('.now-line');
+      if (now < startHour * 60 || now > endHour * 60) {
+        if (line) line.remove();
+        return;
+      }
+      if (!line) {
+        line = document.createElement('div');
+        line.className = 'now-line';
+        scroll.appendChild(line);
+      }
+      const hdr = scroll.querySelector('.room-hdr');
+      const hdrHeight = hdr ? hdr.offsetHeight : 0;
+      const top = 'calc(' + hdrHeight + 'px + ' + (now - startHour * 60) + ' * var(--rpm))';
+      line.style.top = top;
+    });
+  };
+
+  update();
+  setInterval(update, 30000);
+})();
 `;
 
 export const generate = async (

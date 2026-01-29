@@ -105,3 +105,7 @@
   @apply absolute right-1.5 text-[0.65rem] text-text-muted -translate-y-1/2
     whitespace-nowrap;
 }
+
+.now-line {
+  @apply absolute left-0 w-full min-w-fit h-px bg-red-500 z-[100] pointer-events-none;
+}
