@@ -487,7 +487,7 @@ const YearNav = (
   const cls =
     "no-underline px-2.5 py-1 border border-border rounded-md text-[0.82rem] transition-colors duration-150";
   return (
-    <nav class="flex gap-2 items-center ml-auto">
+    <nav class="flex max-sm:flex-col gap-2 items-center ml-auto shrink-0">
       {hasPrev
         ? (
           <a
@@ -555,7 +555,7 @@ const Page = (
               {conference.timezone}
             </p>
           </div>
-          <div class="flex flex-col items-end gap-0.5">
+          <div class="flex flex-col items-end gap-0.5 ml-auto">
             <label class="flex items-center gap-1.5 text-text-muted text-[0.72rem]">
               Zoom
               <input
@@ -574,15 +574,17 @@ const Page = (
             </span>
           </div>
         </div>
-        <nav class="flex flex-wrap gap-2 items-center">
-          {days.map((day) => (
-            <a
-              class="text-accent no-underline px-2.5 py-1 border border-border rounded-md text-[0.82rem] transition-colors duration-150 hover:bg-[#1e2028]"
-              href={`#day-${day.index}`}
-            >
-              Day {day.index} ({day.date})
-            </a>
-          ))}
+        <nav class="flex gap-2 items-start">
+          <div class="flex flex-wrap gap-2 items-center">
+            {days.map((day) => (
+              <a
+                class="text-accent no-underline px-2.5 py-1 border border-border rounded-md text-[0.82rem] transition-colors duration-150 hover:bg-[#1e2028]"
+                href={`#day-${day.index}`}
+              >
+                Day {day.index} ({day.date})
+              </a>
+            ))}
+          </div>
           <YearNav year={year} first={first} last={last} />
         </nav>
       </header>
