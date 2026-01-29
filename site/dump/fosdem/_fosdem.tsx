@@ -12,22 +12,22 @@ type XmlAttachment = XmlText & { "@type": string; "@href": string };
 type XmlLink = XmlText & { "@href": string };
 
 type XmlEvent = {
-  "@guid": string;
+  "@guid"?: string;
   "@id": string;
-  date: string;
+  date?: string;
   start: string;
   duration: string;
   room: string;
   slug: string;
-  url: string;
+  url?: string;
   title: string;
-  subtitle: string;
-  track: XmlText & { "@slug": string };
+  subtitle?: string;
+  track: XmlText & { "@slug"?: string };
   type: string;
-  language: string;
-  abstract: string;
-  description: string;
-  feedback_url: string;
+  language?: string;
+  abstract?: string;
+  description?: string;
+  feedback_url?: string;
   persons?: { person: OneOrMany<XmlPerson> };
   attachments?: { attachment: OneOrMany<XmlAttachment> };
   links?: { link: OneOrMany<XmlLink> };
@@ -35,40 +35,40 @@ type XmlEvent = {
 
 type XmlRoom = {
   "@name": string;
-  "@slug": string;
+  "@slug"?: string;
   event?: OneOrMany<XmlEvent>;
 };
 
 type XmlDay = {
   "@index": number;
   "@date": string;
-  "@start": string;
-  "@end": string;
+  "@start"?: string;
+  "@end"?: string;
   room: OneOrMany<XmlRoom>;
 };
 
 type XmlConference = {
-  acronym: string;
+  acronym?: string;
   title: string;
-  subtitle: string;
+  subtitle?: string;
   venue: string;
   city: string;
   start: string;
   end: string;
   days: string;
-  day_change: string;
-  timeslot_duration: string;
-  base_url: string;
-  time_zone_name: string;
+  day_change?: string;
+  timeslot_duration?: string;
+  base_url?: string;
+  time_zone_name?: string;
 };
 
-type XmlTrack = XmlText & { "@online_qa": string; "@slug": string };
+type XmlTrack = XmlText & { "@online_qa"?: string; "@slug"?: string };
 
 type XmlSchedule = {
   schedule: {
     version: string;
     conference: XmlConference;
-    tracks: { track: OneOrMany<XmlTrack> };
+    tracks?: { track: OneOrMany<XmlTrack> };
     day: OneOrMany<XmlDay>;
   };
 };
@@ -91,11 +91,15 @@ const xmlText = (value: XmlText): string =>
   typeof value === "string" ? value : value["#text"];
 
 type Event = ReturnType<typeof Event>;
-const Event = (raw: XmlEvent, room: string) => ({
+const Event = (raw: XmlEvent, room: string, year: number) => ({
   raw,
   room,
   title: () => raw.title,
-  url: () => raw.url,
+  url: () =>
+    raw.url ||
+    (year <= 2012
+      ? `https://fosdem.org/${year}/schedule/event/${raw.slug}.html`
+      : `https://fosdem.org/${year}/schedule/event/${raw.slug}/`),
   start: () => raw.start,
   track: () => xmlText(raw.track),
   startMinutes: () => parseTime(raw.start),
@@ -110,7 +114,7 @@ const Event = (raw: XmlEvent, room: string) => ({
 });
 
 type Day = ReturnType<typeof Day>;
-const Day = (raw: XmlDay) => {
+const Day = (raw: XmlDay, year: number) => {
   const rooms = () =>
     new Map(
       wrap(raw.room)
@@ -118,7 +122,7 @@ const Day = (raw: XmlDay) => {
         .map((room) => [
           room["@name"],
           wrap(room.event!)
-            .map((event) => Event(event, room["@name"]))
+            .map((event) => Event(event, room["@name"], year))
             .toSorted((left, right) =>
               left.startMinutes() - right.startMinutes()
             ),
@@ -191,7 +195,7 @@ const fetchSchedule = async (year: number) => {
 
   const { schedule } = xml.parse(text) as XmlSchedule;
   const conference = Conference(schedule.conference);
-  const days = wrap(schedule.day).map(Day);
+  const days = wrap(schedule.day).map((day) => Day(day, year));
 
   const total = days
     .flatMap((day) => [...day.rooms().values()])

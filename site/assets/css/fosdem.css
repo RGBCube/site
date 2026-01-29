@@ -29,7 +29,7 @@
 /* Event card */
 .ev {
   @apply absolute left-[0.1875rem] right-[0.1875rem] rounded outline outline-1
-    outline-current border-l border-current px-1.5 py-1 overflow-hidden
+    outline-current border-l-[0.1875rem] border-current px-1.5 py-1 overflow-hidden
     cursor-pointer flex flex-col gap-[0.0625rem] no-underline max-h-[var(--h)];
 
   transition: filter 150ms, transform 150ms, box-shadow 150ms;
