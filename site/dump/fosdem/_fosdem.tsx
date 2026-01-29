@@ -283,14 +283,22 @@ const assignColumns = (events: Event[]): { event: Event; column: number }[] => {
 };
 
 const EventBlock = (
-  { event, column, startHour }: { event: Event; column: number; startHour: number },
+  { event, column, columnStart }: {
+    event: Event;
+    column: number;
+    columnStart: Temporal.PlainTime;
+  },
 ) => {
   const [background, foreground] = event.color;
-  const startMinutes = minutes(event.start);
-  const durationMinutes = event.duration.total("minutes");
-  const height =
-    `max(calc(${durationMinutes} * var(--rem-per-minute)), 1.75rem)`;
-  const top = `calc(${startMinutes - startHour * 60} * var(--rem-per-minute))`;
+
+  const top = `calc(${
+    event.start.since(columnStart).total("minutes")
+  } * var(--rem-per-minute))`;
+
+  const height = `max(calc(${
+    event.duration.total("minutes")
+  } * var(--rem-per-minute)), 1.75rem)`;
+
   const startStr = event.start.toString({ smallestUnit: "minute" });
   const endStr = event.end.toString({ smallestUnit: "minute" });
 
@@ -300,10 +308,14 @@ const EventBlock = (
       href={event.url}
       target="_blank"
       style={`--h:${height};top:${top};min-height:${height};background:${background};color:${foreground};${
-        column > 0 ? `left:calc(0.1875rem + ${column} * 0.75rem);z-index:${column};` : ""
+        column > 0
+          ? `left:calc(0.1875rem + ${column} * 0.75rem);z-index:${column};`
+          : ""
       }`}
       data-track={event.track}
-      title={`${event.title}\n${startStr}\u2013${endStr} (${durationMinutes}min)\n${event.track} \u00b7 ${event.room}${
+      title={`${event.title}\n${startStr}\u2013${endStr} (${
+        event.duration.total("minutes")
+      }min)\n${event.track} \u00b7 ${event.room}${
         event.persons.length ? "\n" + event.persons.join(", ") : ""
       }`}
     >
@@ -318,12 +330,12 @@ const EventBlock = (
 };
 
 const RoomColumn = (
-  { name, events, totalHeight, startHour, endHour }: {
+  { name, events, totalHeight, start, end }: {
     name: string;
     events: Event[];
     totalHeight: string;
-    startHour: number;
-    endHour: number;
+    start: Temporal.PlainTime;
+    end: Temporal.PlainTime;
   },
 ) => {
   const columns = assignColumns(events);
@@ -331,20 +343,23 @@ const RoomColumn = (
     <div class="room-col">
       <div class="room-hdr">{name}</div>
       <div class="relative" style={`height:${totalHeight}`}>
-        {range(startHour, endHour).map((hour) => (
-          <div
-            class="hour-rule"
-            style={`top:calc(${
-              (hour - startHour) * 60
-            } * var(--rem-per-minute))`}
-          />
-        ))}
+        {range(start.hour, end.hour).map((hour) => {
+          const time = Temporal.PlainTime.from({ hour, minute: 0 });
+          return (
+            <div
+              class="hour-rule"
+              style={`top:calc(${
+                time.since(start).total("minutes")
+              } * var(--rem-per-minute))`}
+            />
+          );
+        })}
         {columns.map(({ event, column }) => (
           <EventBlock
             key={event.url}
             event={event}
             column={column}
-            startHour={startHour}
+            columnStart={start}
           />
         ))}
       </div>
@@ -353,12 +368,17 @@ const RoomColumn = (
 };
 
 const DaySection = ({ day }: { day: Day }) => {
-  const startHour = day.events.length ? day.earliestStart.hour : 0;
-  const endHour = day.events.length
-    ? Math.ceil(minutes(day.latestEnd) / 60) + 1
-    : 1;
+  const start = day.events.length
+    ? day.earliestStart
+    : Temporal.PlainTime.from({ hour: 0, minute: 0 });
+  const end = day.events.length
+    ? Temporal.PlainTime.from({
+      hour: day.latestEnd.hour + (day.latestEnd.minute > 0 ? 2 : 1),
+      minute: 0,
+    })
+    : Temporal.PlainTime.from({ hour: 0, minute: 0 });
   const totalHeight = `calc(${
-    (endHour - startHour) * 60
+    end.since(start).total("minutes")
   } * var(--rem-per-minute) + 1rem)`;
   const rooms = day.rooms;
 
@@ -366,9 +386,9 @@ const DaySection = ({ day }: { day: Day }) => {
     <section
       id={`day-${day.index}`}
       class="day mb-10"
-      data-start-hour={startHour}
-      data-end-hour={endHour}
       data-day={day.index}
+      data-start-hour={start.hour}
+      data-end-hour={end.hour}
     >
       <h2 class="text-xl text-text-bright mb-2.5 pb-1.5 border-b border-border-dim flex flex-wrap items-baseline gap-x-2.5">
         Day {day.index} &mdash; {day.date}
@@ -406,16 +426,19 @@ const DaySection = ({ day }: { day: Day }) => {
             class={`px-1.5 py-1 text-[0.72rem] border-b border-border after:content-['\\00a0']`}
           />
           <div class="relative" style={`height:${totalHeight}`}>
-            {range(startHour, endHour).map((hour) => (
-              <div
-                class="hour-label"
-                style={`top:calc(${
-                  (hour - startHour) * 60
-                } * var(--rem-per-minute))`}
-              >
-                {String(hour).padStart(2, "0")}:00
-              </div>
-            ))}
+            {range(start.hour, end.hour).map((hour) => {
+              const time = Temporal.PlainTime.from({ hour, minute: 0 });
+              return (
+                <div
+                  class="hour-label"
+                  style={`top:calc(${
+                    time.since(start).total("minutes")
+                  } * var(--rem-per-minute))`}
+                >
+                  {String(hour).padStart(2, "0")}:00
+                </div>
+              );
+            })}
           </div>
         </div>
         {Object.entries(rooms).map(([name, events]) => (
@@ -423,8 +446,8 @@ const DaySection = ({ day }: { day: Day }) => {
             name={name}
             events={events}
             totalHeight={totalHeight}
-            startHour={startHour}
-            endHour={endHour}
+            start={start}
+            end={end}
           />
         ))}
       </div>
