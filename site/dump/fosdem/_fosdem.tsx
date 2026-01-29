@@ -543,8 +543,8 @@ const Page = (
       data-year={year}
     >
       <header class="bg-surface-alt border-b border-border px-6 py-5">
-        <div class="flex flex-wrap items-start justify-between gap-4 mb-2.5">
-          <div>
+        <div class="flex items-start justify-between gap-4 mb-2.5">
+          <div class="min-w-0">
             <h1 class="text-[1.4rem] text-accent mb-0.5">
               {conference.title} Schedule Planner
             </h1>
@@ -575,7 +575,7 @@ const Page = (
           </div>
         </div>
         <nav class="flex gap-2 items-start">
-          <div class="flex flex-wrap gap-2 items-center">
+          <div class="flex max-sm:flex-col flex-wrap gap-2 items-center max-sm:items-start">
             {days.map((day) => (
               <a
                 class="text-accent no-underline px-2.5 py-1 border border-border rounded-md text-[0.82rem] transition-colors duration-150 hover:bg-[#1e2028]"
