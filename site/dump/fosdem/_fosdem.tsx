@@ -221,6 +221,10 @@ const Conference = (raw: XmlConference) => ({
   get timezone(): string {
     return raw.time_zone_name || "Europe/Brussels";
   },
+  get timezoneUtc(): string {
+    const offset = this.start.toZonedDateTime(this.timezone).offset;
+    return offset === "+00:00" ? "UTC" : `UTC${offset.replace(/:00$/, "").replace(/([+-])0/, "$1")}`;
+  },
 });
 
 const schedule = async (year: number) => {
@@ -537,7 +541,7 @@ const Page = (
       <link href="/assets/css/fosdem.css" rel="stylesheet" inline />
     </head>
     <body
-      class="font-sans bg-surface text-text min-h-screen overflow-x-hidden"
+      class="font-sans bg-surface text-text min-h-screen overflow-x-hidden break-words"
       style={`--rem-per-minute:${REM_PER_MINUTE_DEFAULT}rem`}
       data-tz={conference.timezone}
       data-year={year}
@@ -552,7 +556,7 @@ const Page = (
               {conference.venue}, {conference.city} &mdash; {conference.start}
               {" "}
               &ndash; {conference.end} &mdash; All times in{" "}
-              {conference.timezone}
+              {conference.timezoneUtc}
             </p>
           </div>
           <div class="flex flex-col items-end gap-0.5 ml-auto">
