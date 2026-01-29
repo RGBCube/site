@@ -245,14 +245,14 @@ const trackColor = (track: string): [string, string] => {
   return PALETTE[Math.abs(hash) % PALETTE.length];
 };
 
-const REM_PER_MIN = 0.1125;
+const RPM_DEFAULT = 0.1125;
 
 const timeToRem = (
   { minutes, startHour }: { minutes: number; startHour: number },
-) => (minutes - startHour * 60) * REM_PER_MIN;
+) => `calc(${minutes - startHour * 60} * var(--rpm))`;
 
 const durationToRem = (duration: number) =>
-  Math.max(duration * REM_PER_MIN, 1.75);
+  `max(calc(${duration} * var(--rpm)), 1.75rem)`;
 
 const EventBlock = (
   { event, startHour }: { event: Event; startHour: number },
@@ -265,9 +265,9 @@ const EventBlock = (
       class="ev group"
       href={event.url()}
       target="_blank"
-      style={`--h:${height}rem;top:${
+      style={`--h:${height};top:${
         timeToRem({ minutes: event.startMinutes(), startHour })
-      }rem;min-height:${height}rem;background:${background};color:${foreground};`}
+      };min-height:${height};background:${background};color:${foreground};`}
       data-track={event.track()}
       title={`${event.title()}\n${event.start()}\u2013${event.endTime()} (${event.durationMinutes()}min)\n${event.track()} \u00b7 ${event.room}${
         event.persons().length ? "\n" + event.persons().join(", ") : ""
@@ -287,18 +287,18 @@ const RoomColumn = (
   { name, events, totalHeight, startHour, endHour }: {
     name: string;
     events: Event[];
-    totalHeight: number;
+    totalHeight: string;
     startHour: number;
     endHour: number;
   },
 ) => (
   <div class="room-col">
     <div class="room-hdr">{name}</div>
-    <div class="relative" style={`height:${totalHeight}rem`}>
+    <div class="relative" style={`height:${totalHeight}`}>
       {range(startHour, endHour).map((hour) => (
         <div
           class="hour-rule"
-          style={`top:${timeToRem({ minutes: hour * 60, startHour })}rem`}
+          style={`top:${timeToRem({ minutes: hour * 60, startHour })}`}
         />
       ))}
       {events.map((event) => (
@@ -311,7 +311,7 @@ const RoomColumn = (
 const DaySection = ({ day }: { day: Day }) => {
   const startHour = day.startHour();
   const endHour = day.endHour();
-  const totalHeight = timeToRem({ minutes: endHour * 60, startHour }) + 1;
+  const totalHeight = `calc(${(endHour - startHour) * 60} * var(--rpm) + 1rem)`;
   const rooms = day.sortedRooms();
 
   return (
@@ -351,11 +351,11 @@ const DaySection = ({ day }: { day: Day }) => {
           <div
             class={`px-1.5 py-1 text-[0.72rem] border-b border-border after:content-['\\00a0']`}
           />
-          <div class="relative" style={`height:${totalHeight}rem`}>
+          <div class="relative" style={`height:${totalHeight}`}>
             {range(startHour, endHour).map((hour) => (
               <div
                 class="hour-label"
-                style={`top:${timeToRem({ minutes: hour * 60, startHour })}rem`}
+                style={`top:${timeToRem({ minutes: hour * 60, startHour })}`}
               >
                 {String(hour).padStart(2, "0")}:00
               </div>
@@ -384,7 +384,7 @@ const YearNav = (
   const cls =
     "no-underline px-2.5 py-1 border border-border rounded-md text-[0.82rem] transition-colors duration-150";
   return (
-    <nav class="flex gap-2 items-center">
+    <nav class="flex gap-2 items-center ml-auto">
       {hasPrev
         ? (
           <a
@@ -433,7 +433,7 @@ const Page = (
       <title>{conference.title()} Schedule</title>
       <link href="/assets/css/fosdem.css" rel="stylesheet" inline />
     </head>
-    <body class="font-sans bg-surface text-text min-h-screen overflow-x-hidden">
+    <body class="font-sans bg-surface text-text min-h-screen overflow-x-hidden" style={`--rpm:${RPM_DEFAULT}rem`}>
       <header class="bg-surface-alt border-b border-border px-6 py-5">
         <div class="flex flex-wrap items-start justify-between gap-4 mb-2.5">
           <div>
@@ -446,9 +446,25 @@ const Page = (
               {conference.timezone()}
             </p>
           </div>
-          <YearNav year={year} first={first} last={last} />
+          <div class="flex flex-col items-end gap-0.5">
+            <label class="flex items-center gap-1.5 text-text-muted text-[0.72rem]">
+              Zoom
+              <input
+                id="zoom"
+                type="range"
+                min="0.04"
+                max="0.3"
+                step="0.005"
+                value={String(RPM_DEFAULT)}
+                class="w-24 accent-accent"
+              />
+            </label>
+            <span class="text-text-muted text-[0.6rem] opacity-60">
+              or {"\u2318"}/Ctrl + scroll in schedule
+            </span>
+          </div>
         </div>
-        <nav class="flex flex-wrap gap-2">
+        <nav class="flex flex-wrap gap-2 items-center">
           {days.map((day) => (
             <a
               class="text-accent no-underline px-2.5 py-1 border border-border rounded-md text-[0.82rem] transition-colors duration-150 hover:bg-[#1e2028]"
@@ -457,6 +473,7 @@ const Page = (
               Day {day.index()} ({day.date()})
             </a>
           ))}
+          <YearNav year={year} first={first} last={last} />
         </nav>
       </header>
       <main class="p-5">
@@ -473,6 +490,22 @@ const Page = (
 );
 
 const JS = `
+const zoom = document.getElementById('zoom');
+const setRpm = (v) => {
+  const clamped = Math.min(+zoom.max, Math.max(+zoom.min, v));
+  zoom.value = clamped;
+  document.body.style.setProperty('--rpm', clamped + 'rem');
+};
+zoom.addEventListener('input', (e) => setRpm(+e.target.value));
+
+document.querySelectorAll('.day').forEach((day) => {
+  day.addEventListener('wheel', (e) => {
+    if (!e.ctrlKey && !e.metaKey) return;
+    e.preventDefault();
+    setRpm(+zoom.value - e.deltaY * 0.0005);
+  }, { passive: false });
+});
+
 const applyFilters = (container) => {
   const all = container.querySelectorAll('.fbtn[data-track]');
   const active = new Set(
