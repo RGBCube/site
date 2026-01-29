@@ -641,8 +641,26 @@ const applyFilters = (container) => {
     const favorited = el.querySelector('.ev-fav:checked');
     el.classList.toggle('dimmed', !allSelected && !favorited && !active.has(el.dataset.track));
   });
+  const favCounts = {};
+  container.querySelectorAll('.ev-fav:checked').forEach((cb) => {
+    const track = cb.closest('.ev').dataset.track;
+    favCounts[track] = (favCounts[track] || 0) + 1;
+  });
   container.querySelectorAll('.fbtn[data-track]').forEach((btn) => {
     btn.classList.toggle('inactive', !btn.classList.contains('active'));
+    const count = favCounts[btn.dataset.track] || 0;
+    let badge = btn.querySelector('.track-fav-count');
+    if (count > 0) {
+      if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'track-fav-count';
+        badge.innerHTML = '<span></span>';
+        btn.appendChild(badge);
+      }
+      badge.querySelector('span').textContent = count;
+    } else if (badge) {
+      badge.remove();
+    }
   });
   container.querySelectorAll('.room-col').forEach((col) => {
     if (allSelected) {

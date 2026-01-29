@@ -106,6 +106,20 @@
   @apply border border-current;
 }
 
+.track-fav-count {
+  @apply inline-flex items-center justify-center min-w-[1em] h-[1.1em]
+    px-[0.25em] rounded-[calc(0.25rem-0.125rem)] text-[0.85em] leading-none
+    font-bold ml-1 bg-current;
+
+  & > span {
+    @apply invert grayscale contrast-[9];
+  }
+
+  .inactive > & {
+    @apply opacity-100;
+  }
+}
+
 /* Grid */
 .room-col {
   @apply min-w-[11.25rem] w-[11.25rem] border-r border-border-faint shrink-0;
