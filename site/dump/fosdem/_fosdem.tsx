@@ -223,7 +223,9 @@ const Conference = (raw: XmlConference) => ({
   },
   get timezoneUtc(): string {
     const offset = this.start.toZonedDateTime(this.timezone).offset;
-    return offset === "+00:00" ? "UTC" : `UTC${offset.replace(/:00$/, "").replace(/([+-])0/, "$1")}`;
+    return offset === "+00:00"
+      ? "UTC"
+      : `UTC${offset.replace(/:00$/, "").replace(/([+-])0/, "$1")}`;
   },
 });
 
@@ -426,6 +428,9 @@ const DaySection = ({ day }: { day: Day }) => {
         </span>
       </h2>
 
+      <p class="text-text-muted text-xs pb-2">
+        Tip: To view your favorited talks, press "Unselect all".
+      </p>
       <div class="flex flex-wrap gap-1 mb-3 items-center">
         <button type="button" class="fbtn ctrl-btn" onclick="selectAll(this)">
           Select all
@@ -455,18 +460,20 @@ const DaySection = ({ day }: { day: Day }) => {
             class={`px-1.5 py-1 text-[0.72rem] border-b border-border after:content-['\\00a0']`}
           />
           <div class="relative" style={`height:${totalHeight}`}>
-            {timeRange(start, end, Temporal.Duration.from({ hours: 1 })).map((
-              time,
-            ) => (
-              <div
-                class="hour-label"
-                style={`top:calc(${
-                  time.since(start).total("minutes")
-                } * var(--rem-per-minute))`}
-              >
-                {time.toString({ smallestUnit: "minute" })}
-              </div>
-            )).toArray()}
+            {timeRange(start, end, Temporal.Duration.from({ minutes: 15 })).map(
+              (
+                time,
+              ) => (
+                <div
+                  class="hour-label"
+                  style={`top:calc(${
+                    time.since(start).total("minutes")
+                  } * var(--rem-per-minute))`}
+                >
+                  {time.toString({ smallestUnit: "minute" })}
+                </div>
+              ),
+            ).toArray()}
           </div>
         </div>
         {Object.entries(rooms).map(([name, events]) => (
@@ -537,7 +544,27 @@ const Page = (
     <head>
       <meta charset="utf-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
+
       <title>{conference.title} Schedule Planner</title>
+      <meta
+        name="description"
+        content={`${conference.title} Schedule Planner — ${conference.venue}, ${conference.city}`}
+      />
+      <meta
+        property="og:title"
+        name="title"
+        content={`${conference.title} Schedule Planner`}
+      />
+      <meta
+        property="og:description"
+        content={`${conference.title} Schedule Planner — ${conference.venue}, ${conference.city}`}
+      />
+
+      <link rel="icon" href="/assets/icons/icon.gif" />
+      <meta name="theme-color" content="#7eb8ff" />
+      <meta property="og:type" content="website" />
+      <meta property="og:locale" content="en_US" />
+
       <link href="/assets/css/fosdem.css" rel="stylesheet" inline />
     </head>
     <body
