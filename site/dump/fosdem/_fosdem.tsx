@@ -365,8 +365,26 @@ const DaySection = ({ day }: { day: Day }) => {
   );
 };
 
+const YearNav = (
+  { year, first, last }: { year: number; first: number; last: number },
+) => {
+  const hasPrev = year > first;
+  const hasNext = year < last;
+  const cls = "no-underline px-2.5 py-1 border border-border rounded-md text-[0.82rem] transition-colors duration-150";
+  return (
+    <nav class="flex gap-2 items-center">
+      {hasPrev
+        ? <a class={`${cls} text-accent hover:bg-[#1e2028]`} href={`/dump/fosdem/${year - 1}/`}>&larr; {year - 1}</a>
+        : <span class={`${cls} text-text-muted opacity-40 cursor-default`}>&larr; {year - 1}</span>}
+      {hasNext
+        ? <a class={`${cls} text-accent hover:bg-[#1e2028]`} href={`/dump/fosdem/${year + 1}/`}>{year + 1} &rarr;</a>
+        : <span class={`${cls} text-text-muted opacity-40 cursor-default`}>{year + 1} &rarr;</span>}
+    </nav>
+  );
+};
+
 const Page = (
-  { conference, days }: { conference: Conference; days: Day[] },
+  { conference, days, year, first, last }: { conference: Conference; days: Day[]; year: number; first: number; last: number },
 ) => (
   <html lang="en">
     <head>
@@ -377,13 +395,18 @@ const Page = (
     </head>
     <body class="font-sans bg-surface text-text min-h-screen overflow-x-hidden">
       <header class="bg-surface-alt border-b border-border px-6 py-5">
-        <h1 class="text-[1.4rem] text-accent mb-0.5">
-          {conference.title()} Schedule
-        </h1>
-        <p class="text-text-muted text-sm mb-2.5">
-          {conference.venue()}, {conference.city()} &mdash;{" "}
-          {conference.dateRange()}
-        </p>
+        <div class="flex flex-wrap items-start justify-between gap-4 mb-2.5">
+          <div>
+            <h1 class="text-[1.4rem] text-accent mb-0.5">
+              {conference.title()} Schedule
+            </h1>
+            <p class="text-text-muted text-sm">
+              {conference.venue()}, {conference.city()} &mdash;{" "}
+              {conference.dateRange()}
+            </p>
+          </div>
+          <YearNav year={year} first={first} last={last} />
+        </div>
         <nav class="flex flex-wrap gap-2">
           {days.map((day) => (
             <a
@@ -470,7 +493,9 @@ document.querySelectorAll('.fbtn[data-track]').forEach((btn) => {
 });
 `;
 
-export const generate = async (year: number) => {
+export const generate = async (
+  { year, first, last }: { year: number; first: number; last: number },
+) => {
   const { conference, days } = await fetchSchedule(year);
-  return <Page conference={conference} days={days} />;
+  return <Page conference={conference} days={days} year={year} first={first} last={last} />;
 };

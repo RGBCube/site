@@ -14,7 +14,7 @@ export default async function* () {
       url: `/dump/fosdem/${year}/`,
       layout: "",
       skipProcessing: true,
-      content: await fosdem.generate(year),
+      content: await fosdem.generate({ year, first: FIRST_FOSDEM, last: LAST_FOSDEM }),
     })),
   );
   yield* pages;
