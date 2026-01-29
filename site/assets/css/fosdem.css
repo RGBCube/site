@@ -33,37 +33,28 @@
     overflow-hidden cursor-pointer flex flex-col gap-[0.0625rem] no-underline
     max-h-[var(--h)];
 
-  transition: filter 150ms, transform 150ms, box-shadow 150ms;
+  @apply [transition:filter_150ms,transform_150ms,box-shadow_150ms];
 
   &:hover {
     @apply z-50 brightness-[1.35] -translate-y-[0.0625rem]
-      shadow-[0.25rem_1rem_rgba(0,0,0,0.5)] overflow-visible;
-
-    max-height: calc(var(--h) + 10rem);
-    transition:
-      filter 150ms,
-      transform 150ms,
-      box-shadow 150ms,
-      max-height 300ms;
+      shadow-[0.25rem_1rem_rgba(0,0,0,0.5)] overflow-visible
+      max-h-[calc(var(--h)+10rem)]
+      [transition:filter_150ms,transform_150ms,box-shadow_150ms,max-height_300ms];
   }
 }
 
 .ev-fav {
   @apply absolute top-0.5 right-0.5 appearance-none w-3.5 h-3.5
-    rounded-[calc(0.25rem-0.125rem)]
-    border border-current opacity-30 cursor-pointer z-10 shrink-0;
-
-  transition: opacity 150ms, background 150ms;
+    rounded-[calc(0.25rem-00.125rem)] border border-current opacity-30
+    cursor-pointer z-10 shrink-0 [transition:opacity_150ms,background_150ms];
 
   &:hover {
     @apply opacity-60;
   }
 
   &:checked {
-    @apply opacity-90;
-    background: currentColor;
+    @apply opacity-90 bg-current bg-contain;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8l3 3 5-6' stroke='%23000' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-    background-size: contain;
   }
 }
 
@@ -72,18 +63,12 @@
 }
 
 .ev-title {
-  @apply text-[0.68rem] font-semibold leading-tight overflow-hidden
-    text-inherit;
-
-  -webkit-box-orient: vertical;
-  display: -webkit-box;
+  @apply text-[0.68rem] font-semibold leading-tight overflow-hidden text-inherit
+    [-webkit-box-orient:vertical] [display:-webkit-box];
 
   .group:hover & {
-    @apply block overflow-visible;
-
-    -webkit-line-clamp: unset;
-    background: inherit;
-    padding-bottom: 0.3rem;
+    @apply block overflow-visible [-webkit-line-clamp:unset] bg-inherit
+      pb-[0.3rem];
   }
 }
 
@@ -107,9 +92,9 @@
 }
 
 .track-fav-count {
-  @apply inline-flex items-center justify-center min-w-[1em] h-[1.1em]
-    px-[0.25em] rounded-[calc(0.25rem-0.125rem)] text-[0.85em] leading-none
-    font-bold ml-1 bg-current;
+  @apply inline-flex items-center justify-center p-0.5 -mr-2 -my-0.5 ml-1
+    rounded-l-[calc(0.25rem-00.125rem)] rounded-r-[calc(0.25rem-1px)]
+    text-[0.85em] leading-none font-bold bg-current;
 
   & > span {
     @apply invert grayscale contrast-[9];
@@ -136,21 +121,13 @@
 }
 
 .half-rule {
-  @apply absolute left-0 right-0 h-px;
-  background: repeating-linear-gradient(
-    90deg,
-    var(--color-border-faint) 0 4px,
-    transparent 4px 8px
-  );
+  @apply absolute left-0 right-0 h-px
+    bg-[repeating-linear-gradient(90deg,var(--color-border-faint)_0_4px,transparent_4px_8px)];
 }
 
 .quarter-rule {
-  @apply absolute left-0 right-0 h-px;
-  background: repeating-linear-gradient(
-    90deg,
-    var(--color-border-faint) 0 2px,
-    transparent 2px 6px
-  );
+  @apply absolute left-0 right-0 h-px
+    bg-[repeating-linear-gradient(90deg,var(--color-border-faint)_0_2px,transparent_2px_6px)];
 }
 
 .hour-label {
