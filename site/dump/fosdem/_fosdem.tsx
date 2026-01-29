@@ -437,7 +437,7 @@ const DaySection = ({ day }: { day: Day }) => {
               class="fbtn track-btn active"
               data-track={track}
               onclick="toggleTrack(this)"
-              style={`background:${background};color:${foreground};`}
+              style={`background:${background};color:${foreground}`}
             >
               {track}
             </button>
@@ -533,7 +533,7 @@ const Page = (
     <head>
       <meta charset="utf-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <title>{conference.title} Schedule</title>
+      <title>{conference.title} Schedule Planner</title>
       <link href="/assets/css/fosdem.css" rel="stylesheet" inline />
     </head>
     <body
@@ -546,7 +546,7 @@ const Page = (
         <div class="flex flex-wrap items-start justify-between gap-4 mb-2.5">
           <div>
             <h1 class="text-[1.4rem] text-accent mb-0.5">
-              {conference.title} Schedule
+              {conference.title} Schedule Planner
             </h1>
             <p class="text-text-muted text-sm">
               {conference.venue}, {conference.city} &mdash; {conference.start}
@@ -570,6 +570,7 @@ const Page = (
             </label>
             <span class="text-text-muted text-[0.6rem] opacity-60">
               or {"\u2318"}/Ctrl + scroll in schedule
+              or pinch to zoom, and Shift for default
             </span>
           </div>
         </div>
@@ -676,6 +677,15 @@ const applyFilters = (container) => {
   saveFilters(container);
 };
 
+/* Favorites */
+const favorites = new Set(JSON.parse(localStorage.getItem(storageKey('favorites')) || '[]'));
+
+const saveFavorites = () => localStorage.setItem(storageKey('favorites'), JSON.stringify([...favorites]));
+
+document.querySelectorAll('.ev-fav').forEach((checkbox) => {
+  if (favorites.has(checkbox.dataset.eventId)) checkbox.checked = true;
+});
+
 const restoreFilters = (container) => {
   const dayIndex = container.dataset.day;
   const saved = localStorage.getItem(storageKey('filters-' + dayIndex));
@@ -766,11 +776,6 @@ document.querySelectorAll('.fbtn[data-track]').forEach((btn) => {
   setInterval(update, 30000);
 })();
 
-/* Favorites */
-const favorites = new Set(JSON.parse(localStorage.getItem(storageKey('favorites')) || '[]'));
-
-const saveFavorites = () => localStorage.setItem(storageKey('favorites'), JSON.stringify([...favorites]));
-
 const toggleFavorite = (event) => {
   event.stopPropagation();
   const checkbox = event.target;
@@ -780,10 +785,6 @@ const toggleFavorite = (event) => {
   const day = checkbox.closest('.day');
   if (day) applyFilters(day);
 };
-
-document.querySelectorAll('.ev-fav').forEach((checkbox) => {
-  if (favorites.has(checkbox.dataset.eventId)) checkbox.checked = true;
-});
 `;
 
 export const generate = async (

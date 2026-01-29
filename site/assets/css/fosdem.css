@@ -45,7 +45,7 @@
 
 .ev-fav {
   @apply absolute top-0.5 right-0.5 appearance-none w-3.5 h-3.5
-    rounded-[calc(0.25rem-00.125rem)] border border-current opacity-30
+    rounded-[calc(0.25rem-0.125rem)] border border-current opacity-30
     cursor-pointer z-10 shrink-0 [transition:opacity_150ms,background_150ms];
 
   &:hover {
@@ -88,20 +88,17 @@
 }
 
 .track-btn {
-  @apply border border-current;
+  @apply inline-flex items-center border border-current;
 }
 
 .track-fav-count {
-  @apply inline-flex items-center justify-center p-0.5 -mr-2 -my-0.5 ml-1
-    rounded-l-[calc(0.25rem-00.125rem)] rounded-r-[calc(0.25rem-1px)]
-    text-[0.85em] leading-none font-bold bg-current;
+  @apply inline-flex items-center justify-center self-stretch
+    px-0.5 -mr-[calc(0.5rem-0.125rem)]
+    ml-1 rounded-[calc(0.25rem-0.125rem)] text-[0.85em]
+    leading-none font-bold bg-current;
 
   & > span {
     @apply invert grayscale contrast-[9];
-  }
-
-  .inactive > & {
-    @apply opacity-100;
   }
 }
 
