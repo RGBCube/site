@@ -4,10 +4,10 @@ import codeHighlight from "lume/plugins/code_highlight.ts";
 import extractDate from "lume/plugins/extract_date.ts";
 import feed from "lume/plugins/feed.ts";
 import inline from "lume/plugins/inline.ts";
+import jsx from "lume/plugins/jsx.ts";
 import lightningcss from "lume/plugins/lightningcss.ts";
 // import minifyHtml from "lume/plugins/minify_html.ts";
 import nav from "lume/plugins/nav.ts";
-import redirects from "lume/plugins/redirects.ts";
 import resolveUrls from "lume/plugins/resolve_urls.ts";
 import sitemap from "lume/plugins/sitemap.ts";
 import slugifyUrls from "lume/plugins/slugify_urls.ts";
@@ -30,6 +30,7 @@ const site = lume({
   },
 });
 
+// DATA
 site.data("layout", "default.vto");
 
 site.data("site_name", siteName);
@@ -38,7 +39,20 @@ site.data("description", siteDescription);
 site.data("author", author);
 site.data("color", color);
 
+site.use(nav());
+
+// TEMPLATS
+site.use(jsx());
+
+// FILES
 site.add(".");
+
+// URLs
+site.use(resolveUrls());
+site.use(extractDate());
+site.use(slugifyUrls({
+  extensions: "*",
+}));
 
 site.preprocess([".html"], (pages) =>
   pages.forEach((page) => {
@@ -48,8 +62,46 @@ site.preprocess([".html"], (pages) =>
         .replace(/\b\w/g, (char) => char.toUpperCase());
   }));
 
+// CSS
+site.use(tailwindcss());
+site.use(lightningcss()); // TODO: LightningCSS doesn't handle inline styles.
+site.use(inline());
+
+// CODEBLOCK CSS
+site.use(codeHighlight({
+  options: {
+    classPrefix: "token-",
+    noHighlightRe: /^no-highlight$/,
+  },
+}));
 site.process([".html"], (pages) =>
   pages.forEach((page) => {
+    if (page.data.skipProcessing) return;
+
+    const { document } = page;
+
+    document.querySelectorAll("pre code").forEach((code) => {
+      const matches = code.innerHTML.match(/\{\[\([^\)]+\)\]\}/g);
+      if (!matches) return;
+
+      let newHTML = code.innerHTML;
+
+      matches.forEach((match) => {
+        newHTML = newHTML.replace(
+          match,
+          `<span class="callout">${match.replaceAll(/[^\d]/g, "")}</span>`,
+        );
+      });
+
+      code.innerHTML = newHTML;
+    });
+  }));
+
+// CONTENT
+site.process([".html"], (pages) =>
+  pages.forEach((page) => {
+    if (page.data.skipProcessing) return;
+
     const { document } = page;
 
     document.querySelectorAll("table").forEach((element) => {
@@ -165,49 +217,6 @@ site.process([".html"], (pages) =>
     }
   }));
 
-site.use(extractDate());
-site.use(redirects());
-
-site.use(tailwindcss());
-site.use(codeHighlight({
-  options: {
-    classPrefix: "token-",
-    noHighlightRe: /^no-highlight$/,
-  },
-}));
-
-site.process([".html"], (pages) =>
-  pages.forEach((page) => {
-    const { document } = page;
-
-    document.querySelectorAll("pre code").forEach((code) => {
-      const matches = code.innerHTML.match(/\{\[\([^\)]+\)\]\}/g);
-      if (!matches) return;
-
-      let newHTML = code.innerHTML;
-
-      matches.forEach((match) => {
-        newHTML = newHTML.replace(
-          match,
-          `<span class="callout">${match.replaceAll(/[^\d]/g, "")}</span>`,
-        );
-      });
-
-      code.innerHTML = newHTML;
-    });
-  }));
-
-site.use(resolveUrls());
-site.use(slugifyUrls({
-  extensions: "*",
-}));
-site.use(checkUrls({
-  strict: true,
-  throw: true,
-}));
-
-site.use(nav());
-
 site.use(feed({
   output: ["/blog.rss", "/blog.json"],
 
@@ -240,8 +249,10 @@ site.use(sitemap({
   },
 }));
 
-site.use(lightningcss()); // TODO: LightningCSS doesn't handle inline styles.
-site.use(inline());
+site.use(checkUrls({
+  strict: true,
+  throw: true,
+}));
 
 // site.use(minifyHtml({
 //   options: {

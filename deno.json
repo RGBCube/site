@@ -1,7 +1,8 @@
 {
   "imports": {
     "lume/": "https://deno.land/x/lume@v3.0.2/",
-    "lume/jsx-runtime": "https://deno.land/x/ssx@v0.1.10/jsx-runtime.ts"
+    "lume/jsx-runtime": "https://deno.land/x/ssx@v0.1.10/jsx-runtime.ts",
+    "xml": "jsr:@libs/xml@7"
   },
   "tasks": {
     "lume": "echo \"import 'lume/cli.ts'\" | deno run --allow-all - --config site.ts",
