@@ -340,7 +340,13 @@ const DaySection = ({ day }: { day: Day }) => {
   const rooms = day.sortedRooms();
 
   return (
-    <section id={`day-${day.index()}`} class="day mb-10" data-start-hour={startHour} data-end-hour={endHour}>
+    <section
+      id={`day-${day.index()}`}
+      class="day mb-10"
+      data-start-hour={startHour}
+      data-end-hour={endHour}
+      data-day={day.index()}
+    >
       <h2 class="text-xl text-text-bright mb-2.5 pb-1.5 border-b border-border-dim flex flex-wrap items-baseline gap-x-2.5">
         Day {day.index()} &mdash; {day.date()}
         <span class="text-text-muted text-xs font-normal">
@@ -462,6 +468,7 @@ const Page = (
       class="font-sans bg-surface text-text min-h-screen overflow-x-hidden"
       style={`--rpm:${RPM_DEFAULT}rem`}
       data-tz={conference.timezone()}
+      data-year={year}
     >
       <header class="bg-surface-alt border-b border-border px-6 py-5">
         <div class="flex flex-wrap items-start justify-between gap-4 mb-2.5">
@@ -519,21 +526,34 @@ const Page = (
 );
 
 const JS = `
+const storageKey = (suffix) => 'fosdem-' + document.body.dataset.year + '-' + suffix;
+
 const zoom = document.getElementById('zoom');
-const setRpm = (v) => {
-  const clamped = Math.min(+zoom.max, Math.max(+zoom.min, v));
+const savedZoom = localStorage.getItem(storageKey('zoom'));
+if (savedZoom != null) zoom.value = savedZoom;
+
+const setRpm = (value) => {
+  const clamped = Math.min(+zoom.max, Math.max(+zoom.min, value));
   zoom.value = clamped;
   document.body.style.setProperty('--rpm', clamped + 'rem');
+  localStorage.setItem(storageKey('zoom'), clamped);
 };
-zoom.addEventListener('input', (e) => setRpm(+e.target.value));
+setRpm(+zoom.value);
+zoom.addEventListener('input', (event) => setRpm(+event.target.value));
 
 document.querySelectorAll('.day').forEach((day) => {
-  day.addEventListener('wheel', (e) => {
-    if (!e.ctrlKey && !e.metaKey) return;
-    e.preventDefault();
-    setRpm(+zoom.value - e.deltaY * 0.0005);
+  day.addEventListener('wheel', (event) => {
+    if (!event.ctrlKey && !event.metaKey) return;
+    event.preventDefault();
+    setRpm(+zoom.value - event.deltaY * 0.0005);
   }, { passive: false });
 });
+
+const saveFilters = (container) => {
+  const dayIndex = container.dataset.day;
+  const inactive = [...container.querySelectorAll('.fbtn[data-track]:not(.active)')].map((btn) => btn.dataset.track);
+  localStorage.setItem(storageKey('filters-' + dayIndex), JSON.stringify(inactive));
+};
 
 const applyFilters = (container) => {
   const all = container.querySelectorAll('.fbtn[data-track]');
@@ -557,7 +577,21 @@ const applyFilters = (container) => {
       col.classList.toggle('hidden', !col.querySelector(selector));
     }
   });
+  saveFilters(container);
 };
+
+const restoreFilters = (container) => {
+  const dayIndex = container.dataset.day;
+  const saved = localStorage.getItem(storageKey('filters-' + dayIndex));
+  if (!saved) return;
+  const inactive = new Set(JSON.parse(saved));
+  container.querySelectorAll('.fbtn[data-track]').forEach((btn) => {
+    btn.classList.toggle('active', !inactive.has(btn.dataset.track));
+  });
+  applyFilters(container);
+};
+
+document.querySelectorAll('.day').forEach(restoreFilters);
 
 const toggleTrack = (btn) => {
   btn.classList.toggle('active');
