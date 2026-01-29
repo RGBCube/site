@@ -254,8 +254,23 @@ const timeToRem = (
 const durationToRem = (duration: number) =>
   `max(calc(${duration} * var(--rpm)), 1.75rem)`;
 
+const MIN_VISUAL_MINUTES = 1.75 / RPM_DEFAULT;
+
+const assignColumns = (events: Event[]): [Event, number][] => {
+  const ends: number[] = []; // visual end time per column
+  return events.map((event) => {
+    const start = event.startMinutes();
+    const visualEnd = start +
+      Math.max(event.durationMinutes(), MIN_VISUAL_MINUTES);
+    let col = ends.findIndex((end) => end <= start);
+    if (col === -1) col = ends.length;
+    ends[col] = visualEnd;
+    return [event, col];
+  });
+};
+
 const EventBlock = (
-  { event, startHour }: { event: Event; startHour: number },
+  { event, col, startHour }: { event: Event; col: number; startHour: number },
 ) => {
   const [background, foreground] = event.color();
   const height = durationToRem(event.durationMinutes());
@@ -267,7 +282,9 @@ const EventBlock = (
       target="_blank"
       style={`--h:${height};top:${
         timeToRem({ minutes: event.startMinutes(), startHour })
-      };min-height:${height};background:${background};color:${foreground};`}
+      };min-height:${height};background:${background};color:${foreground};${
+        col > 0 ? `left:calc(0.1875rem + ${col} * 0.75rem);z-index:${col};` : ""
+      }`}
       data-track={event.track()}
       title={`${event.title()}\n${event.start()}\u2013${event.endTime()} (${event.durationMinutes()}min)\n${event.track()} \u00b7 ${event.room}${
         event.persons().length ? "\n" + event.persons().join(", ") : ""
@@ -291,22 +308,30 @@ const RoomColumn = (
     startHour: number;
     endHour: number;
   },
-) => (
-  <div class="room-col">
-    <div class="room-hdr">{name}</div>
-    <div class="relative" style={`height:${totalHeight}`}>
-      {range(startHour, endHour).map((hour) => (
-        <div
-          class="hour-rule"
-          style={`top:${timeToRem({ minutes: hour * 60, startHour })}`}
-        />
-      ))}
-      {events.map((event) => (
-        <EventBlock key={event.url()} event={event} startHour={startHour} />
-      ))}
+) => {
+  const columns = assignColumns(events);
+  return (
+    <div class="room-col">
+      <div class="room-hdr">{name}</div>
+      <div class="relative" style={`height:${totalHeight}`}>
+        {range(startHour, endHour).map((hour) => (
+          <div
+            class="hour-rule"
+            style={`top:${timeToRem({ minutes: hour * 60, startHour })}`}
+          />
+        ))}
+        {columns.map(([event, col]) => (
+          <EventBlock
+            key={event.url()}
+            event={event}
+            col={col}
+            startHour={startHour}
+          />
+        ))}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const DaySection = ({ day }: { day: Day }) => {
   const startHour = day.startHour();
@@ -433,7 +458,10 @@ const Page = (
       <title>{conference.title()} Schedule</title>
       <link href="/assets/css/fosdem.css" rel="stylesheet" inline />
     </head>
-    <body class="font-sans bg-surface text-text min-h-screen overflow-x-hidden" style={`--rpm:${RPM_DEFAULT}rem`}>
+    <body
+      class="font-sans bg-surface text-text min-h-screen overflow-x-hidden"
+      style={`--rpm:${RPM_DEFAULT}rem`}
+    >
       <header class="bg-surface-alt border-b border-border px-6 py-5">
         <div class="flex flex-wrap items-start justify-between gap-4 mb-2.5">
           <div>
