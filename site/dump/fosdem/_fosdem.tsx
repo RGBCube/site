@@ -388,7 +388,9 @@ const DaySection = ({ day }: { day: Day }) => {
     ? day.earliestStart.round({ smallestUnit: "hour", roundingMode: "floor" })
     : Temporal.PlainTime.from({ hour: 0, minute: 0 });
   const end = day.events.length
-    ? day.latestEnd.round({ smallestUnit: "hour", roundingMode: "ceil" }).add({ hours: 1 })
+    ? day.latestEnd.round({ smallestUnit: "hour", roundingMode: "ceil" }).add({
+      hours: 1,
+    })
     : Temporal.PlainTime.from({ hour: 0, minute: 0 });
   const totalHeight = `calc(${
     end.since(start).total("minutes")
@@ -398,7 +400,7 @@ const DaySection = ({ day }: { day: Day }) => {
   return (
     <section
       id={`day-${day.index}`}
-      class="day mb-10"
+      class="day relative mb-10"
       data-day={day.index}
       data-start-hour={start.hour}
       data-end-hour={end.hour}
@@ -709,20 +711,23 @@ document.querySelectorAll('.fbtn[data-track]').forEach((btn) => {
     document.querySelectorAll('.day').forEach((day) => {
       const startHour = +day.dataset.startHour;
       const endHour = +day.dataset.endHour;
-      const scroll = day.querySelector('.grid-scroll');
-      let line = scroll.querySelector('.now-line');
+      const existing = day.querySelector('.now-line');
       if (now < startHour * 60 || now > endHour * 60) {
-        if (line) line.remove();
+        if (existing) existing.remove();
         return;
       }
-      if (!line) {
-        line = document.createElement('div');
-        line.className = 'now-line';
-        scroll.appendChild(line);
-      }
+      const scroll = day.querySelector('.grid-scroll');
+      const line = existing ?? (() => {
+        const el = document.createElement('div');
+        el.className = 'now-line';
+        day.appendChild(el);
+        return el;
+      })();
+      const scrollRect = scroll.getBoundingClientRect();
+      const dayRect = day.getBoundingClientRect();
       const hdr = scroll.querySelector('.room-hdr');
       const hdrHeight = hdr ? hdr.offsetHeight : 0;
-      const top = 'calc(' + hdrHeight + 'px + ' + (now - startHour * 60) + ' * var(--rem-per-minute))';
+      const top = 'calc(' + (scrollRect.top - dayRect.top + hdrHeight) + 'px + ' + (now - startHour * 60) + ' * var(--rem-per-minute))';
       line.style.top = top;
     });
   };
