@@ -222,7 +222,8 @@ body {
       }
 
       &:active {
-        @apply border-[fuchsia] dark:border-[springgreen] animate-to-the-future;
+        @apply inline-block -mt-[2px] -mb-[calc(2px+var(--spacing)*0.75)]
+          border-[fuchsia] dark:border-[springgreen] animate-to-the-future;
       }
     }
 
