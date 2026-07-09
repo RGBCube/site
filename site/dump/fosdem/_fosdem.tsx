@@ -600,7 +600,7 @@ const Page = (
               />
             </label>
             <span class="text-text-muted text-[0.6rem] opacity-60">
-              <p>or {"\u2318"}/Ctrl + scroll in schedule</p>
+              <p>or ⌘/Ctrl + scroll in schedule</p>
               <p>or pinch to zoom, and Shift for default</p>
             </span>
           </div>

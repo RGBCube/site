@@ -222,8 +222,18 @@ body {
       }
 
       &:active {
+        @apply border-[fuchsia] dark:border-[springgreen];
+      }
+
+      /*
+       * `inline-block`ing a wrapped <a> on mousedown changes the position
+       * of the <a> and since the mouseup fires the event, the click can
+       * be send to the parent <p> instead, never opening the URL.
+       */
+      &:not(.wraps):active,
+      &.clicked {
         @apply inline-block -mt-[2px] -mb-[calc(2px+var(--spacing)*0.75)]
-          border-[fuchsia] dark:border-[springgreen] animate-to-the-future;
+          animate-to-the-future;
       }
     }
 

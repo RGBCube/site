@@ -50,3 +50,29 @@ layout: default.vto
 
 </div>
 </div>
+
+<script>
+  {
+    const links = document.querySelectorAll(".text-content a:not(.reset)");
+
+    const update = () =>
+      links.forEach((link) =>
+        link.classList.toggle("wraps", link.getClientRects().length > 1));
+
+    update();
+    document.fonts.ready.then(update);
+    addEventListener("resize", update);
+
+    links.forEach((link) =>
+      link.addEventListener("click", () => {
+        if (!link.classList.contains("wraps")) return;
+
+        link.classList.add("clicked");
+        link.addEventListener(
+          "animationend",
+          () => link.classList.remove("clicked"),
+          { once: true },
+        );
+      }));
+  }
+</script>

@@ -41,7 +41,7 @@ site.data("color", color);
 
 site.use(nav());
 
-// TEMPLATS
+// TEMPLATES
 site.use(jsx());
 
 // FILES
@@ -104,21 +104,7 @@ site.process([".html"], (pages) =>
 
     const { document } = page;
 
-    document.querySelectorAll("table").forEach((element) => {
-      const wrapper = document.createElement("div");
-
-      element.classList.add("transform-[rotateX(180deg)]");
-      wrapper.classList.add(
-        "transform-[rotateX(180deg)]",
-        "overflow-x-auto",
-      );
-
-      element.parentNode!.insertBefore(wrapper, element);
-      wrapper.appendChild(element);
-    });
-
-    document.querySelectorAll("pre code").forEach((code) => {
-      const element = code.parentElement!;
+    document.querySelectorAll("table, pre").forEach((element) => {
       const wrapper = document.createElement("div");
 
       element.classList.add("transform-[rotateX(180deg)]");
@@ -179,7 +165,7 @@ site.process([".html"], (pages) =>
           let number;
           let addFooter;
 
-          if (footnoteText.match(/^[1-9]+$/g)) {
+          if (footnoteText.match(/^[1-9][0-9]*$/)) {
             number = parseInt(footnoteText);
             addFooter = false;
           } else {
@@ -188,12 +174,15 @@ site.process([".html"], (pages) =>
             addFooter = true;
           }
 
-          const anchorId = `ref:${counter}`;
-          const footnoteId = `fn:${counter}`;
+          const anchorId = `ref:${number}`;
+          const footnoteId = `fn:${number}`;
 
-          const link =
-            `<sup><a id="${anchorId}" href="#${footnoteId}">^${number}</a></sup>`;
-          newHTML = newHTML.replace(match, link);
+          newHTML = newHTML.replace(
+            match,
+            `<sup><a${
+              addFooter ? ` id="${anchorId}"` : ""
+            } href="#${footnoteId}">^${number}</a></sup>`,
+          );
 
           if (addFooter) {
             const hr = document.createElement("hr");
@@ -252,6 +241,12 @@ site.use(sitemap({
 site.use(checkUrls({
   strict: true,
   throw: true,
+  anchors: true,
+
+  output: (urls) =>
+    urls.forEach((references, url) =>
+      console.error(`${url} <- ${Array.from(references).join(", ")}`)
+    ),
 }));
 
 // site.use(minifyHtml({
